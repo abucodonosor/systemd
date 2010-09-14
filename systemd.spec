@@ -6,7 +6,7 @@ License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
 Source0:	http://www.freedesktop.org/software/systemd/%{name}-%{version}.tar.bz2
-BuildRequires:	dbus-devel >= 1.3.2
+BuildRequires:	dbus-devel >= 1.4.0
 BuildRequires:	libudev-devel >= 160
 BuildRequires:	libcap-devel
 BuildRequires:	tcp_wrappers-devel
@@ -16,9 +16,6 @@ BuildRequires:	docbook-style-xsl
 BuildRequires:	dbus-glib-devel
 BuildRequires:	vala >= 0.9
 BuildRequires:	gtk2-devel
-BuildRequires:	automake
-BuildRequires:	autoconf
-BuildRequires:	libtool
 Requires:	systemd-units = %{version}-%{release}
 Requires:	dbus >= 1.3.2
 Requires:	udev >= 160
@@ -68,7 +65,10 @@ Drop-in replacement for the System V init tools of systemd.
 %build
 %configure2_5x \
 	--with-rootdir= \
-	--with-distro=Mandriva
+	--with-distro=other \
+	--with-sysvinit-path=%{_initdir} \
+	--with-sysvrcd-path=%{_sysconfdir}/rc.d \
+	--with-syslog-service=rsyslogd
 
 %make
 
@@ -142,7 +142,7 @@ fi
 %files
 %defattr(-,root,root)
 %config(noreplace) %{_sysconfdir}/dbus-1/system.d/org.freedesktop.systemd1.conf
-%{_sysconfdir}/rc.d/init.d/reboot
+#%{_sysconfdir}/rc.d/init.d/reboot
 %dir %{_sysconfdir}/systemd/session
 %{_sysconfdir}/xdg/systemd
 /bin/systemd
@@ -165,7 +165,7 @@ fi
 %{_docdir}/systemd
 
 # Joint ownership with libcgroup
-%dir /cgroup
+#%dir /cgroup
 
 %files units
 %defattr(-,root,root)
@@ -173,12 +173,12 @@ fi
 %dir %{_sysconfdir}/systemd/system
 %config(noreplace) %{_sysconfdir}/systemd/system.conf
 %config(noreplace) %{_sysconfdir}/systemd/system/ctrl-alt-del.target
-%config(noreplace) %{_sysconfdir}/systemd/system/display-manager.service
+#%config(noreplace) %{_sysconfdir}/systemd/system/display-manager.service
 %config(noreplace) %{_sysconfdir}/systemd/system/kbrequest.target
-%config(noreplace) %{_sysconfdir}/systemd/system/runlevel2.target
-%config(noreplace) %{_sysconfdir}/systemd/system/runlevel3.target
-%config(noreplace) %{_sysconfdir}/systemd/system/runlevel4.target
-%config(noreplace) %{_sysconfdir}/systemd/system/runlevel5.target
+#%config(noreplace) %{_sysconfdir}/systemd/system/runlevel2.target
+#%config(noreplace) %{_sysconfdir}/systemd/system/runlevel3.target
+#%config(noreplace) %{_sysconfdir}/systemd/system/runlevel4.target
+#%config(noreplace) %{_sysconfdir}/systemd/system/runlevel5.target
 %dir /lib/systemd
 /lib/systemd/system
 /bin/systemctl
