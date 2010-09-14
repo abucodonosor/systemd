@@ -1,6 +1,6 @@
 Summary:	A System and Session Manager
 Name:		systemd
-Version:	8
+Version:	10
 Release:	%mkrel 1
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
