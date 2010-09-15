@@ -106,7 +106,7 @@ if [ $1 -eq 1 ] ; then
         if [ -z "$runlevel" ] ; then
                 target="/lib/systemd/system/graphical.target"
         else
-                target="/etc/systemd/system/runlevel$runlevel.target"
+                target="/lib/systemd/system/runlevel$runlevel.target"
         fi
 
         # And symlink what we found to the new-style default.target
@@ -174,10 +174,6 @@ fi
 %config(noreplace) %{_sysconfdir}/systemd/system/ctrl-alt-del.target
 #%config(noreplace) %{_sysconfdir}/systemd/system/display-manager.service
 %config(noreplace) %{_sysconfdir}/systemd/system/kbrequest.target
-#%config(noreplace) %{_sysconfdir}/systemd/system/runlevel2.target
-#%config(noreplace) %{_sysconfdir}/systemd/system/runlevel3.target
-#%config(noreplace) %{_sysconfdir}/systemd/system/runlevel4.target
-#%config(noreplace) %{_sysconfdir}/systemd/system/runlevel5.target
 %dir /lib/systemd
 /lib/systemd/system
 /bin/systemctl
