@@ -1,7 +1,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	10
-Release:	%mkrel 3
+Release:	%mkrel 4
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -97,7 +97,9 @@ ln -s ../bin/systemctl %{buildroot}/sbin/runlevel
 # We create all wants links manually at installation time to make sure
 # they are not owned and hence overriden by rpm after the used deleted
 # them.
-rm -r %{buildroot}/etc/systemd/system/*.target.wants
+# (bor) I am not sure why Fedora removes them but no dependency on
+# getty exists without those files and nothing is installed somewhere else
+# rm -r %{buildroot}/etc/systemd/system/*.target.wants
 
 # And the default symlink we generate automatically based on inittab
 rm %{buildroot}/etc/systemd/system/default.target
