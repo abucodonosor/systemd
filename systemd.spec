@@ -1,7 +1,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	10
-Release:	%mkrel 2
+Release:	%mkrel 3
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -71,7 +71,7 @@ Drop-in replacement for the System V init tools of systemd.
 %configure2_5x \
 	--with-rootdir= \
 	--with-distro=other \
-	--with-sysvinit-path=%{_initdir} \
+	--with-sysvinit-path=%{_initrddir} \
 	--with-sysvrcd-path=%{_sysconfdir}/rc.d \
 	--with-syslog-service=rsyslogd
 
