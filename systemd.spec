@@ -6,6 +6,9 @@ License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
 Source0:	http://www.freedesktop.org/software/systemd/%{name}-%{version}.tar.bz2
+
+# (bor) use /cgroup until kernel supports /sys/fs/cgroup
+Patch0:		0001-Revert-cgroup-mount-cgroup-file-systems-to-sys-fs-cg.patch
 BuildRequires:	dbus-devel >= 1.4.0
 BuildRequires:	libudev-devel >= 160
 BuildRequires:	libcap-devel
@@ -60,6 +63,7 @@ Drop-in replacement for the System V init tools of systemd.
 
 %prep
 %setup -q
+%apply_patches
 
 %build
 %configure2_5x \
@@ -164,7 +168,7 @@ fi
 %{_docdir}/systemd
 
 # Joint ownership with libcgroup
-#%dir /cgroup
+%dir /cgroup
 
 %files units
 %defattr(-,root,root)
