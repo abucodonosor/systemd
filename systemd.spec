@@ -19,7 +19,6 @@ BuildRequires:	gtk2-devel
 Requires:	systemd-units = %{version}-%{release}
 Requires:	dbus >= 1.3.2
 Requires:	udev >= 160
-Requires:	libudev >= 160
 Requires:	initscripts
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
