@@ -70,7 +70,7 @@ Drop-in replacement for the System V init tools of systemd.
 %build
 %configure2_5x \
 	--with-rootdir= \
-	--with-distro=other \
+	--with-distro=fedora \
 	--with-sysvinit-path=%{_initrddir} \
 	--with-sysvrcd-path=%{_sysconfdir}/rc.d \
 	--with-syslog-service=rsyslogd
@@ -147,7 +147,7 @@ fi
 %files
 %defattr(-,root,root)
 %config(noreplace) %{_sysconfdir}/dbus-1/system.d/org.freedesktop.systemd1.conf
-#%{_sysconfdir}/rc.d/init.d/reboot
+%{_sysconfdir}/rc.d/init.d/reboot
 %dir %{_sysconfdir}/systemd/session
 %{_sysconfdir}/xdg/systemd
 /bin/systemd
@@ -176,9 +176,10 @@ fi
 %defattr(-,root,root)
 %dir %{_sysconfdir}/systemd
 %dir %{_sysconfdir}/systemd/system
+%{_sysconfdir}/systemd/system/*.wants
 %config(noreplace) %{_sysconfdir}/systemd/system.conf
 %config(noreplace) %{_sysconfdir}/systemd/system/ctrl-alt-del.target
-#%config(noreplace) %{_sysconfdir}/systemd/system/display-manager.service
+%config(noreplace) %{_sysconfdir}/systemd/system/display-manager.service
 %config(noreplace) %{_sysconfdir}/systemd/system/kbrequest.target
 %dir /lib/systemd
 /lib/systemd/system
