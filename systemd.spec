@@ -1,7 +1,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	10
-Release:	%mkrel 5
+Release:	%mkrel 6
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -99,12 +99,11 @@ ln -s ../bin/systemctl %{buildroot}/sbin/runlevel
 # We create all wants links manually at installation time to make sure
 # they are not owned and hence overriden by rpm after the used deleted
 # them.
-# (bor) I am not sure why Fedora removes them but no dependency on
-# getty exists without those files and nothing is installed somewhere else
-# rm -r %{buildroot}/etc/systemd/system/*.target.wants
+rm -r %{buildroot}%{_sysconfdir}/systemd/system/*.target.wants
+rm -f %{buildroot}%{_sysconfdir}/systemd/system/display-manager.service
 
 # And the default symlink we generate automatically based on inittab
-rm %{buildroot}/etc/systemd/system/default.target
+rm -f %{buildroot}%{_sysconfdir}/systemd/system/default.target
 
 %clean
 rm -rf %{buildroot}
@@ -120,7 +119,7 @@ if [ $1 -eq 1 ] ; then
         fi
 
         # And symlink what we found to the new-style default.target
-        /bin/ln -sf "$target" /etc/systemd/system/default.target 2>&1 || :
+        /bin/ln -sf "$target" %{_sysconfdir}/systemd/system/default.target 2>&1 || :
 
         # Enable the services we install by default.
         /bin/systemctl enable \
@@ -180,10 +179,8 @@ fi
 %defattr(-,root,root)
 %dir %{_sysconfdir}/systemd
 %dir %{_sysconfdir}/systemd/system
-%{_sysconfdir}/systemd/system/*.wants
 %config(noreplace) %{_sysconfdir}/systemd/system.conf
 %config(noreplace) %{_sysconfdir}/systemd/system/ctrl-alt-del.target
-%config(noreplace) %{_sysconfdir}/systemd/system/display-manager.service
 %config(noreplace) %{_sysconfdir}/systemd/system/kbrequest.target
 %dir /lib/systemd
 /lib/systemd/system
