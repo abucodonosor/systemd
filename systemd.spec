@@ -1,7 +1,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	10
-Release:	%mkrel 5.2
+Release:	%mkrel 7
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -16,6 +16,8 @@ Patch1:		0002-Use-xhtml-not-xhtml-1_1-which-does-not-exist-in-our-.patch
 Patch2:		0003-Export-INIT_VERSION-for-shutdown-commands.patch
 # (bor) use local version of /etc/init.d/halt that does not unmount cgroup
 Patch3:		0004-use-local-version-of-halt-that-does-not-unmount-cgro.patch
+# (bor) for now we use messabus service to start D-Bus
+Patch4:		0005-Set-special-D-Bus-service-to-messagebus.service.patch
 BuildRequires:	dbus-devel >= 1.4.0
 BuildRequires:	libudev-devel >= 160
 BuildRequires:	libcap-devel
