@@ -122,9 +122,9 @@ if [ $1 -eq 1 ] ; then
         /bin/ln -sf "$target" %{_sysconfdir}/systemd/system/default.target 2>&1 || :
 
         # Enable the services we install by default.
+	# (bor) do not enable prefdm.service, we start it in initscript
         /bin/systemctl enable \
                 getty@.service \
-                prefdm.service \
                 getty.target \
                 rc-local.service \
                 remote-fs.target 2>&1 || :
@@ -134,7 +134,6 @@ fi
 if [ $1 -eq 0 ] ; then
         /bin/systemctl disable \
                 getty@.service \
-                prefdm.service \
                 getty.target \
                 rc-local.service \
                 remote-fs.target 2>&1 || :
