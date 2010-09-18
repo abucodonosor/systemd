@@ -151,10 +151,12 @@ fi
 %defattr(-,root,root)
 %config(noreplace) %{_sysconfdir}/dbus-1/system.d/org.freedesktop.systemd1.conf
 %{_sysconfdir}/rc.d/init.d/reboot
+%dir %{_sysconfdir}/systemd
 %dir %{_sysconfdir}/systemd/session
 %{_sysconfdir}/xdg/systemd
 /bin/systemd
 /bin/systemd-notify
+%dir /lib/systemd
 /lib/systemd/systemd-*
 /lib/udev/rules.d/*.rules
 /%{_lib}/security/pam_systemd.so
@@ -177,12 +179,10 @@ fi
 
 %files units
 %defattr(-,root,root)
-%dir %{_sysconfdir}/systemd
 %dir %{_sysconfdir}/systemd/system
 %config(noreplace) %{_sysconfdir}/systemd/system.conf
 %config(noreplace) %{_sysconfdir}/systemd/system/ctrl-alt-del.target
 %config(noreplace) %{_sysconfdir}/systemd/system/kbrequest.target
-%dir /lib/systemd
 /lib/systemd/system
 /bin/systemctl
 %{_mandir}/man1/systemctl.*
