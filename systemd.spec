@@ -1,11 +1,12 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	10
-Release:	%mkrel 6
+Release:	%mkrel 5.2
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
 Source0:	http://www.freedesktop.org/software/systemd/%{name}-%{version}.tar.bz2
+Source1:	halt
 
 # (bor) use /cgroup until kernel supports /sys/fs/cgroup
 Patch0:		0001-Revert-cgroup-mount-cgroup-file-systems-to-sys-fs-cg.patch
@@ -13,6 +14,8 @@ Patch0:		0001-Revert-cgroup-mount-cgroup-file-systems-to-sys-fs-cg.patch
 Patch1:		0002-Use-xhtml-not-xhtml-1_1-which-does-not-exist-in-our-.patch
 # (bor) export INIT_VERSION to allow use of legacy /sbin/halt from sysvinit
 Patch2:		0003-Export-INIT_VERSION-for-shutdown-commands.patch
+# (bor) use local version of /etc/init.d/halt that does not unmount cgroup
+Patch3:		0004-use-local-version-of-halt-that-does-not-unmount-cgro.patch
 BuildRequires:	dbus-devel >= 1.4.0
 BuildRequires:	libudev-devel >= 160
 BuildRequires:	libcap-devel
@@ -105,6 +108,10 @@ rm -f %{buildroot}%{_sysconfdir}/systemd/system/display-manager.service
 # And the default symlink we generate automatically based on inittab
 rm -f %{buildroot}%{_sysconfdir}/systemd/system/default.target
 
+# temporary workaround until initscripts support is avaialble
+install -m 0755 %{SOURCE1} %{buildroot}/lib/systemd
+ln -s halt %{buildroot}/lib/systemd/reboot
+
 %clean
 rm -rf %{buildroot}
 
@@ -157,6 +164,9 @@ fi
 /bin/systemd-notify
 %dir /lib/systemd
 /lib/systemd/systemd-*
+# FIXME to be removed later
+/lib/systemd/halt
+/lib/systemd/reboot
 /lib/udev/rules.d/*.rules
 /%{_lib}/security/pam_systemd.so
 %{_bindir}/systemd-cgls
