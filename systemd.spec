@@ -75,7 +75,7 @@ Drop-in replacement for the System V init tools of systemd.
 	--with-distro=fedora \
 	--with-sysvinit-path=%{_initrddir} \
 	--with-sysvrcd-path=%{_sysconfdir}/rc.d \
-	--with-syslog-service=rsyslogd
+	--with-syslog-service=rsyslog.service
 
 %make
 
