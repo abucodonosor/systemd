@@ -18,6 +18,8 @@ Patch2:		0003-Export-INIT_VERSION-for-shutdown-commands.patch
 Patch3:		0004-use-local-version-of-halt-that-does-not-unmount-cgro.patch
 # (bor) for now we use messabus service to start D-Bus
 Patch4:		0005-Set-special-D-Bus-service-to-messagebus.service.patch
+# (bor) adapt vconsole service to Mandriva configuration
+Patch5:		0006-Adapt-vconsole-setup-to-Mandriva-configuration-based.patch
 BuildRequires:	dbus-devel >= 1.4.0
 BuildRequires:	libudev-devel >= 160
 BuildRequires:	libcap-devel
