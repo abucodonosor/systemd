@@ -160,8 +160,11 @@ fi
 %config(noreplace) %{_sysconfdir}/dbus-1/system.d/org.freedesktop.systemd1.conf
 %{_sysconfdir}/rc.d/init.d/reboot
 %dir %{_sysconfdir}/systemd
+%config(noreplace) %{_sysconfdir}/systemd/system.conf
 %dir %{_sysconfdir}/systemd/session
+%dir %{_sysconfdir}/systemd/system
 %{_sysconfdir}/xdg/systemd
+/bin/systemctl
 /bin/systemd
 /bin/systemd-ask-password
 /bin/systemd-notify
@@ -192,15 +195,11 @@ fi
 
 %files units
 %defattr(-,root,root)
-%dir %{_sysconfdir}/systemd/system
-%config(noreplace) %{_sysconfdir}/systemd/system.conf
 %dir %{_sysconfdir}/tmpfiles.d
 %config(noreplace) %{_sysconfdir}/tmpfiles.d/*.conf
 /lib/systemd/system
-/bin/systemctl
 %{_mandir}/man1/systemctl.*
 %{_datadir}/pkgconfig/systemd.pc
-%{_docdir}/systemd/LICENSE
 
 %files gtk
 %defattr(-,root,root)
