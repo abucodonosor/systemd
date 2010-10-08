@@ -138,7 +138,6 @@ if [ $1 -eq 1 ] ; then
 	# (bor) do not enable prefdm.service, we start it in initscript
         /bin/systemctl enable \
                 getty@.service \
-                getty.target \
                 rc-local.service \
                 remote-fs.target 2>&1 || :
 fi
@@ -147,7 +146,6 @@ fi
 if [ $1 -eq 0 ] ; then
         /bin/systemctl disable \
                 getty@.service \
-                getty.target \
                 rc-local.service \
                 remote-fs.target 2>&1 || :
 
