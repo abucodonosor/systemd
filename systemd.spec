@@ -118,6 +118,25 @@ rm -f %{buildroot}%{_sysconfdir}/systemd/system/default.target
 install -m 0755 %{SOURCE1} %{buildroot}/lib/systemd
 ln -s halt %{buildroot}/lib/systemd/reboot
 
+# The following services are currently executed by rc.sysinit
+# tmpwatch installs own cron script
+pushd %{buildroot}/lib/systemd/system/basic.target.wants && {
+	rm -f sysctl.service
+	rm -f systemd-modules-load.service
+	rm -f systemd-random-seed-load.service
+	rm -f systemd-tmpfiles.service
+	rm -f tmpwatch.service
+	rm -f tmpwatch.timer
+}
+
+# The following services are currently executed by rc.sysinit
+pushd %{buildroot}/lib/systemd/system/local-fs.target.wants && {
+	rm -f remount-rootfs.target
+	rm -f systemd-remount-api-vfs.service
+	rm -f var-lock.mount
+	rm -f var-run.mount
+}
+
 %clean
 rm -rf %{buildroot}
 
