@@ -139,6 +139,12 @@ pushd %{buildroot}/lib/systemd/system/local-fs.target.wants && {
 	rm -f var-run.mount
 }
 
+# The following services are currently executed by rc.sysinit
+pushd %{buildroot}/lib/systemd/system/default.target.wants && {
+	rm -f readahead-collect.target
+	rm -f readahead-replay.target
+}
+
 %clean
 rm -rf %{buildroot}
 
