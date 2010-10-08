@@ -1,7 +1,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
-Version:	10
-Release:	%mkrel 7
+Version:	11
+Release:	%mkrel 0.1
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -163,6 +163,7 @@ fi
 %dir %{_sysconfdir}/systemd/session
 %{_sysconfdir}/xdg/systemd
 /bin/systemd
+/bin/systemd-ask-password
 /bin/systemd-notify
 %dir /lib/systemd
 /lib/systemd/systemd-*
@@ -183,6 +184,7 @@ fi
 %{_datadir}/dbus-1/services/org.freedesktop.systemd1.service
 %{_datadir}/dbus-1/system-services/org.freedesktop.systemd1.service
 %{_datadir}/dbus-1/interfaces/org.freedesktop.systemd1.*.xml
+%{_datadir}/polkit-1/actions/org.freedesktop.systemd1.policy
 %{_docdir}/systemd
 
 # Joint ownership with libcgroup
@@ -192,8 +194,8 @@ fi
 %defattr(-,root,root)
 %dir %{_sysconfdir}/systemd/system
 %config(noreplace) %{_sysconfdir}/systemd/system.conf
-%config(noreplace) %{_sysconfdir}/systemd/system/ctrl-alt-del.target
-%config(noreplace) %{_sysconfdir}/systemd/system/kbrequest.target
+%dir %{_sysconfdir}/tmpfiles.d
+%config(noreplace) %{_sysconfdir}/tmpfiles.d/*.conf
 /lib/systemd/system
 /bin/systemctl
 %{_mandir}/man1/systemctl.*
@@ -203,6 +205,7 @@ fi
 %files gtk
 %defattr(-,root,root)
 %{_bindir}/systemadm
+%{_bindir}/systemd-ask-password-agent
 %{_mandir}/man1/systemadm.*
 
 %files sysvinit
