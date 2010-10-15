@@ -1,7 +1,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	11
-Release:	%mkrel 0.2
+Release:	%mkrel 0.3
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -147,6 +147,18 @@ pushd %{buildroot}/lib/systemd/system/default.target.wants && {
 
 %clean
 rm -rf %{buildroot}
+
+# reexec daemon on update to avoid busy / on shutdown
+%postun
+if [ $1 -ge 1 ] ; then
+        /bin/systemctl daemon-reexec 2>&1 || :
+fi
+
+# reexec daemon on glibc update to avoid busy / on shutdown
+%triggerin -- glibc
+if [ $1 -ge 1 ] ; then
+	/bin/systemctl daemon-reexec 2>&1 || :
+fi
 
 %post units
 if [ $1 -eq 1 ] ; then
