@@ -129,6 +129,7 @@ pushd %{buildroot}/lib/systemd/system/basic.target.wants && {
 	rm -f systemd-tmpfiles.service
 	rm -f tmpwatch.service
 	rm -f tmpwatch.timer
+popd
 }
 
 # The following services are currently executed by rc.sysinit
@@ -137,13 +138,12 @@ pushd %{buildroot}/lib/systemd/system/local-fs.target.wants && {
 	rm -f systemd-remount-api-vfs.service
 	rm -f var-lock.mount
 	rm -f var-run.mount
+popd
 }
 
-# The following services are currently executed by rc.sysinit
-pushd %{buildroot}/lib/systemd/system/default.target.wants && {
-	rm -f readahead-collect.target
-	rm -f readahead-replay.target
-}
+# (bor) For now mounts are performed by initscripts (Fedora)
+sed -i -e 's/^#MountAuto=yes$/MountAuto=no/' \
+        -e 's/^#SwapAuto=yes$/SwapAuto=no/' %{buildroot}/etc/systemd/system.conf
 
 %clean
 rm -rf %{buildroot}
