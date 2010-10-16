@@ -1,7 +1,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	11
-Release:	%mkrel 0.4
+Release:	%mkrel 1
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -134,7 +134,7 @@ popd
 
 # The following services are currently executed by rc.sysinit
 pushd %{buildroot}/lib/systemd/system/local-fs.target.wants && {
-	rm -f remount-rootfs.target
+	rm -f remount-rootfs.service
 	rm -f systemd-remount-api-vfs.service
 	rm -f var-lock.mount
 	rm -f var-run.mount
@@ -191,10 +191,11 @@ if [ $1 -eq 0 ] ; then
         /bin/rm -f /etc/systemd/system/default.target 2>&1 || :
 fi
 
-%postun units
-if [ $1 -ge 1 ] ; then
-        /bin/systemctl daemon-reload 2>&1 || :
-fi
+# (bor) disable it for now, it races with daemon-reexec
+# %postun units
+# if [ $1 -ge 1 ] ; then
+#         /bin/systemctl daemon-reload 2>&1 || :
+# fi
 
 %files
 %defattr(-,root,root)
