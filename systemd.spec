@@ -1,7 +1,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	11
-Release:	%mkrel 1
+Release:	%mkrel 2
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -24,6 +24,8 @@ Patch5:		0006-Adapt-vconsole-setup-to-Mandriva-configuration-based.patch
 Patch6:		0007-Fully-support-all-i18n-environments-in-Mandriva.patch
 # (bor) distinguish between network and $network to break dependency loop
 Patch7:		0008-Use-network-for-special-network-service.patch
+# (bor) revert to using hardcoded /bin/sh in single user mode
+Patch8:		0009-Revert-to-using-bin-sh-for-single-user-shell.patch
 BuildRequires:	dbus-devel >= 1.4.0
 BuildRequires:	libudev-devel >= 160
 BuildRequires:	libcap-devel
