@@ -72,7 +72,7 @@ Graphical front-end for systemd.
 %package sysvinit
 Summary:        System V init tools
 Group:          System/Configuration/Boot and Init
-Requires:       %{name} = %{version}-%{release}
+Requires(post):       %{name} = %{version}-%{release}
 #(tpg) do not obsolete sysvinit
 
 %description sysvinit
