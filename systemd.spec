@@ -1,7 +1,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	11
-Release:	%mkrel 2
+Release:	%mkrel 3
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -153,15 +153,11 @@ sed -i -e 's/^#MountAuto=yes$/MountAuto=no/' \
 %clean
 rm -rf %{buildroot}
 
-# reexec daemon on update to avoid busy / on shutdown
-%postun
-if [ $1 -ge 1 ] ; then
-        /bin/systemctl daemon-reexec 2>&1 || :
-fi
-
-# reexec daemon on glibc update to avoid busy / on shutdown
 %triggerin -- glibc
-if [ $1 -ge 1 ] ; then
+# reexec daemon on self or glibc update to avoid busy / on shutdown
+# trigger is executed on both self and target install so no need to have
+# extra own post
+if [ $1 -ge 2 -o $2 -ge 2 ] ; then
 	/bin/systemctl daemon-reexec 2>&1 || :
 fi
 
@@ -196,22 +192,18 @@ if [ $1 -eq 0 ] ; then
         /bin/rm -f /etc/systemd/system/default.target 2>&1 || :
 fi
 
-# (bor) disable it for now, it races with daemon-reexec
-# %postun units
-# if [ $1 -ge 1 ] ; then
-#         /bin/systemctl daemon-reload 2>&1 || :
-# fi
+%postun units
+if [ $1 -ge 1 ] ; then
+        /bin/systemctl daemon-reload 2>&1 || :
+fi
 
 %files
 %defattr(-,root,root)
 %config(noreplace) %{_sysconfdir}/dbus-1/system.d/org.freedesktop.systemd1.conf
 %{_sysconfdir}/rc.d/init.d/reboot
-%dir %{_sysconfdir}/systemd
 %config(noreplace) %{_sysconfdir}/systemd/system.conf
 %dir %{_sysconfdir}/systemd/session
-%dir %{_sysconfdir}/systemd/system
 %{_sysconfdir}/xdg/systemd
-/bin/systemctl
 /bin/systemd
 /bin/systemd-ask-password
 /bin/systemd-notify
@@ -242,6 +234,9 @@ fi
 
 %files units
 %defattr(-,root,root)
+/bin/systemctl
+%dir %{_sysconfdir}/systemd
+%dir %{_sysconfdir}/systemd/system
 %dir %{_sysconfdir}/tmpfiles.d
 %config(noreplace) %{_sysconfdir}/tmpfiles.d/*.conf
 /lib/systemd/system
