@@ -26,6 +26,8 @@ Patch6:		0007-Fully-support-all-i18n-environments-in-Mandriva.patch
 Patch7:		0008-Use-network-for-special-network-service.patch
 # (bor) revert to using hardcoded /bin/sh in single user mode
 Patch8:		0009-Revert-to-using-bin-sh-for-single-user-shell.patch
+# (bor) fix systemctl enable getty@.service (upstream)
+Patch9:		0010-systemctl-fix-systemctl-enable-getty-.service.patch
 
 BuildRequires:	dbus-devel >= 1.4.0
 BuildRequires:	libudev-devel >= 160
