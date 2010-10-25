@@ -26,6 +26,7 @@ Patch6:		0007-Fully-support-all-i18n-environments-in-Mandriva.patch
 Patch7:		0008-Use-network-for-special-network-service.patch
 # (bor) revert to using hardcoded /bin/sh in single user mode
 Patch8:		0009-Revert-to-using-bin-sh-for-single-user-shell.patch
+
 BuildRequires:	dbus-devel >= 1.4.0
 BuildRequires:	libudev-devel >= 160
 BuildRequires:	libcap-devel
@@ -55,7 +56,7 @@ work as a drop-in replacement for sysvinit.
 %package units
 Summary:	Configuration files, directories and installation tool for systemd
 Group:		System/Configuration/Boot and Init
-Requires:	%{name} = %{version}-%{release}
+Requires(post):	%{name} = %{version}-%{release}
 
 %description units
 Basic configuration files, directories and installation tool for the systemd
@@ -72,7 +73,7 @@ Graphical front-end for systemd.
 %package sysvinit
 Summary:        System V init tools
 Group:          System/Configuration/Boot and Init
-Requires(post):       %{name} = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 #(tpg) do not obsolete sysvinit
 
 %description sysvinit
