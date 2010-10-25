@@ -58,7 +58,7 @@ work as a drop-in replacement for sysvinit.
 %package units
 Summary:	Configuration files, directories and installation tool for systemd
 Group:		System/Configuration/Boot and Init
-Requires(post):	%{name} = %{version}-%{release}
+Requires:	%{name} = %{version}-%{release}
 
 %description units
 Basic configuration files, directories and installation tool for the systemd
