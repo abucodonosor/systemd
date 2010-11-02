@@ -1,7 +1,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	11
-Release:	%mkrel 3
+Release:	%mkrel 4
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -30,6 +30,8 @@ Patch8:		0009-Revert-to-using-bin-sh-for-single-user-shell.patch
 Patch9:		0010-systemctl-fix-systemctl-enable-getty-.service.patch
 # (bor) fix error message on startup when IPv6 is disabled (upstream)
 Patch10:	0011-check-disable-paramater-for-ipv6.patch
+# (bor) fix broken device ACLs after systemd was installed
+Patch11:	0012-add-instead-of-replace-systemd-tag.patch
 
 BuildRequires:	dbus-devel >= 1.4.0
 BuildRequires:	libudev-devel >= 160
