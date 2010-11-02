@@ -28,6 +28,8 @@ Patch7:		0008-Use-network-for-special-network-service.patch
 Patch8:		0009-Revert-to-using-bin-sh-for-single-user-shell.patch
 # (bor) fix systemctl enable getty@.service (upstream)
 Patch9:		0010-systemctl-fix-systemctl-enable-getty-.service.patch
+# (bor) fix error message on startup when IPv6 is disabled (upstream)
+Patch10:	0011-check-disable-paramater-for-ipv6.patch
 
 BuildRequires:	dbus-devel >= 1.4.0
 BuildRequires:	libudev-devel >= 160
