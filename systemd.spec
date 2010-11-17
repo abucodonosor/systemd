@@ -10,8 +10,6 @@ Source1:	halt
 
 # (bor) use /cgroup until kernel supports /sys/fs/cgroup
 Patch0:		0001-Revert-cgroup-mount-cgroup-file-systems-to-sys-fs-cg.patch
-# (bor) needed because patch0 touches man sources
-Patch1:		0002-Use-xhtml-not-xhtml-1_1-which-does-not-exist-in-our-.patch
 # (bor) export INIT_VERSION to allow use of legacy /sbin/halt from sysvinit
 Patch2:		0003-Export-INIT_VERSION-for-shutdown-commands.patch
 # (bor) use local version of /etc/init.d/halt that does not unmount cgroup
