@@ -7,8 +7,6 @@ Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
 Source0:	http://www.freedesktop.org/software/systemd/%{name}-%{version}.tar.bz2
 
-# (bor) use /cgroup until kernel supports /sys/fs/cgroup
-Patch0:		0001-Revert-cgroup-mount-cgroup-file-systems-to-sys-fs-cg.patch
 # (bor) export INIT_VERSION to allow use of legacy /sbin/halt from sysvinit
 Patch2:		0003-Export-INIT_VERSION-for-shutdown-commands.patch
 # (bor) for now we use messabus service to start D-Bus
@@ -25,7 +23,7 @@ Patch8:		0009-Revert-to-using-bin-sh-for-single-user-shell.patch
 Patch9:		0010-systemctl-fix-systemctl-enable-getty-.service.patch
 # (bor) fix error message on startup when IPv6 is disabled (upstream)
 Patch10:	0011-check-disable-paramater-for-ipv6.patch
-# (bor) fix broken device ACLs after systemd was installed
+# (bor) fix broken device ACLs after systemd was installed (upstream)
 Patch11:	0012-add-instead-of-replace-systemd-tag.patch
 
 BuildRequires:	dbus-devel >= 1.4.0
@@ -220,9 +218,6 @@ fi
 %{_datadir}/dbus-1/interfaces/org.freedesktop.systemd1.*.xml
 %{_datadir}/polkit-1/actions/org.freedesktop.systemd1.policy
 %{_docdir}/systemd
-
-# Joint ownership with libcgroup
-%dir /cgroup
 
 %files units
 %defattr(-,root,root)
