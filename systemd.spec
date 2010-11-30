@@ -1,7 +1,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	11
-Release:	%mkrel 6
+Release:	%mkrel 7
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -39,7 +39,7 @@ BuildRequires:	gtk2-devel glib2-devel libnotify-devel
 Requires:	systemd-units = %{version}-%{release}
 Requires:	dbus >= 1.3.2
 Requires:	udev >= 160
-Requires:	initscripts >= 9.21
+Requires:	initscripts >= 9.21-2
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
 %description
@@ -136,6 +136,29 @@ pushd %{buildroot}/lib/systemd/system/local-fs.target.wants && {
 	rm -f systemd-remount-api-vfs.service
 	rm -f var-lock.mount
 	rm -f var-run.mount
+popd
+}
+
+# The following services are currently executed by /etc/init.d/halt
+pushd %{buildroot}/lib/systemd/system/shutdown.target.wants && {
+	rm -f hwclock-save.service
+	rm -f systemd-random-seed-save.service
+	rm -f systemd-update-utmp-shutdown.service
+popd
+}
+
+# The following services are currently part of initscripts
+pushd %{buildroot}/lib/systemd/system && {
+	rm -f runlevel?.target.wants/systemd-update-utmp-runlevel.service
+	rm -f default.target
+	rm -f halt.service
+	rm -f killall.service
+	rm -f poweroff.service
+	rm -f prefdm.service
+	rm -f rc-local.service
+	rm -f reboot.service
+	rm -f single.service
+	rm -f sysinit.service
 popd
 }
 
