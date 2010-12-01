@@ -1,14 +1,12 @@
 Summary:	A System and Session Manager
 Name:		systemd
-Version:	11
-Release:	%mkrel 7
+Version:	15
+Release:	%mkrel 1
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
 Source0:	http://www.freedesktop.org/software/systemd/%{name}-%{version}.tar.bz2
 
-# (bor) export INIT_VERSION to allow use of legacy /sbin/halt from sysvinit
-Patch2:		0003-Export-INIT_VERSION-for-shutdown-commands.patch
 # (bor) for now we use messabus service to start D-Bus
 Patch4:		0005-Set-special-D-Bus-service-to-messagebus.service.patch
 # (bor) adapt vconsole service to Mandriva configuration
@@ -17,30 +15,25 @@ Patch5:		0006-Adapt-vconsole-setup-to-Mandriva-configuration-based.patch
 Patch6:		0007-Fully-support-all-i18n-environments-in-Mandriva.patch
 # (bor) distinguish between network and $network to break dependency loop
 Patch7:		0008-Use-network-for-special-network-service.patch
-# (bor) revert to using hardcoded /bin/sh in single user mode
-Patch8:		0009-Revert-to-using-bin-sh-for-single-user-shell.patch
-# (bor) fix systemctl enable getty@.service (upstream)
-Patch9:		0010-systemctl-fix-systemctl-enable-getty-.service.patch
-# (bor) fix error message on startup when IPv6 is disabled (upstream)
-Patch10:	0011-check-disable-paramater-for-ipv6.patch
-# (bor) fix broken device ACLs after systemd was installed (upstream)
-Patch11:	0012-add-instead-of-replace-systemd-tag.patch
+# (bor) support libnotify < 0.7; combines d0ef22 and ab85c2 (GIT)
+Patch12:	0001-gnome-ask-password-agent-also-support-libnotify-0.7-.patch
 
 BuildRequires:	dbus-devel >= 1.4.0
 BuildRequires:	libudev-devel >= 160
 BuildRequires:	libcap-devel
 BuildRequires:	tcp_wrappers-devel
 BuildRequires:	pam-devel
-BuildRequires:	libxslt-devel
-BuildRequires:	docbook-style-xsl
 BuildRequires:	dbus-glib-devel
 BuildRequires:	vala >= 0.9
 BuildRequires:	gtk2-devel glib2-devel libnotify-devel
 Requires:	systemd-units = %{version}-%{release}
 Requires:	dbus >= 1.3.2
 Requires:	udev >= 160
-Requires:	initscripts >= 9.21-2
+Requires:	initscripts >= 9.21-3mdv2011.0
+Requires:	util-linux-ng >= 2.18-2mdv2011.0
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
+# TODO for P12, remove when it is removed
+BuildRequires:	automake autoconf
 
 %description
 systemd is a system and session manager for Linux, compatible with
@@ -83,6 +76,9 @@ Drop-in replacement for the System V init tools of systemd.
 %apply_patches
 
 %build
+# TODO for P12, remove when it is removed
+automake -c -f
+autoconf
 %configure2_5x \
 	--with-rootdir= \
 	--with-distro=fedora \
@@ -119,23 +115,42 @@ rm -f %{buildroot}%{_sysconfdir}/systemd/system/display-manager.service
 rm -f %{buildroot}%{_sysconfdir}/systemd/system/default.target
 
 # The following services are currently executed by rc.sysinit
-# tmpwatch installs own cron script
 pushd %{buildroot}/lib/systemd/system/basic.target.wants && {
 	rm -f sysctl.service
 	rm -f systemd-modules-load.service
 	rm -f systemd-random-seed-load.service
 	rm -f systemd-tmpfiles.service
-	rm -f tmpwatch.service
-	rm -f tmpwatch.timer
+	rm -f systemd-tmpfiles-clean.timer
+popd
+}
+
+# The following services are currently executed by rc.sysinit
+pushd %{buildroot}/lib/systemd/system/final.target.wants && {
+	rm -f halt-local.service
+popd
+}
+
+# The following services are currently installed by initscripts
+pushd %{buildroot}/lib/systemd/system/graphical.target.wants && {
+	rm -f display-manager.service
 popd
 }
 
 # The following services are currently executed by rc.sysinit
 pushd %{buildroot}/lib/systemd/system/local-fs.target.wants && {
+	rm -f cryptsetup.target
+	rm -f fsck-root.service
 	rm -f remount-rootfs.service
 	rm -f systemd-remount-api-vfs.service
 	rm -f var-lock.mount
 	rm -f var-run.mount
+popd
+}
+
+# The following services are currently installed by initscripts
+pushd %{buildroot}/lib/systemd/system/multi-user.target.wants && {
+	rm -f rc-local.service
+	rm -f systemd-ask-password-wall.path
 popd
 }
 
@@ -147,10 +162,22 @@ pushd %{buildroot}/lib/systemd/system/shutdown.target.wants && {
 popd
 }
 
+# The following services are currently executed by rc.sysinit
+pushd %{buildroot}/lib/systemd/system/sysinit.target.wants && {
+	rm -f systemd-ask-password-console.path
+	rm -f systemd-modules-load.service
+	rm -f systemd-random-seed-save.service
+	rm -f systemd-sysctl.service
+	rm -f systemd-tmpfiles-setup.service
+	rm -f systemd-update-utmp-shutdown.service
+popd
+}
+
 # The following services are currently part of initscripts
 pushd %{buildroot}/lib/systemd/system && {
 	rm -f runlevel?.target.wants/systemd-update-utmp-runlevel.service
 	rm -f default.target
+	rm -f display-manager.service
 	rm -f halt.service
 	rm -f killall.service
 	rm -f poweroff.service
@@ -216,13 +243,13 @@ fi
 %files
 %defattr(-,root,root)
 %config(noreplace) %{_sysconfdir}/dbus-1/system.d/org.freedesktop.systemd1.conf
-%{_sysconfdir}/rc.d/init.d/reboot
 %config(noreplace) %{_sysconfdir}/systemd/system.conf
-%dir %{_sysconfdir}/systemd/session
+%dir %{_sysconfdir}/systemd/user
 %{_sysconfdir}/xdg/systemd
 /bin/systemd
 /bin/systemd-ask-password
 /bin/systemd-notify
+/bin/systemd-tty-ask-password-agent
 %dir /lib/systemd
 /lib/systemd/systemd-*
 /lib/udev/rules.d/*.rules
@@ -248,6 +275,7 @@ fi
 %dir %{_sysconfdir}/systemd
 %dir %{_sysconfdir}/systemd/system
 %dir %{_sysconfdir}/tmpfiles.d
+%{_sysconfdir}/bash_completion.d/systemctl-bash-completion.sh
 %config(noreplace) %{_sysconfdir}/tmpfiles.d/*.conf
 /lib/systemd/system
 %{_mandir}/man1/systemctl.*
@@ -256,7 +284,7 @@ fi
 %files gtk
 %defattr(-,root,root)
 %{_bindir}/systemadm
-%{_bindir}/systemd-ask-password-agent
+%{_bindir}/systemd-gnome-ask-password-agent
 %{_mandir}/man1/systemadm.*
 
 %files sysvinit
