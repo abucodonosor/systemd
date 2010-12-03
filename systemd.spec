@@ -1,7 +1,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	15
-Release:	%mkrel 2
+Release:	%mkrel 3
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -125,12 +125,6 @@ pushd %{buildroot}/lib/systemd/system/basic.target.wants && {
 popd
 }
 
-# The following services are currently executed by rc.sysinit
-pushd %{buildroot}/lib/systemd/system/final.target.wants && {
-	rm -f halt-local.service
-popd
-}
-
 # The following services are currently installed by initscripts
 pushd %{buildroot}/lib/systemd/system/graphical.target.wants && {
 	rm -f display-manager.service
@@ -155,14 +149,6 @@ pushd %{buildroot}/lib/systemd/system/multi-user.target.wants && {
 popd
 }
 
-# The following services are currently executed by /etc/init.d/halt
-pushd %{buildroot}/lib/systemd/system/shutdown.target.wants && {
-	rm -f hwclock-save.service
-	rm -f systemd-random-seed-save.service
-	rm -f systemd-update-utmp-shutdown.service
-popd
-}
-
 # The following services are currently executed by rc.sysinit
 pushd %{buildroot}/lib/systemd/system/sysinit.target.wants && {
 	rm -f systemd-ask-password-console.path
@@ -177,12 +163,8 @@ popd
 pushd %{buildroot}/lib/systemd/system && {
 	rm -f default.target
 	rm -f display-manager.service
-	rm -f halt.service
-	rm -f killall.service
-	rm -f poweroff.service
 	rm -f prefdm.service
 	rm -f rc-local.service
-	rm -f reboot.service
 	rm -f single.service
 	rm -f sysinit.service
 popd
