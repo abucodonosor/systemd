@@ -169,13 +169,11 @@ pushd %{buildroot}/lib/systemd/system/sysinit.target.wants && {
 	rm -f systemd-random-seed-save.service
 	rm -f systemd-sysctl.service
 	rm -f systemd-tmpfiles-setup.service
-	rm -f systemd-update-utmp-shutdown.service
 popd
 }
 
 # The following services are currently part of initscripts
 pushd %{buildroot}/lib/systemd/system && {
-	rm -f runlevel?.target.wants/systemd-update-utmp-runlevel.service
 	rm -f default.target
 	rm -f display-manager.service
 	rm -f halt.service
