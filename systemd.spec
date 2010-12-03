@@ -118,7 +118,6 @@ rm -f %{buildroot}%{_sysconfdir}/systemd/system/default.target
 pushd %{buildroot}/lib/systemd/system/basic.target.wants && {
 	rm -f sysctl.service
 	rm -f systemd-modules-load.service
-	rm -f systemd-random-seed-load.service
 	rm -f systemd-tmpfiles.service
 	rm -f systemd-tmpfiles-clean.timer
 popd
@@ -166,7 +165,7 @@ popd
 pushd %{buildroot}/lib/systemd/system/sysinit.target.wants && {
 	rm -f systemd-ask-password-console.path
 	rm -f systemd-modules-load.service
-	rm -f systemd-random-seed-save.service
+	rm -f systemd-random-seed-load.service
 	rm -f systemd-sysctl.service
 	rm -f systemd-tmpfiles-setup.service
 popd
