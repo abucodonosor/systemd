@@ -17,6 +17,8 @@ Patch6:		0007-Fully-support-all-i18n-environments-in-Mandriva.patch
 Patch7:		0008-Use-network-for-special-network-service.patch
 # (bor) support libnotify < 0.7; combines d0ef22 and ab85c2 (GIT)
 Patch12:	0001-gnome-ask-password-agent-also-support-libnotify-0.7-.patch
+# (bor) take welcome message from /etc/mandriva-release
+Patch13:	0001-Use-etc-mandriva-release-to-show-boot-welcome-messag.patch
 
 BuildRequires:	dbus-devel >= 1.4.0
 BuildRequires:	libudev-devel >= 160
