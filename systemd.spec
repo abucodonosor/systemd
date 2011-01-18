@@ -3,11 +3,16 @@
 %define sysvinit_version 2.87
 %define sysvinit_release %mkrel 9
 
+# (eugeni) for backports and old distributions, rely on EVRD as well
+%if %mdkversion < 201100
+%define EVRD %{?epoch:%{epoch}:}%{?version:%{version}}%{?release:-%{release}}%{?distepoch::%{distepoch}}
+%endif
+
 
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	16
-Release:	%mkrel 1
+Release:	%mkrel 2
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -34,7 +39,7 @@ BuildRequires:	pam-devel
 BuildRequires:	dbus-glib-devel
 BuildRequires:	vala >= 0.9
 BuildRequires:	gtk2-devel glib2-devel libnotify-devel
-Requires:	systemd-units = %{version}-%{release}
+Requires:	systemd-units = %{EVRD}
 Requires:	dbus >= 1.3.2
 Requires:	udev >= 160
 Requires:	initscripts >= 9.21-3mdv2011.0
