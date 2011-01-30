@@ -12,7 +12,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	17
-Release:	%mkrel 3
+Release:	%mkrel 4
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -187,6 +187,9 @@ popd
 # (bor) For now mounts are performed by initscripts (Fedora)
 sed -i -e 's/^#MountAuto=yes$/MountAuto=no/' \
         -e 's/^#SwapAuto=yes$/SwapAuto=no/' %{buildroot}/etc/systemd/system.conf
+
+# (bor) make sure we own directory for bluez to install service
+mkdir -p %{buildroot}/lib/systemd/system/bluetooth.target.wants
 
 %clean
 rm -rf %{buildroot}
