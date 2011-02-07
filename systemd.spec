@@ -1,7 +1,7 @@
 # macros for sysvinit transition - should be equal to
 # sysvinit %version-%release-plus-1
 %define sysvinit_version 2.87
-%define sysvinit_release %mkrel 10
+%define sysvinit_release %mkrel 11
 
 # (eugeni) for backports and old distributions, rely on EVRD as well
 %if %mdkversion < 201100
@@ -191,6 +191,11 @@ sed -i -e 's/^#MountAuto=yes$/MountAuto=no/' \
 # (bor) make sure we own directory for bluez to install service
 mkdir -p %{buildroot}/lib/systemd/system/bluetooth.target.wants
 
+# use consistent naming and permissions for completion scriplets
+mv %{buildroot}%{_sysconfdir}/bash_completion.d/systemctl-bash-completion.sh \
+    %{buildroot}%{_sysconfdir}/bash_completion.d/systemctl
+chmod 644 %{buildroot}%{_sysconfdir}/bash_completion.d/systemctl
+
 %clean
 rm -rf %{buildroot}
 
@@ -273,7 +278,7 @@ fi
 %dir %{_sysconfdir}/systemd
 %dir %{_sysconfdir}/systemd/system
 %dir %{_sysconfdir}/tmpfiles.d
-%{_sysconfdir}/bash_completion.d/systemctl-bash-completion.sh
+%{_sysconfdir}/bash_completion.d/systemctl
 %config(noreplace) %{_sysconfdir}/tmpfiles.d/*.conf
 /lib/systemd/system
 %{_mandir}/man1/systemctl.*
