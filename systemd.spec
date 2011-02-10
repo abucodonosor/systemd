@@ -12,14 +12,12 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	17
-Release:	%mkrel 4
+Release:	%mkrel 5
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
 Source0:	http://www.freedesktop.org/software/systemd/%{name}-%{version}.tar.bz2
 
-# (bor) for now we use messabus service to start D-Bus
-Patch4:		0005-Set-special-D-Bus-service-to-messagebus.service.patch
 # (bor) adapt vconsole service to Mandriva configuration
 Patch5:		0006-Adapt-vconsole-setup-to-Mandriva-configuration-based.patch
 # (bor) adapt locale setup to Mandriva configuration
@@ -30,6 +28,8 @@ Patch7:		0008-Use-network-for-special-network-service.patch
 Patch13:	0001-Use-etc-mandriva-release-to-show-boot-welcome-messag.patch
 # (eugeni) do not mess with the system time, rely on kernel
 Patch14:	systemd-17-hwclock-hctosys.patch
+# (bor) allow user tasks to request real time priority (GIT)
+Patch15:	systemd-17-fix-cgroup.patch 
 
 BuildRequires:	dbus-devel >= 1.4.0
 BuildRequires:	libudev-devel >= 160
@@ -39,6 +39,8 @@ BuildRequires:	pam-devel
 BuildRequires:	dbus-glib-devel
 BuildRequires:	vala >= 0.9
 BuildRequires:	gtk2-devel glib2-devel libnotify-devel
+BuildRequires:  libxslt-devel
+BuildRequires:  docbook-style-xsl
 Requires:	systemd-units = %{EVRD}
 Requires:	dbus >= 1.3.2
 Requires:	udev >= 160
