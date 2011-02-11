@@ -26,8 +26,6 @@ Patch6:		0007-Fully-support-all-i18n-environments-in-Mandriva.patch
 Patch7:		0008-Use-network-for-special-network-service.patch
 # (bor) take welcome message from /etc/mandriva-release
 Patch13:	0001-Use-etc-mandriva-release-to-show-boot-welcome-messag.patch
-# (eugeni) do not mess with the system time, rely on kernel
-Patch14:	systemd-17-hwclock-hctosys.patch
 # (bor) allow user tasks to request real time priority (GIT)
 Patch15:	systemd-17-fix-cgroup.patch 
 
