@@ -108,6 +108,9 @@ rm -rf %{buildroot}
 %makeinstall_std
 find %{buildroot} \( -name '*.a' -o -name '*.la' \) -exec rm {} \;
 
+# (bor) create late shutdown directory
+mkdir -p %{buildroot}/lib/systemd/system-shutdown
+
 # Create SysV compatibility symlinks. systemctl/systemd are smart
 # enough to detect in which way they are called.
 mkdir -p %{buildroot}/sbin
@@ -253,7 +256,11 @@ fi
 /bin/systemd-tmpfiles
 /bin/systemd-tty-ask-password-agent
 %dir /lib/systemd
+%dir /lib/systemd/system-generators
+%dir /lib/systemd/system-shutdown
 /lib/systemd/systemd-*
+# (bor) uncomment when cryptsetup is enabled
+#/lib/systemd/system-generators/*
 /lib/udev/rules.d/*.rules
 /%{_lib}/security/pam_systemd.so
 %{_bindir}/systemd-cgls
