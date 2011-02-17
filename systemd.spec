@@ -250,6 +250,7 @@ fi
 /bin/systemd
 /bin/systemd-ask-password
 /bin/systemd-notify
+/bin/systemd-tmpfiles
 /bin/systemd-tty-ask-password-agent
 %dir /lib/systemd
 /lib/systemd/systemd-*
@@ -263,6 +264,7 @@ fi
 %{_mandir}/man5/*
 %{_mandir}/man7/*
 %{_mandir}/man8/pam_systemd.*
+%{_mandir}/man8/systemd-tmpfiles.*
 %{_datadir}/systemd
 %{_datadir}/dbus-1/services/org.freedesktop.systemd1.service
 %{_datadir}/dbus-1/system-services/org.freedesktop.systemd1.service
