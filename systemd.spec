@@ -11,8 +11,8 @@
 
 Summary:	A System and Session Manager
 Name:		systemd
-Version:	17
-Release:	%mkrel 5
+Version:	18
+Release:	%mkrel 1
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -26,8 +26,6 @@ Patch6:		0007-Fully-support-all-i18n-environments-in-Mandriva.patch
 Patch7:		0008-Use-network-for-special-network-service.patch
 # (bor) take welcome message from /etc/mandriva-release
 Patch13:	0001-Use-etc-mandriva-release-to-show-boot-welcome-messag.patch
-# (bor) allow user tasks to request real time priority (GIT)
-Patch15:	systemd-17-fix-cgroup.patch 
 
 BuildRequires:	dbus-devel >= 1.4.0
 BuildRequires:	libudev-devel >= 160
