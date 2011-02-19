@@ -12,7 +12,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	18
-Release:	%mkrel 3
+Release:	%mkrel 4
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -146,9 +146,10 @@ pushd %{buildroot}/lib/systemd/system/local-fs.target.wants && {
 popd
 }
 
-# hide iniscripts service
+# hide iniscripts services
 pushd %{buildroot}/lib/systemd/system && {
 	ln -s prefdm.service dm.service
+	ln -s rescue.service single.service
 popd
 }
 
