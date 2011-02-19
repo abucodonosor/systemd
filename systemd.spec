@@ -12,7 +12,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	18
-Release:	%mkrel 2
+Release:	%mkrel 3
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -26,7 +26,14 @@ Patch6:		0007-Fully-support-all-i18n-environments-in-Mandriva.patch
 Patch7:		0008-Use-network-for-special-network-service.patch
 # (bor) take welcome message from /etc/mandriva-release
 Patch13:	0001-Use-etc-mandriva-release-to-show-boot-welcome-messag.patch
+# (bor) adapt prefdm to Mandriva (moved from initscripts)
+Patch15:	systemd-17-prefdm.patch
+# (bor) clean up directories on boot as done by rc.sysinit
+Patch16:	systemd-18-clean-dirs-on-boot.patch
+# (bor) reset /etc/mtab on boot (why is it not a link)?
+Patch17:	systemd-18-reset-mtab-on-boot.patch
 
+BuildRequires:	cryptsetup-devel
 BuildRequires:	dbus-devel >= 1.4.0
 BuildRequires:	libudev-devel >= 160
 BuildRequires:	libcap-devel
@@ -37,14 +44,15 @@ BuildRequires:	vala >= 0.9
 BuildRequires:	gtk2-devel glib2-devel libnotify-devel
 BuildRequires:  libxslt-devel
 BuildRequires:  docbook-style-xsl
+# TODO for P12, remove when it is removed
+BuildRequires:	automake autoconf
 Requires:	systemd-units = %{EVRD}
 Requires:	dbus >= 1.3.2
 Requires:	udev >= 160
 Requires:	initscripts >= 9.21-3mdv2011.0
 Requires:	util-linux-ng >= 2.18-2mdv2011.0
+Conflicts:	inistcripts < 9.24
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
-# TODO for P12, remove when it is removed
-BuildRequires:	automake autoconf
 
 %description
 systemd is a system and session manager for Linux, compatible with
@@ -131,63 +139,18 @@ rm -f %{buildroot}%{_sysconfdir}/systemd/system/display-manager.service
 # And the default symlink we generate automatically based on inittab
 rm -f %{buildroot}%{_sysconfdir}/systemd/system/default.target
 
-# The following services are currently executed by rc.sysinit
-pushd %{buildroot}/lib/systemd/system/basic.target.wants && {
-	rm -f sysctl.service
-	rm -f systemd-modules-load.service
-	rm -f systemd-tmpfiles.service
-	rm -f systemd-tmpfiles-clean.timer
-popd
-}
-
-# The following services are currently installed by initscripts
-pushd %{buildroot}/lib/systemd/system/graphical.target.wants && {
-	rm -f display-manager.service
-popd
-}
-
-# The following services are currently executed by rc.sysinit
+# We are not prepared to deal with tmpfs /var/run or /var/lock
 pushd %{buildroot}/lib/systemd/system/local-fs.target.wants && {
-	rm -f cryptsetup.target
-	rm -f fsck-root.service
-	rm -f remount-rootfs.service
-	rm -f systemd-remount-api-vfs.service
-	rm -f var-lock.mount
-	rm -f var-run.mount
+        rm -f var-lock.mount
+        rm -f var-run.mount
 popd
 }
 
-# The following services are currently installed by initscripts
-pushd %{buildroot}/lib/systemd/system/multi-user.target.wants && {
-	rm -f rc-local.service
-	rm -f systemd-ask-password-wall.path
-popd
-}
-
-# The following services are currently executed by rc.sysinit
-pushd %{buildroot}/lib/systemd/system/sysinit.target.wants && {
-	rm -f systemd-ask-password-console.path
-	rm -f systemd-modules-load.service
-	rm -f systemd-random-seed-load.service
-	rm -f systemd-sysctl.service
-	rm -f systemd-tmpfiles-setup.service
-popd
-}
-
-# The following services are currently part of initscripts
+# hide iniscripts service
 pushd %{buildroot}/lib/systemd/system && {
-	rm -f default.target
-	rm -f display-manager.service
-	rm -f prefdm.service
-	rm -f rc-local.service
-	rm -f single.service
-	rm -f sysinit.service
+	ln -s prefdm.service dm.service
 popd
 }
-
-# (bor) For now mounts are performed by initscripts (Fedora)
-sed -i -e 's/^#MountAuto=yes$/MountAuto=no/' \
-        -e 's/^#SwapAuto=yes$/SwapAuto=no/' %{buildroot}/etc/systemd/system.conf
 
 # (bor) make sure we own directory for bluez to install service
 mkdir -p %{buildroot}/lib/systemd/system/bluetooth.target.wants
@@ -196,6 +159,10 @@ mkdir -p %{buildroot}/lib/systemd/system/bluetooth.target.wants
 mv %{buildroot}%{_sysconfdir}/bash_completion.d/systemctl-bash-completion.sh \
     %{buildroot}%{_sysconfdir}/bash_completion.d/systemctl
 chmod 644 %{buildroot}%{_sysconfdir}/bash_completion.d/systemctl
+
+# (bor) disable legacy output to console, it just messes things up
+sed -i -e 's/^#SysVConsole=yes$/SysVConsole=no/' \
+	%{buildroot}/etc/systemd/system.conf
 
 %clean
 rm -rf %{buildroot}
@@ -259,8 +226,7 @@ fi
 %dir /lib/systemd/system-generators
 %dir /lib/systemd/system-shutdown
 /lib/systemd/systemd-*
-# (bor) uncomment when cryptsetup is enabled
-#/lib/systemd/system-generators/*
+/lib/systemd/system-generators/*
 /lib/udev/rules.d/*.rules
 /%{_lib}/security/pam_systemd.so
 %{_bindir}/systemd-cgls
