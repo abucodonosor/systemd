@@ -146,7 +146,7 @@ pushd %{buildroot}/lib/systemd/system/local-fs.target.wants && {
 popd
 }
 
-# hide iniscripts services
+# hide initscripts services
 pushd %{buildroot}/lib/systemd/system && {
 	ln -s prefdm.service dm.service
 	ln -s rescue.service single.service
