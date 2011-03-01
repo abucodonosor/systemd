@@ -11,8 +11,8 @@
 
 Summary:	A System and Session Manager
 Name:		systemd
-Version:	18
-Release:	%mkrel 5
+Version:	19
+Release:	%mkrel 1
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -32,6 +32,10 @@ Patch15:	systemd-17-prefdm.patch
 Patch16:	systemd-18-clean-dirs-on-boot.patch
 # (bor) reset /etc/mtab on boot (why is it not a link)?
 Patch17:	systemd-18-reset-mtab-on-boot.patch
+# (bor) allow explicit stdout configuration for SysV scripts
+#Patch18:	systemd-19-sysv_std_output.patch
+# (bor) fix potential deadlock when onseshot unit is not finished
+Patch19:	systemd-19-apply-timeoutsec-to-oneshot-too.patch
 
 BuildRequires:	cryptsetup-devel
 BuildRequires:	dbus-devel >= 1.4.0
@@ -176,6 +180,19 @@ if [ $1 -ge 2 -o $2 -ge 2 ] ; then
 	/bin/systemctl daemon-reexec 2>&1 || :
 fi
 
+%triggerin units -- systemd-units < 19
+# Enable the services we install by default.
+/bin/systemctl enable \
+	quotaon.service \
+	quotacheck.service \
+	systemd-readahead-replay.service \
+	systemd-readahead-collect.service \
+	2>&1 || :
+# rc-local is now enabled by default in base package
+/bin/systemctl disable \
+	rc-local.service \
+	2>&1 || :
+
 %post units
 if [ $1 -eq 1 ] ; then
         # Try to read default runlevel from the old inittab if it exists
@@ -189,20 +206,25 @@ if [ $1 -eq 1 ] ; then
         # And symlink what we found to the new-style default.target
         /bin/ln -sf "$target" %{_sysconfdir}/systemd/system/default.target 2>&1 || :
 
-        # Enable the services we install by default.
-	# (bor) do not enable prefdm.service, we start it in initscript
-        /bin/systemctl enable \
-                getty@.service \
-                rc-local.service \
-                remote-fs.target 2>&1 || :
+	# Enable the services we install by default.
+	/bin/systemctl enable \
+		getty@.service \
+		quotaon.service \
+		quotacheck.service \
+		systemd-readahead-replay.service \
+		systemd-readahead-collect.service \
+		remote-fs.target 2>&1 || :
 fi
 
 %preun units
 if [ $1 -eq 0 ] ; then
         /bin/systemctl disable \
-                getty@.service \
-                rc-local.service \
-                remote-fs.target 2>&1 || :
+		getty@.service \
+		quotaon.service \
+		quotacheck.service \
+		systemd-readahead-replay.service \
+		systemd-readahead-collect.service \
+		remote-fs.target 2>&1 || :
 
         /bin/rm -f /etc/systemd/system/default.target 2>&1 || :
 fi
