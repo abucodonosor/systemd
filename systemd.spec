@@ -36,6 +36,8 @@ Patch17:	systemd-18-reset-mtab-on-boot.patch
 #Patch18:	systemd-19-sysv_std_output.patch
 # (bor) fix potential deadlock when onseshot unit is not finished
 Patch19:	systemd-19-apply-timeoutsec-to-oneshot-too.patch
+# (bor) add unit to put "reboot" record on wtmp on boot
+Patch20:	systemd-19-add-utmp-reboot.patch
 
 BuildRequires:	cryptsetup-devel
 BuildRequires:	dbus-devel >= 1.4.0
