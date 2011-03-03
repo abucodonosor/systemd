@@ -12,7 +12,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	19
-Release:	%mkrel 2
+Release:	%mkrel 3
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -36,8 +36,8 @@ Patch17:	systemd-18-reset-mtab-on-boot.patch
 #Patch18:	systemd-19-sysv_std_output.patch
 # (bor) fix potential deadlock when onseshot unit is not finished
 Patch19:	systemd-19-apply-timeoutsec-to-oneshot-too.patch
-# (bor) add unit to put "reboot" record on wtmp on boot
-Patch20:	systemd-19-add-utmp-reboot.patch
+# (bor) do not skip files on reiserfs in directory scan (GIT)
+Patch20:	systemd-19-do-not-ignore-DT_UNKNOWN.patch
 
 BuildRequires:	cryptsetup-devel
 BuildRequires:	dbus-devel >= 1.4.0
