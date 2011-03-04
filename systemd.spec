@@ -171,6 +171,10 @@ chmod 644 %{buildroot}%{_sysconfdir}/bash_completion.d/systemctl
 sed -i -e 's/^#SysVConsole=yes$/SysVConsole=no/' \
 	%{buildroot}/etc/systemd/system.conf
 
+# (bor) enable rpcbind.target by default so we have something to plug
+#	portmapper service into
+ln -s ../rpcbind.target %{buildroot}/lib/systemd/system/multi-user.target.wants
+
 %clean
 rm -rf %{buildroot}
 
