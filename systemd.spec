@@ -57,7 +57,7 @@ Requires:	dbus >= 1.3.2
 Requires:	udev >= 160
 Requires:	initscripts >= 9.21-3mdv2011.0
 Requires:	util-linux-ng >= 2.18-2mdv2011.0
-Conflicts:	inistcripts < 9.24
+Conflicts:	initscripts < 9.24
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
 %description
