@@ -198,9 +198,7 @@ fi
 	systemd-readahead-collect.service \
 	2>&1 || :
 # rc-local is now enabled by default in base package
-/bin/systemctl --quiet disable \
-	rc-local.service \
-	2>&1 || :
+rm -f /etc/systemd/system/multi-user.target.wants/rc-local.service || :
 
 %post units
 if [ $1 -eq 1 ] ; then
