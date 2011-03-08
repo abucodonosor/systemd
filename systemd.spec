@@ -188,16 +188,17 @@ if [ $1 -ge 2 -o $2 -ge 2 ] ; then
 	/bin/systemctl daemon-reexec 2>&1 || :
 fi
 
-%triggerin units -- systemd-units < 19
+%triggerin units -- %{name}-units < 19-4
 # Enable the services we install by default.
-/bin/systemctl enable \
+/bin/systemctl --quiet enable \
+	hwclock-load.service \
 	quotaon.service \
 	quotacheck.service \
 	systemd-readahead-replay.service \
 	systemd-readahead-collect.service \
 	2>&1 || :
 # rc-local is now enabled by default in base package
-/bin/systemctl disable \
+/bin/systemctl --quiet disable \
 	rc-local.service \
 	2>&1 || :
 
@@ -215,24 +216,28 @@ if [ $1 -eq 1 ] ; then
         /bin/ln -sf "$target" %{_sysconfdir}/systemd/system/default.target 2>&1 || :
 
 	# Enable the services we install by default.
-	/bin/systemctl enable \
+	/bin/systemctl --quiet enable \
+		hwclock-load.service \
 		getty@.service \
 		quotaon.service \
 		quotacheck.service \
+		remote-fs.target \
 		systemd-readahead-replay.service \
 		systemd-readahead-collect.service \
-		remote-fs.target 2>&1 || :
+		2>&1 || :
 fi
 
 %preun units
 if [ $1 -eq 0 ] ; then
-        /bin/systemctl disable \
+        /bin/systemctl --quiet disable \
+		hwclock-load.service \
 		getty@.service \
 		quotaon.service \
 		quotacheck.service \
+		remote-fs.target \
 		systemd-readahead-replay.service \
 		systemd-readahead-collect.service \
-		remote-fs.target 2>&1 || :
+		2>&1 || :
 
         /bin/rm -f /etc/systemd/system/default.target 2>&1 || :
 fi
