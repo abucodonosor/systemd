@@ -26,6 +26,8 @@ Patch6:		0007-Fully-support-all-i18n-environments-in-Mandriva.patch
 Patch7:		0008-Use-network-for-special-network-service.patch
 # (bor) take welcome message from /etc/mandriva-release
 Patch13:	0001-Use-etc-mandriva-release-to-show-boot-welcome-messag.patch
+# (eugeni) do not mess with the system time, rely on kernel
+Patch14:	systemd-17-hwclock-hctosys.patch
 # (bor) adapt prefdm to Mandriva (moved from initscripts)
 Patch15:	systemd-17-prefdm.patch
 # (bor) clean up directories on boot as done by rc.sysinit
