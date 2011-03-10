@@ -12,7 +12,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	19
-Release:	%mkrel 3
+Release:	%mkrel 4
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -40,6 +40,8 @@ Patch17:	systemd-18-reset-mtab-on-boot.patch
 Patch19:	systemd-19-apply-timeoutsec-to-oneshot-too.patch
 # (bor) do not skip files on reiserfs in directory scan (GIT)
 Patch20:	systemd-19-do-not-ignore-DT_UNKNOWN.patch
+# (bor) network filesystems do not need quota service (mdv#62746)
+Patch21:	systemd-19-no-quotacheck-for-netfs.patch
 
 BuildRequires:	cryptsetup-devel
 BuildRequires:	dbus-devel >= 1.4.0
