@@ -11,25 +11,15 @@
 
 Summary:	A System and Session Manager
 Name:		systemd
-Version:	19
-Release:	%mkrel 4
+Version:	20
+Release:	%mkrel 1
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
 Source0:	http://www.freedesktop.org/software/systemd/%{name}-%{version}.tar.bz2
 
-# (bor) adapt vconsole service to Mandriva configuration
-Patch5:		0006-Adapt-vconsole-setup-to-Mandriva-configuration-based.patch
-# (bor) adapt locale setup to Mandriva configuration
-Patch6:		0007-Fully-support-all-i18n-environments-in-Mandriva.patch
-# (bor) distinguish between network and $network to break dependency loop
-Patch7:		0008-Use-network-for-special-network-service.patch
-# (bor) take welcome message from /etc/mandriva-release
-Patch13:	0001-Use-etc-mandriva-release-to-show-boot-welcome-messag.patch
 # (eugeni) do not mess with the system time, rely on kernel
 Patch14:	systemd-17-hwclock-hctosys.patch
-# (bor) adapt prefdm to Mandriva (moved from initscripts)
-Patch15:	systemd-17-prefdm.patch
 # (bor) clean up directories on boot as done by rc.sysinit
 Patch16:	systemd-18-clean-dirs-on-boot.patch
 # (bor) reset /etc/mtab on boot (why is it not a link)?
@@ -38,10 +28,10 @@ Patch17:	systemd-18-reset-mtab-on-boot.patch
 #Patch18:	systemd-19-sysv_std_output.patch
 # (bor) fix potential deadlock when onseshot unit is not finished
 Patch19:	systemd-19-apply-timeoutsec-to-oneshot-too.patch
-# (bor) do not skip files on reiserfs in directory scan (GIT)
-Patch20:	systemd-19-do-not-ignore-DT_UNKNOWN.patch
 # (bor) network filesystems do not need quota service (mdv#62746)
 Patch21:	systemd-19-no-quotacheck-for-netfs.patch
+# (bor) fix assertion due to uninitialized error (GIT)
+Patch22:	systemd-20-dbus_error_init.patch
 
 BuildRequires:	cryptsetup-devel
 BuildRequires:	dbus-devel >= 1.4.0
@@ -109,14 +99,9 @@ find src/ -name "*.vala" -exec touch '{}' \;
 
 %build
 # TODO for P12, remove when it is removed
-automake -c -f
-autoconf
+autoreconf -fis
 %configure2_5x \
-	--with-rootdir= \
-	--with-distro=fedora \
-	--with-sysvinit-path=%{_initrddir} \
-	--with-sysvrcd-path=%{_sysconfdir}/rc.d \
-	--with-syslog-service=rsyslog.service
+	--with-rootdir=
 
 %make
 
@@ -156,13 +141,6 @@ pushd %{buildroot}/lib/systemd/system/local-fs.target.wants && {
 popd
 }
 
-# hide initscripts services
-pushd %{buildroot}/lib/systemd/system && {
-	ln -s prefdm.service dm.service
-	ln -s rescue.service single.service
-popd
-}
-
 # (bor) make sure we own directory for bluez to install service
 mkdir -p %{buildroot}/lib/systemd/system/bluetooth.target.wants
 
@@ -179,6 +157,10 @@ sed -i -e 's/^#SysVConsole=yes$/SysVConsole=no/' \
 #	portmapper service into
 ln -s ../rpcbind.target %{buildroot}/lib/systemd/system/multi-user.target.wants
 
+# (bor) machine-id-setup is in /sbin in post-v20
+install -d %{buildroot}/sbin && \
+	mv %{buildroot}/bin/systemd-machine-id-setup %{buildroot}/sbin
+
 %clean
 rm -rf %{buildroot}
 
@@ -189,6 +171,9 @@ rm -rf %{buildroot}
 if [ $1 -ge 2 -o $2 -ge 2 ] ; then
 	/bin/systemctl daemon-reexec 2>&1 || :
 fi
+
+%post
+/sbin/systemd-machine-id-setup
 
 %triggerin units -- %{name}-units < 19-4
 # Enable the services we install by default.
@@ -258,6 +243,7 @@ fi
 /bin/systemd-notify
 /bin/systemd-tmpfiles
 /bin/systemd-tty-ask-password-agent
+/sbin/systemd-machine-id-setup
 %dir /lib/systemd
 %dir /lib/systemd/system-generators
 %dir /lib/systemd/system-shutdown
