@@ -12,7 +12,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	20
-Release:	%mkrel 1
+Release:	%mkrel 2
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -67,7 +67,6 @@ work as a drop-in replacement for sysvinit.
 %package units
 Summary:	Configuration files, directories and installation tool for systemd
 Group:		System/Configuration/Boot and Init
-Requires:	%{name} = %{version}-%{release}
 
 %description units
 Basic configuration files, directories and installation tool for the systemd
@@ -236,7 +235,8 @@ fi
 %defattr(-,root,root)
 %config(noreplace) %{_sysconfdir}/dbus-1/system.d/org.freedesktop.systemd1.conf
 %config(noreplace) %{_sysconfdir}/systemd/system.conf
-%dir %{_sysconfdir}/systemd/user
+%dir %{_sysconfdir}/tmpfiles.d
+%config(noreplace) %{_sysconfdir}/tmpfiles.d/*.conf
 %{_sysconfdir}/xdg/systemd
 /bin/systemd
 /bin/systemd-ask-password
@@ -272,9 +272,8 @@ fi
 /bin/systemctl
 %dir %{_sysconfdir}/systemd
 %dir %{_sysconfdir}/systemd/system
-%dir %{_sysconfdir}/tmpfiles.d
+%dir %{_sysconfdir}/systemd/user
 %{_sysconfdir}/bash_completion.d/systemctl
-%config(noreplace) %{_sysconfdir}/tmpfiles.d/*.conf
 /lib/systemd/system
 %{_mandir}/man1/systemctl.*
 %{_datadir}/pkgconfig/systemd.pc
