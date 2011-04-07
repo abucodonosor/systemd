@@ -11,15 +11,13 @@
 
 Summary:	A System and Session Manager
 Name:		systemd
-Version:	20
-Release:	%mkrel 3
+Version:	24
+Release:	%mkrel 1
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
 Source0:	http://www.freedesktop.org/software/systemd/%{name}-%{version}.tar.bz2
 
-# (eugeni) do not mess with the system time, rely on kernel
-Patch14:	systemd-17-hwclock-hctosys.patch
 # (bor) clean up directories on boot as done by rc.sysinit
 Patch16:	systemd-18-clean-dirs-on-boot.patch
 # (bor) reset /etc/mtab on boot (why is it not a link)?
@@ -29,9 +27,7 @@ Patch17:	systemd-18-reset-mtab-on-boot.patch
 # (bor) fix potential deadlock when onseshot unit is not finished
 Patch19:	systemd-19-apply-timeoutsec-to-oneshot-too.patch
 # (bor) network filesystems do not need quota service (mdv#62746)
-Patch21:	systemd-19-no-quotacheck-for-netfs.patch
-# (bor) fix assertion due to uninitialized error (GIT)
-Patch22:	systemd-20-dbus_error_init.patch
+#Patch21:	systemd-19-no-quotacheck-for-netfs.patch
 
 BuildRequires:	cryptsetup-devel
 BuildRequires:	dbus-devel >= 1.4.0
@@ -251,16 +247,19 @@ fi
 /lib/systemd/system-generators/*
 /lib/udev/rules.d/*.rules
 /%{_lib}/security/pam_systemd.so
+%{_bindir}/systemd-analyze
 %{_bindir}/systemd-cgls
+%{_bindir}/systemd-nspawn
+%{_bindir}/systemd-stdio-bridge
 %{_mandir}/man1/systemd.*
 %{_mandir}/man1/systemd-notify.*
+%{_mandir}/man1/systemd-nspawn.*
 %{_mandir}/man1/systemd-cgls.*
 %{_mandir}/man3/*
 %{_mandir}/man5/*
 %{_mandir}/man7/*
 %{_mandir}/man8/pam_systemd.*
 %{_mandir}/man8/systemd-tmpfiles.*
-%{_datadir}/systemd
 %{_datadir}/dbus-1/services/org.freedesktop.systemd1.service
 %{_datadir}/dbus-1/system-services/org.freedesktop.systemd1.service
 %{_datadir}/dbus-1/interfaces/org.freedesktop.systemd1.*.xml
@@ -275,6 +274,7 @@ fi
 %dir %{_sysconfdir}/systemd/user
 %{_sysconfdir}/bash_completion.d/systemctl
 /lib/systemd/system
+/usr/lib/systemd/
 %{_mandir}/man1/systemctl.*
 %{_datadir}/pkgconfig/systemd.pc
 
