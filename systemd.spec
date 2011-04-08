@@ -12,7 +12,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	24
-Release:	%mkrel 1
+Release:	%mkrel 2
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -155,6 +155,9 @@ ln -s ../rpcbind.target %{buildroot}/lib/systemd/system/multi-user.target.wants
 # (bor) machine-id-setup is in /sbin in post-v20
 install -d %{buildroot}/sbin && \
 	mv %{buildroot}/bin/systemd-machine-id-setup %{buildroot}/sbin
+
+# (eugeni) install /run
+mkdir %{buildroot}/run
 
 %clean
 rm -rf %{buildroot}
@@ -300,3 +303,4 @@ fi
 %{_mandir}/man8/poweroff.*
 %{_mandir}/man8/telinit.*
 %{_mandir}/man8/runlevel.*
+%dir /run
