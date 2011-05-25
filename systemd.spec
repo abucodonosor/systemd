@@ -11,8 +11,8 @@
 
 Summary:	A System and Session Manager
 Name:		systemd
-Version:	24
-Release:	%mkrel 2
+Version:	27
+Release:	%mkrel 1
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -235,7 +235,6 @@ fi
 %config(noreplace) %{_sysconfdir}/dbus-1/system.d/org.freedesktop.systemd1.conf
 %config(noreplace) %{_sysconfdir}/systemd/system.conf
 %dir %{_sysconfdir}/tmpfiles.d
-%config(noreplace) %{_sysconfdir}/tmpfiles.d/*.conf
 %{_sysconfdir}/xdg/systemd
 /bin/systemd
 /bin/systemd-ask-password
@@ -249,12 +248,18 @@ fi
 /lib/systemd/systemd-*
 /lib/systemd/system-generators/*
 /lib/udev/rules.d/*.rules
+%dir /usr/lib/tmpfiles.d/
+/usr/lib/tmpfiles.d/legacy.conf
+/usr/lib/tmpfiles.d/systemd.conf
+/usr/lib/tmpfiles.d/x11.conf
+%{_sysconfdir}/dbus-1/system.d/org.freedesktop.hostname1.conf
 /%{_lib}/security/pam_systemd.so
 %{_bindir}/systemd-analyze
 %{_bindir}/systemd-cgls
 %{_bindir}/systemd-nspawn
 %{_bindir}/systemd-stdio-bridge
 %{_mandir}/man1/systemd.*
+%{_mandir}/man1/systemd-ask-password.*
 %{_mandir}/man1/systemd-notify.*
 %{_mandir}/man1/systemd-nspawn.*
 %{_mandir}/man1/systemd-cgls.*
@@ -263,10 +268,12 @@ fi
 %{_mandir}/man7/*
 %{_mandir}/man8/pam_systemd.*
 %{_mandir}/man8/systemd-tmpfiles.*
+%{_datadir}/dbus-1/system-services/org.freedesktop.hostname1.service
 %{_datadir}/dbus-1/services/org.freedesktop.systemd1.service
 %{_datadir}/dbus-1/system-services/org.freedesktop.systemd1.service
 %{_datadir}/dbus-1/interfaces/org.freedesktop.systemd1.*.xml
 %{_datadir}/polkit-1/actions/org.freedesktop.systemd1.policy
+%{_datadir}/polkit-1/actions/org.freedesktop.hostname1.policy
 %{_docdir}/systemd
 
 %files units
