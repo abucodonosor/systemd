@@ -1,7 +1,7 @@
 # macros for sysvinit transition - should be equal to
 # sysvinit %version-%release-plus-1
 %define sysvinit_version 2.87
-%define sysvinit_release %mkrel 11
+%define sysvinit_release %mkrel 12
 
 # (eugeni) for backports and old distributions, rely on EVRD as well
 %if %mdkversion < 201100
@@ -159,6 +159,14 @@ install -d %{buildroot}/sbin && \
 # (eugeni) install /run
 mkdir %{buildroot}/run
 
+# add missing ttys (mdv #63600)
+mkdir -p %{buildroot}/etc/systemd/system/getty.target.wants
+pushd %{buildroot}/etc/systemd/system/getty.target.wants
+	for _term in 1 2 3 4 5 6 ; do
+	ln -s /lib/systemd/system/getty@.service getty@tty$_term.service
+	done
+popd
+
 %clean
 rm -rf %{buildroot}
 
@@ -282,6 +290,8 @@ fi
 %dir %{_sysconfdir}/systemd
 %dir %{_sysconfdir}/systemd/system
 %dir %{_sysconfdir}/systemd/user
+%{_sysconfdir}/systemd/system/getty.target.wants/getty@*.service
+%{_sysconfdir}/systemd/system/getty.target.wants
 %{_sysconfdir}/bash_completion.d/systemctl
 /lib/systemd/system
 /usr/lib/systemd/
