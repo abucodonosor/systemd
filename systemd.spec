@@ -36,7 +36,7 @@ BuildRequires:	libcap-devel
 BuildRequires:	tcp_wrappers-devel
 BuildRequires:	pam-devel
 BuildRequires:	dbus-glib-devel
-BuildRequires:	vala
+BuildRequires:	vala >= 0.9
 BuildRequires:	gtk2-devel glib2-devel libnotify-devel
 BuildRequires:  libxslt-devel
 BuildRequires:  docbook-style-xsl
