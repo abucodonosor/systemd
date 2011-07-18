@@ -1,7 +1,7 @@
 # macros for sysvinit transition - should be equal to
 # sysvinit %version-%release-plus-1
 %define sysvinit_version 2.87
-%define sysvinit_release %mkrel 12
+%define sysvinit_release %mkrel 13
 
 # (eugeni) for backports and old distributions, rely on EVRD as well
 %if %mdkversion < 201100
@@ -12,7 +12,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	29
-Release:	%mkrel 3
+Release:	%mkrel 4
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -28,6 +28,7 @@ Patch17:	systemd-18-reset-mtab-on-boot.patch
 Patch19:	systemd-19-apply-timeoutsec-to-oneshot-too.patch
 # (bor) network filesystems do not need quota service (mdv#62746)
 #Patch21:	systemd-19-no-quotacheck-for-netfs.patch
+Patch22: systemd-tmpfilesd-utmp-temp-patch.patch
 
 BuildRequires:	cryptsetup-devel
 BuildRequires:	dbus-devel >= 1.4.0
