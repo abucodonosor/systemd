@@ -8,11 +8,20 @@
 %define EVRD %{?epoch:%{epoch}:}%{?version:%{version}}%{?release:-%{release}}%{?distepoch::%{distepoch}}
 %endif
 
+%define libdaemon_major 0
+%define liblogin_major 0
+
+%define libdaemon %mklibname systemd-daemon %{libdaemon_major}
+%define libdaemon_devel %mklibname -d systemd-daemon %{libdaemon_major}
+
+%define liblogin %mklibname systemd-login %{liblogin_major}
+%define liblogin_devel %mklibname -d systemd-login %{liblogin_major}
+
 
 Summary:	A System and Session Manager
 Name:		systemd
-Version:	29
-Release:	%mkrel 4
+Version:	31
+Release:	%mkrel 1
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -43,6 +52,7 @@ BuildRequires:  libxslt-devel
 BuildRequires:  docbook-style-xsl
 # TODO for P12, remove when it is removed
 BuildRequires:	automake autoconf
+BuildRequires:	intltool
 Requires:	systemd-units = %{EVRD}
 Requires:	dbus >= 1.3.2
 Requires:	udev >= 160
@@ -88,14 +98,46 @@ Conflicts:      sysvinit < %sysvinit_version-%sysvinit_release, SysVinit < %sysv
 %description sysvinit
 Drop-in replacement for the System V init tools of systemd.
 
+%package -n %{libdaemon}
+Summary: 	Systemd-daemon library package
+Group: 		System/Libraries
+Provides:	libsystemd-daemon = %{version}-%{release}
+
+%description -n %{libdaemon}
+This package provides the systemd-daemon shared library.
+
+%package -n %{libdaemon_devel}
+Summary: 	Systemd-daemon library development files
+Group: 		Development/C
+Requires:	%{libdaemon} = %{version}-%{release}
+Provides:	libsystemd-daemon-devel = %{version}-%{release}
+
+%description -n %{libdaemon_devel}
+This package provides the development files for the systemd-daemon shared library.
+
+%package -n %{liblogin}
+Summary: 	Systemd-login library package
+Group: 		System/Libraries
+Provides:	libsystemd-login = %{version}-%{release}
+
+%description -n %{liblogin}
+This package provides the systemd-login shared library.
+
+%package -n %{liblogin_devel}
+Summary: 	Systemd-login library development files
+Group: 		Development/C
+Requires:	%{liblogin} = %{version}-%{release}
+Provides:	libsystemd-login-devel = %{version}-%{release}
+
+%description -n %{liblogin_devel}
+This package provides the development files for the systemd-login shared library.
+
 %prep
 %setup -q
 %apply_patches
 find src/ -name "*.vala" -exec touch '{}' \;
 
 %build
-# TODO for P12, remove when it is removed
-autoreconf -fis
 %configure2_5x \
 	--with-rootdir=
 
@@ -243,10 +285,13 @@ fi
 %defattr(-,root,root)
 %config(noreplace) %{_sysconfdir}/dbus-1/system.d/org.freedesktop.systemd1.conf
 %config(noreplace) %{_sysconfdir}/systemd/system.conf
+%config(noreplace) %{_sysconfdir}/systemd/systemd-logind.conf
+%config(noreplace) %{_sysconfdir}/systemd/user.conf
 %dir %{_sysconfdir}/tmpfiles.d
 %{_sysconfdir}/xdg/systemd
 /bin/systemd
 /bin/systemd-ask-password
+/bin/systemd-loginctl
 /bin/systemd-notify
 /bin/systemd-tmpfiles
 /bin/systemd-tty-ask-password-agent
@@ -262,6 +307,9 @@ fi
 /usr/lib/tmpfiles.d/systemd.conf
 /usr/lib/tmpfiles.d/x11.conf
 %{_sysconfdir}/dbus-1/system.d/org.freedesktop.hostname1.conf
+%{_sysconfdir}/dbus-1/system.d/org.freedesktop.locale1.conf
+%{_sysconfdir}/dbus-1/system.d/org.freedesktop.login1.conf
+%{_sysconfdir}/dbus-1/system.d/org.freedesktop.timedate1.conf
 /%{_lib}/security/pam_systemd.so
 %{_bindir}/systemd-analyze
 %{_bindir}/systemd-cgls
@@ -269,6 +317,7 @@ fi
 %{_bindir}/systemd-stdio-bridge
 %{_mandir}/man1/systemd.*
 %{_mandir}/man1/systemd-ask-password.*
+%{_mandir}/man1/systemd-loginctl.*
 %{_mandir}/man1/systemd-notify.*
 %{_mandir}/man1/systemd-nspawn.*
 %{_mandir}/man1/systemd-cgls.*
@@ -277,12 +326,21 @@ fi
 %{_mandir}/man7/*
 %{_mandir}/man8/pam_systemd.*
 %{_mandir}/man8/systemd-tmpfiles.*
-%{_datadir}/dbus-1/system-services/org.freedesktop.hostname1.service
 %{_datadir}/dbus-1/services/org.freedesktop.systemd1.service
+%{_datadir}/dbus-1/system-services/org.freedesktop.hostname1.service
 %{_datadir}/dbus-1/system-services/org.freedesktop.systemd1.service
+%{_datadir}/dbus-1/system-services/org.freedesktop.locale1.service
+%{_datadir}/dbus-1/system-services/org.freedesktop.login1.service
+%{_datadir}/dbus-1/system-services/org.freedesktop.timedate1.service
 %{_datadir}/dbus-1/interfaces/org.freedesktop.systemd1.*.xml
+%{_datadir}/dbus-1/interfaces/org.freedesktop.hostname1*.xml
+%{_datadir}/dbus-1/interfaces/org.freedesktop.locale1*.xml
+%{_datadir}/dbus-1/interfaces/org.freedesktop.timedate1*.xml
 %{_datadir}/polkit-1/actions/org.freedesktop.systemd1.policy
 %{_datadir}/polkit-1/actions/org.freedesktop.hostname1.policy
+%{_datadir}/polkit-1/actions/org.freedesktop.locale1.policy
+%{_datadir}/polkit-1/actions/org.freedesktop.login1.policy
+%{_datadir}/polkit-1/actions/org.freedesktop.timedate1.policy
 %{_docdir}/systemd
 
 %files units
@@ -322,3 +380,23 @@ fi
 %{_mandir}/man8/telinit.*
 %{_mandir}/man8/runlevel.*
 %dir /run
+
+%files -n %{libdaemon}
+%defattr(-,root,root,-)
+%{_libdir}/libsystemd-daemon.so.%{libdaemon_major}*
+
+%files -n %{libdaemon_devel}
+%defattr(-,root,root,-)
+%{_includedir}/systemd/sd-daemon.h
+%{_libdir}/libsystemd-daemon.so
+%{_libdir}/pkgconfig/libsystemd-daemon.pc
+
+%files -n %{liblogin}
+%defattr(-,root,root,-)
+%{_libdir}/libsystemd-login.so.%{liblogin_major}*
+
+%files -n %{liblogin_devel}
+%defattr(-,root,root,-)
+%{_includedir}/systemd/sd-login.h
+%{_libdir}/libsystemd-login.so
+%{_libdir}/pkgconfig/libsystemd-login.pc
