@@ -20,7 +20,7 @@
 
 Summary:	A System and Session Manager
 Name:		systemd
-Version:	31
+Version:	33
 Release:	%mkrel 1
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
@@ -37,7 +37,11 @@ Patch17:	systemd-18-reset-mtab-on-boot.patch
 Patch19:	systemd-19-apply-timeoutsec-to-oneshot-too.patch
 # (bor) network filesystems do not need quota service (mdv#62746)
 #Patch21:	systemd-19-no-quotacheck-for-netfs.patch
-Patch22: systemd-tmpfilesd-utmp-temp-patch.patch
+Patch22:	systemd-tmpfilesd-utmp-temp-patch.patch
+# (tpg) Patches from upstream git
+Patch23:	systemd-33-git-5ed27.patch
+Patch24:	systemd-33-git-e1915.patch
+Patch25:	systemd-33-git-612e5.patch
 
 BuildRequires:	cryptsetup-devel
 BuildRequires:	dbus-devel >= 1.4.0
@@ -53,6 +57,7 @@ BuildRequires:  docbook-style-xsl
 # TODO for P12, remove when it is removed
 BuildRequires:	automake autoconf
 BuildRequires:	intltool
+BuildRequires:	gperf
 Requires:	systemd-units = %{EVRD}
 Requires:	dbus >= 1.3.2
 Requires:	udev >= 160
@@ -210,6 +215,12 @@ pushd %{buildroot}/etc/systemd/system/getty.target.wants
 	done
 popd
 
+# add /etc/hostname
+touch %{buildroot}%{_sysconfdir}/hostname
+
+# create modules.conf as a symlink to /etc/
+ln -s /etc/modules %{buildroot}%{_sysconfdir}/modules-load.d/modules.conf
+
 %clean
 rm -rf %{buildroot}
 
@@ -287,7 +298,9 @@ fi
 %config(noreplace) %{_sysconfdir}/systemd/system.conf
 %config(noreplace) %{_sysconfdir}/systemd/systemd-logind.conf
 %config(noreplace) %{_sysconfdir}/systemd/user.conf
+%config(noreplace) %{_sysconfdir}/hostname
 %dir %{_sysconfdir}/tmpfiles.d
+%dir %{_sysconfdir}/modules-load.d/modules.conf
 %{_sysconfdir}/xdg/systemd
 /bin/systemd
 /bin/systemd-ask-password
@@ -303,6 +316,7 @@ fi
 /lib/systemd/system-generators/*
 /lib/udev/rules.d/*.rules
 %dir /usr/lib/tmpfiles.d/
+%dir /usr/lib/modules-load.d
 /usr/lib/tmpfiles.d/legacy.conf
 /usr/lib/tmpfiles.d/systemd.conf
 /usr/lib/tmpfiles.d/x11.conf
