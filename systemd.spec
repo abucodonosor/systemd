@@ -21,7 +21,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	33
-Release:	%mkrel 2
+Release:	%mkrel 3
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -42,6 +42,7 @@ Patch22:	systemd-tmpfilesd-utmp-temp-patch.patch
 Patch23:	systemd-33-git-5ed27.patch
 Patch24:	systemd-33-git-e1915.patch
 Patch25:	systemd-33-git-612e5.patch
+Patch26:	systemd-halt-pre.patch
 
 BuildRequires:	cryptsetup-devel
 BuildRequires:	dbus-devel >= 1.4.0
