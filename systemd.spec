@@ -20,8 +20,8 @@
 
 Summary:	A System and Session Manager
 Name:		systemd
-Version:	33
-Release:	%mkrel 4
+Version:	35
+Release:	%mkrel 1
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -39,9 +39,6 @@ Patch19:	systemd-19-apply-timeoutsec-to-oneshot-too.patch
 #Patch21:	systemd-19-no-quotacheck-for-netfs.patch
 Patch22:	systemd-tmpfilesd-utmp-temp-patch.patch
 # (tpg) Patches from upstream git
-Patch23:	systemd-33-git-5ed27.patch
-Patch24:	systemd-33-git-e1915.patch
-Patch25:	systemd-33-git-612e5.patch
 Patch26:	systemd-halt-pre.patch
 Patch27:	systemd-33-rc-local.patch
 
@@ -222,6 +219,8 @@ touch %{buildroot}%{_sysconfdir}/hostname
 
 # create modules.conf as a symlink to /etc/
 ln -s /etc/modules %{buildroot}%{_sysconfdir}/modules-load.d/modules.conf
+# (tpg) symlink also modprobe.preload because a lot of modules are inserted there from drak* stuff
+ln -s /etc/modprobe.preload %{buildroot}%{_sysconfdir}/modules-load.d/modprobe-preload.conf
 
 %clean
 rm -rf %{buildroot}
@@ -303,6 +302,7 @@ fi
 %config(noreplace) %{_sysconfdir}/hostname
 %dir %{_sysconfdir}/tmpfiles.d
 %dir %{_sysconfdir}/modules-load.d/modules.conf
+%dir %{_sysconfdir}/modules-load.d/modprobe-preload.conf
 %{_sysconfdir}/xdg/systemd
 /bin/systemd
 /bin/systemd-ask-password
@@ -322,6 +322,7 @@ fi
 /usr/lib/tmpfiles.d/legacy.conf
 /usr/lib/tmpfiles.d/systemd.conf
 /usr/lib/tmpfiles.d/x11.conf
+/usr/lib/tmpfiles.d/tmp.conf
 %{_sysconfdir}/dbus-1/system.d/org.freedesktop.hostname1.conf
 %{_sysconfdir}/dbus-1/system.d/org.freedesktop.locale1.conf
 %{_sysconfdir}/dbus-1/system.d/org.freedesktop.login1.conf
@@ -365,8 +366,8 @@ fi
 %dir %{_sysconfdir}/systemd
 %dir %{_sysconfdir}/systemd/system
 %dir %{_sysconfdir}/systemd/user
+%dir %{_sysconfdir}/systemd/system/getty.target.wants
 %{_sysconfdir}/systemd/system/getty.target.wants/getty@*.service
-%{_sysconfdir}/systemd/system/getty.target.wants
 %{_sysconfdir}/bash_completion.d/systemctl
 /lib/systemd/system
 /usr/lib/systemd/
