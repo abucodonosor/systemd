@@ -21,7 +21,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	35
-Release:	%mkrel 1
+Release:	%mkrel 2
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -78,6 +78,8 @@ work as a drop-in replacement for sysvinit.
 %package units
 Summary:	Configuration files, directories and installation tool for systemd
 Group:		System/Configuration/Boot and Init
+Requires(post):	coreutils
+Requires(post):	gawk
 
 %description units
 Basic configuration files, directories and installation tool for the systemd
@@ -87,6 +89,7 @@ system and session manager.
 Summary:        Graphical frontend for systemd
 Group:          System/Configuration/Boot and Init
 Requires:       %{name} = %{version}-%{release}
+Requires:	polkit
 
 %description gtk
 Graphical front-end for systemd.
@@ -270,6 +273,7 @@ if [ $1 -eq 1 ] ; then
 		remote-fs.target \
 		systemd-readahead-replay.service \
 		systemd-readahead-collect.service \
+		rsyslog.service \
 		2>&1 || :
 fi
 
@@ -283,6 +287,7 @@ if [ $1 -eq 0 ] ; then
 		remote-fs.target \
 		systemd-readahead-replay.service \
 		systemd-readahead-collect.service \
+		rsyslog.service \
 		2>&1 || :
 
         /bin/rm -f /etc/systemd/system/default.target 2>&1 || :
