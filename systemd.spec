@@ -21,7 +21,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	35
-Release:	%mkrel 2
+Release:	%mkrel 3
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -60,9 +60,10 @@ BuildRequires:	gperf
 Requires:	systemd-units = %{EVRD}
 Requires:	dbus >= 1.3.2
 Requires:	udev >= 160
-Requires:	initscripts >= 9.21-3mdv2011.0
+Requires(pre):	initscripts >= 9.21-3mdv2011.0
 Requires:	util-linux-ng >= 2.18-2mdv2011.0
 Conflicts:	initscripts < 9.24
+Conflicts:	readahead
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
 %description
@@ -236,8 +237,11 @@ if [ $1 -ge 2 -o $2 -ge 2 ] ; then
 	/bin/systemctl daemon-reexec 2>&1 || :
 fi
 
+
+
 %post
-/sbin/systemd-machine-id-setup
+/sbin/systemd-machine-id-setup > /dev/null 2>&1 || :
+/sbin/systemctl daemon-reexec > /dev/null 2>&1 || :
 
 %triggerin units -- %{name}-units < 19-4
 # Enable the services we install by default.
