@@ -237,7 +237,14 @@ if [ $1 -ge 2 -o $2 -ge 2 ] ; then
 	/bin/systemctl daemon-reexec 2>&1 || :
 fi
 
-
+%triggerin -- initscripts
+# (tpg) disable speedboot feature on install or on update
+# speedboot feature messes things really hard
+if [ $1 -ge 1 -o $2 -ge 2 ] ; then
+	if [ -e /etc/sysconfig/speedboot ] ; then
+	    sed -i -e 's/^SPEEDBOOT=.*$/SPEEDBOOT=no/g' /etc/sysconfig/speedboot
+	fi
+fi
 
 %post
 /sbin/systemd-machine-id-setup > /dev/null 2>&1 || :
