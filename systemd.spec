@@ -21,7 +21,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	35
-Release:	%mkrel 3
+Release:	%mkrel 4
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -62,6 +62,7 @@ Requires:	dbus >= 1.3.2
 Requires:	udev >= 160
 Requires(pre):	initscripts >= 9.21-3mdv2011.0
 Requires:	util-linux-ng >= 2.18-2mdv2011.0
+Requires:	nss-myhostname
 Conflicts:	initscripts < 9.24
 Conflicts:	readahead
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
