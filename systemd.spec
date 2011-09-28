@@ -21,7 +21,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	35
-Release:	%mkrel 5
+Release:	%mkrel 6
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -81,7 +81,7 @@ work as a drop-in replacement for sysvinit.
 Summary:	Non essential systemd tools
 Group:		System/Configuration/Boot and Init
 Requires:	%{name} = %{version}-%{release}
-Conflicts:	%{name} < 35-5
+Conflicts:	%{name} < 35-6
 
 %description tools
 Non essential systemd tools
@@ -356,7 +356,6 @@ fi
 %{_sysconfdir}/dbus-1/system.d/org.freedesktop.login1.conf
 %{_sysconfdir}/dbus-1/system.d/org.freedesktop.timedate1.conf
 /%{_lib}/security/pam_systemd.so
-%{_bindir}/systemd-analyze
 %{_bindir}/systemd-cgls
 %{_bindir}/systemd-nspawn
 %{_bindir}/systemd-stdio-bridge
