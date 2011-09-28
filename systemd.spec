@@ -21,7 +21,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	35
-Release:	%mkrel 4
+Release:	%mkrel 5
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -76,6 +76,15 @@ Linux cgroups, supports snapshotting and restoring of the system
 state, maintains mount and automount points and implements an
 elaborate transactional dependency-based service control logic. It can
 work as a drop-in replacement for sysvinit.
+
+%package tools
+Summary:	Non essential systemd tools
+Group:		System/Configuration/Boot and Init
+Requires:	%{name} = %{version}-%{release}
+Conflicts:	%{name} < 35-5
+
+%description tools
+Non essential systemd tools
 
 %package units
 Summary:	Configuration files, directories and installation tool for systemd
@@ -148,7 +157,9 @@ find src/ -name "*.vala" -exec touch '{}' \;
 
 %build
 %configure2_5x \
-	--with-rootdir=
+	--with-rootdir= \
+	--enable-plymouth \
+	--disable-static
 
 %make
 
@@ -249,7 +260,7 @@ fi
 
 %post
 /sbin/systemd-machine-id-setup > /dev/null 2>&1 || :
-/sbin/systemctl daemon-reexec > /dev/null 2>&1 || :
+#/sbin/systemctl daemon-reexec > /dev/null 2>&1 || :
 
 %triggerin units -- %{name}-units < 19-4
 # Enable the services we install by default.
@@ -377,6 +388,10 @@ fi
 %{_datadir}/polkit-1/actions/org.freedesktop.timedate1.policy
 %{_docdir}/systemd
 
+%files tools
+%defattr(-,root,root)
+%{_bindir}/systemd-analyze
+
 %files units
 %defattr(-,root,root)
 /bin/systemctl
@@ -389,7 +404,7 @@ fi
 /lib/systemd/system
 /usr/lib/systemd/
 %{_mandir}/man1/systemctl.*
-%{_datadir}/pkgconfig/systemd.pc
+
 
 %files gtk
 %defattr(-,root,root)
@@ -424,6 +439,7 @@ fi
 %{_includedir}/systemd/sd-daemon.h
 %{_libdir}/libsystemd-daemon.so
 %{_libdir}/pkgconfig/libsystemd-daemon.pc
+%{_datadir}/pkgconfig/systemd.pc
 
 %files -n %{liblogin}
 %defattr(-,root,root,-)
