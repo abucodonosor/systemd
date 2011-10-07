@@ -21,7 +21,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	36
-Release:	%mkrel 1
+Release:	%mkrel 2
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -156,7 +156,11 @@ This package provides the development files for the systemd-login shared library
 find src/ -name "*.vala" -exec touch '{}' \;
 
 %build
+%if %mdvver >= 201200
+%serverbuild_hardened
+%else
 %serverbuild
+%endif
 
 %configure2_5x \
 	--with-rootdir= \
