@@ -26,7 +26,7 @@ License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
 Source0:	http://www.freedesktop.org/software/systemd/%{name}-%{version}.tar.bz2
-
+Source1:	%{name}.macros
 # (bor) clean up directories on boot as done by rc.sysinit
 Patch16:	systemd-18-clean-dirs-on-boot.patch
 # (bor) reset /etc/mtab on boot (why is it not a link)?
@@ -251,6 +251,9 @@ ln -s /etc/modules %{buildroot}%{_sysconfdir}/modules-load.d/modules.conf
 # (tpg) symlink also modprobe.preload because a lot of modules are inserted there from drak* stuff
 ln -s /etc/modprobe.preload %{buildroot}%{_sysconfdir}/modules-load.d/modprobe-preload.conf
 
+# (tpg) add rpm macros
+install -m 0644 -D %{SOURCE1} %{_sysconfdir}/rpm/macros.d/%{name}.macros
+
 %clean
 rm -rf %{buildroot}
 
@@ -415,6 +418,7 @@ fi
 %{_sysconfdir}/bash_completion.d/systemctl
 /lib/systemd/system
 /usr/lib/systemd/
+%{_sysconfdir}/rpm/macros.d/%{name}.macros
 %{_mandir}/man1/systemctl.*
 
 
