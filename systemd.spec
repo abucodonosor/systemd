@@ -20,8 +20,8 @@
 
 Summary:	A System and Session Manager
 Name:		systemd
-Version:	36
-Release:	%mkrel 3
+Version:	37
+Release:	%mkrel 1
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -50,11 +50,11 @@ BuildRequires:	tcp_wrappers-devel
 BuildRequires:	pam-devel
 BuildRequires:	dbus-glib-devel
 BuildRequires:	vala >= 0.9
-BuildRequires:	gtk2-devel glib2-devel libnotify-devel
+BuildRequires:	gtk2-devel
+BuildRequires:	glib2-devel
+BuildRequires:	libnotify-devel
 BuildRequires:  libxslt-devel
 BuildRequires:  docbook-style-xsl
-# TODO for P12, remove when it is removed
-BuildRequires:	automake autoconf
 BuildRequires:	intltool
 BuildRequires:	gperf
 Requires:	systemd-units = %{EVRD}
