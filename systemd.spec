@@ -41,7 +41,6 @@ Patch22:	systemd-tmpfilesd-utmp-temp-patch.patch
 # (tpg) Patches from upstream git
 Patch26:	systemd-halt-pre.patch
 Patch27:	systemd-33-rc-local.patch
-
 BuildRequires:	cryptsetup-devel
 BuildRequires:	dbus-devel >= 1.4.0
 BuildRequires:	libudev-devel >= 160
@@ -53,8 +52,8 @@ BuildRequires:	vala >= 0.9
 BuildRequires:	gtk2-devel
 BuildRequires:	glib2-devel
 BuildRequires:	libnotify-devel
-BuildRequires:  libxslt-devel
-BuildRequires:  docbook-style-xsl
+BuildRequires:	libxslt-devel
+BuildRequires:	docbook-style-xsl
 BuildRequires:	intltool
 BuildRequires:	gperf
 Requires:	systemd-units = %{EVRD}
@@ -97,36 +96,36 @@ Basic configuration files, directories and installation tool for the systemd
 system and session manager.
 
 %package gtk
-Summary:        Graphical frontend for systemd
-Group:          System/Configuration/Boot and Init
-Requires:       %{name} = %{version}-%{release}
+Summary:	Graphical frontend for systemd
+Group:		System/Configuration/Boot and Init
+Requires:	%{name} = %{version}-%{release}
 Requires:	polkit
 
 %description gtk
 Graphical front-end for systemd.
 
 %package sysvinit
-Summary:        System V init tools
-Group:          System/Configuration/Boot and Init
-Requires:       %{name} = %{version}-%{release}
+Summary:	System V init tools
+Group:		System/Configuration/Boot and Init
+Requires:	%{name} = %{version}-%{release}
 # (eugeni) systemd should work as a drop-in replacement for sysvinit, but not obsolete it
-Provides:       sysvinit = %sysvinit_version-%sysvinit_release, SysVinit = %sysvinit_release-%sysvinit_release
-Conflicts:      sysvinit < %sysvinit_version-%sysvinit_release, SysVinit < %sysvinit_release-%sysvinit_release
+Provides:	sysvinit = %sysvinit_version-%sysvinit_release, SysVinit = %sysvinit_release-%sysvinit_release
+Conflicts:	sysvinit < %sysvinit_version-%sysvinit_release, SysVinit < %sysvinit_release-%sysvinit_release
 
 %description sysvinit
 Drop-in replacement for the System V init tools of systemd.
 
 %package -n %{libdaemon}
-Summary: 	Systemd-daemon library package
-Group: 		System/Libraries
+Summary:	Systemd-daemon library package
+Group:		System/Libraries
 Provides:	libsystemd-daemon = %{version}-%{release}
 
 %description -n %{libdaemon}
 This package provides the systemd-daemon shared library.
 
 %package -n %{libdaemon_devel}
-Summary: 	Systemd-daemon library development files
-Group: 		Development/C
+Summary:	Systemd-daemon library development files
+Group:		Development/C
 Requires:	%{libdaemon} = %{version}-%{release}
 Provides:	libsystemd-daemon-devel = %{version}-%{release}
 
@@ -134,16 +133,16 @@ Provides:	libsystemd-daemon-devel = %{version}-%{release}
 This package provides the development files for the systemd-daemon shared library.
 
 %package -n %{liblogin}
-Summary: 	Systemd-login library package
-Group: 		System/Libraries
+Summary:	Systemd-login library package
+Group:		System/Libraries
 Provides:	libsystemd-login = %{version}-%{release}
 
 %description -n %{liblogin}
 This package provides the systemd-login shared library.
 
 %package -n %{liblogin_devel}
-Summary: 	Systemd-login library development files
-Group: 		Development/C
+Summary:	Systemd-login library development files
+Group:		Development/C
 Requires:	%{liblogin} = %{version}-%{release}
 Provides:	libsystemd-login-devel = %{version}-%{release}
 
