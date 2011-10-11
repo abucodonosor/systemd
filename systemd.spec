@@ -21,7 +21,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	36
-Release:	%mkrel 2
+Release:	%mkrel 3
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -212,6 +212,13 @@ mkdir -p %{buildroot}/lib/systemd/system/bluetooth.target.wants
 mv %{buildroot}%{_sysconfdir}/bash_completion.d/systemctl-bash-completion.sh \
     %{buildroot}%{_sysconfdir}/bash_completion.d/systemctl
 chmod 644 %{buildroot}%{_sysconfdir}/bash_completion.d/systemctl
+
+# (tpg) use systemd's own mounting capability
+sed -i -e 's/^#MountAuto=yes$/MountAuto=yes/' \
+	%{buildroot}/etc/systemd/system.conf
+
+sed -i -e 's/^#SwapAuto=yes$/SwapAuto=yes/' \
+	%{buildroot}/etc/systemd/system.conf
 
 # (bor) disable legacy output to console, it just messes things up
 sed -i -e 's/^#SysVConsole=yes$/SysVConsole=no/' \
