@@ -400,6 +400,7 @@ fi
 %{_datadir}/polkit-1/actions/org.freedesktop.locale1.policy
 %{_datadir}/polkit-1/actions/org.freedesktop.login1.policy
 %{_datadir}/polkit-1/actions/org.freedesktop.timedate1.policy
+%{_datadir}/systemd/kbd-model-map
 %{_docdir}/systemd
 
 %files tools
