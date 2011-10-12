@@ -251,7 +251,7 @@ ln -s /etc/modules %{buildroot}%{_sysconfdir}/modules-load.d/modules.conf
 ln -s /etc/modprobe.preload %{buildroot}%{_sysconfdir}/modules-load.d/modprobe-preload.conf
 
 # (tpg) add rpm macros
-install -m 0644 -D %{SOURCE1} %{_sysconfdir}/rpm/macros.d/%{name}.macros
+install -m 0644 -D %{SOURCE1} %{buildroot}%{_sysconfdir}/rpm/macros.d/%{name}.macros
 
 %clean
 rm -rf %{buildroot}
