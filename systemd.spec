@@ -21,12 +21,13 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	37
-Release:	%mkrel 1
+Release:	%mkrel 2
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
 Source0:	http://www.freedesktop.org/software/systemd/%{name}-%{version}.tar.bz2
 Source1:	%{name}.macros
+Source2:	systemd-sysv-convert
 # (bor) clean up directories on boot as done by rc.sysinit
 Patch16:	systemd-18-clean-dirs-on-boot.patch
 # (bor) reset /etc/mtab on boot (why is it not a link)?
@@ -114,6 +115,14 @@ Conflicts:	sysvinit < %sysvinit_version-%sysvinit_release, SysVinit < %sysvinit_
 
 %description sysvinit
 Drop-in replacement for the System V init tools of systemd.
+
+%package sysv
+Summary:        SysV tools for systemd
+Group:          System/Configuration/Boot and Init
+Requires:       %{name} = %{version}-%{release}
+
+%description sysv
+SysV compatibility tools for systemd
 
 %package -n %{libdaemon}
 Summary:	Systemd-daemon library package
@@ -252,6 +261,9 @@ ln -s /etc/modprobe.preload %{buildroot}%{_sysconfdir}/modules-load.d/modprobe-p
 
 # (tpg) add rpm macros
 install -m 0644 -D %{SOURCE1} %{buildroot}%{_sysconfdir}/rpm/macros.d/%{name}.macros
+
+# Install SysV conversion tool for systemd
+install -m 0755 %{SOURCE2} %{buildroot}%{_bindir}/
 
 %clean
 rm -rf %{buildroot}
@@ -445,6 +457,10 @@ fi
 %{_mandir}/man8/telinit.*
 %{_mandir}/man8/runlevel.*
 %dir /run
+
+%files sysv
+%defattr(-,root,root,-)
+%{_bindir}/systemd-sysv-convert
 
 %files -n %{libdaemon}
 %defattr(-,root,root,-)
