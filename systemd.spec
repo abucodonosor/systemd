@@ -21,7 +21,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	37
-Release:	%mkrel 2
+Release:	%mkrel 3
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -61,6 +61,9 @@ Requires:	systemd-units = %{EVRD}
 Requires:	dbus >= 1.3.2
 Requires:	udev >= 160
 Requires(pre):	initscripts >= 9.21-3mdv2011.0
+%if %mdkver >= 201200
+Requires(pre):	basesystem-minimal >= 2011.0-2
+%endif
 Requires:	util-linux-ng >= 2.18-2mdv2011.0
 Requires:	nss-myhostname
 Conflicts:	initscripts < 9.24
