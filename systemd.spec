@@ -21,7 +21,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	37
-Release:	%mkrel 3
+Release:	4
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -67,8 +67,7 @@ Requires(pre):	basesystem-minimal >= 2011.0-2
 Requires:	util-linux-ng >= 2.18-2mdv2011.0
 Requires:	nss-myhostname
 Conflicts:	initscripts < 9.24
-Conflicts:	readahead
-BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
+%rename		readahead
 
 %description
 systemd is a system and session manager for Linux, compatible with
@@ -268,9 +267,6 @@ install -m 0644 -D %{SOURCE1} %{buildroot}%{_sysconfdir}/rpm/macros.d/%{name}.ma
 # Install SysV conversion tool for systemd
 install -m 0755 %{SOURCE2} %{buildroot}%{_bindir}/
 
-%clean
-rm -rf %{buildroot}
-
 %triggerin -- glibc
 # reexec daemon on self or glibc update to avoid busy / on shutdown
 # trigger is executed on both self and target install so no need to have
@@ -352,7 +348,6 @@ if [ $1 -ge 1 ] ; then
 fi
 
 %files
-%defattr(-,root,root)
 %config(noreplace) %{_sysconfdir}/dbus-1/system.d/org.freedesktop.systemd1.conf
 %config(noreplace) %{_sysconfdir}/systemd/system.conf
 %config(noreplace) %{_sysconfdir}/systemd/systemd-logind.conf
@@ -419,11 +414,9 @@ fi
 %{_docdir}/systemd
 
 %files tools
-%defattr(-,root,root)
 %{_bindir}/systemd-analyze
 
 %files units
-%defattr(-,root,root)
 /bin/systemctl
 %dir %{_sysconfdir}/systemd
 %dir %{_sysconfdir}/systemd/system
@@ -436,15 +429,12 @@ fi
 %{_sysconfdir}/rpm/macros.d/%{name}.macros
 %{_mandir}/man1/systemctl.*
 
-
 %files gtk
-%defattr(-,root,root)
 %{_bindir}/systemadm
 %{_bindir}/systemd-gnome-ask-password-agent
 %{_mandir}/man1/systemadm.*
 
 %files sysvinit
-%defattr(-,root,root,-)
 /sbin/init
 /sbin/reboot
 /sbin/halt
@@ -462,26 +452,22 @@ fi
 %dir /run
 
 %files sysv
-%defattr(-,root,root,-)
 %{_bindir}/systemd-sysv-convert
 
 %files -n %{libdaemon}
-%defattr(-,root,root,-)
 %{_libdir}/libsystemd-daemon.so.%{libdaemon_major}*
 
 %files -n %{libdaemon_devel}
-%defattr(-,root,root,-)
 %{_includedir}/systemd/sd-daemon.h
 %{_libdir}/libsystemd-daemon.so
 %{_libdir}/pkgconfig/libsystemd-daemon.pc
 %{_datadir}/pkgconfig/systemd.pc
 
 %files -n %{liblogin}
-%defattr(-,root,root,-)
 %{_libdir}/libsystemd-login.so.%{liblogin_major}*
 
 %files -n %{liblogin_devel}
-%defattr(-,root,root,-)
 %{_includedir}/systemd/sd-login.h
 %{_libdir}/libsystemd-login.so
 %{_libdir}/pkgconfig/libsystemd-login.pc
+
