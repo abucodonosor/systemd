@@ -44,29 +44,31 @@ Patch26:	systemd-halt-pre.patch
 Patch27:	systemd-33-rc-local.patch
 Patch28:	systemd-37-fix-bash-completion.patch
 Patch29:	systemd-37-dont-unset-locales-in-getty.patch
-BuildRequires:	cryptsetup-devel
-BuildRequires:	dbus-devel >= 1.4.0
-BuildRequires:	libudev-devel >= 160
-BuildRequires:	libcap-devel
-BuildRequires:	tcp_wrappers-devel
-BuildRequires:	pam-devel
-BuildRequires:	dbus-glib-devel
-BuildRequires:	vala >= 0.9
-BuildRequires:	gtk2-devel
-BuildRequires:	glib2-devel
-BuildRequires:	libnotify-devel
-BuildRequires:	libxslt-devel
+
 BuildRequires:	docbook-style-xsl
-BuildRequires:	intltool
 BuildRequires:	gperf
+BuildRequires:	intltool
+BuildRequires:	vala >= 0.9
+BuildRequires:	libcap-devel
+BuildRequires:	pam-devel
+BuildRequires:	tcp_wrappers-devel
+BuildRequires:	pkgconfig(dbus-1) >= 1.4.0
+BuildRequires:	pkgconfig(dbus-glib-1)
+BuildRequires:	pkgconfig(glib-2.0)
+BuildRequires:	pkgconfig(gtk+-2.0)
+BuildRequires:	pkgconfig(libcryptsetup)
+BuildRequires:	pkgconfig(libnotify)
+BuildRequires:	pkgconfig(libudev) >= 160
+BuildRequires:	pkgconfig(libxslt)
+
 Requires:	systemd-units = %{EVRD}
 Requires:	dbus >= 1.3.2
 Requires:	udev >= 160
-Requires(pre):	initscripts >= 9.21-3mdv2011.0
+Requires(pre):	initscripts >= 9.21-3
 %if %mdkver >= 201200
 Requires(pre):	basesystem-minimal >= 2011.0-2
 %endif
-Requires:	util-linux-ng >= 2.18-2mdv2011.0
+Requires:	util-linux-ng >= 2.18-2
 Requires:	nss-myhostname
 Conflicts:	initscripts < 9.24
 %rename		readahead
