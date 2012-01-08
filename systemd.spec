@@ -21,7 +21,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	37
-Release:	4
+Release:	5
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -42,6 +42,8 @@ Patch22:	systemd-tmpfilesd-utmp-temp-patch.patch
 # (tpg) Patches from upstream git
 Patch26:	systemd-halt-pre.patch
 Patch27:	systemd-33-rc-local.patch
+Patch28:	systemd-37-fix-bash-completion.patch
+Patch29:	systemd-37-dont-unset-locales-in-getty.patch
 BuildRequires:	cryptsetup-devel
 BuildRequires:	dbus-devel >= 1.4.0
 BuildRequires:	libudev-devel >= 160
