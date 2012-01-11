@@ -20,12 +20,12 @@
 
 Summary:	A System and Session Manager
 Name:		systemd
-Version:	37
-Release:	5
+Version:	38
+Release:	1
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
-Source0:	http://www.freedesktop.org/software/systemd/%{name}-%{version}.tar.bz2
+Source0:	http://www.freedesktop.org/software/systemd/%{name}-%{version}.tar.xz
 Source1:	%{name}.macros
 Source2:	systemd-sysv-convert
 # (bor) clean up directories on boot as done by rc.sysinit
