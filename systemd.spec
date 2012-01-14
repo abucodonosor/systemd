@@ -10,6 +10,8 @@
 
 %define libdaemon_major 0
 %define liblogin_major 0
+%define libjournal_major 0
+%define libid128_major 0
 
 %define libdaemon %mklibname systemd-daemon %{libdaemon_major}
 %define libdaemon_devel %mklibname -d systemd-daemon %{libdaemon_major}
@@ -17,6 +19,11 @@
 %define liblogin %mklibname systemd-login %{liblogin_major}
 %define liblogin_devel %mklibname -d systemd-login %{liblogin_major}
 
+%define libjournal %mklibname systemd-journal %{libjournal_major}
+%define libjournal_devel %mklibname -d systemd-journal %{libjournal_major}
+
+%define libid128 %mklibname systemd-id128 %{libid128_major}
+%define libid128_devel %mklibname -d systemd-id128 %{libid128_major}
 
 Summary:	A System and Session Manager
 Name:		systemd
@@ -31,7 +38,7 @@ Source2:	systemd-sysv-convert
 # (bor) clean up directories on boot as done by rc.sysinit
 Patch16:	systemd-18-clean-dirs-on-boot.patch
 # (bor) reset /etc/mtab on boot (why is it not a link)?
-Patch17:	systemd-18-reset-mtab-on-boot.patch
+#Patch17:	systemd-18-reset-mtab-on-boot.patch
 # (bor) allow explicit stdout configuration for SysV scripts
 #Patch18:	systemd-19-sysv_std_output.patch
 # (bor) fix potential deadlock when onseshot unit is not finished
@@ -40,10 +47,11 @@ Patch19:	systemd-19-apply-timeoutsec-to-oneshot-too.patch
 #Patch21:	systemd-19-no-quotacheck-for-netfs.patch
 Patch22:	systemd-tmpfilesd-utmp-temp-patch.patch
 # (tpg) Patches from upstream git
-Patch26:	systemd-halt-pre.patch
+#Patch26:	systemd-halt-pre.patch
 Patch27:	systemd-33-rc-local.patch
-Patch28:	systemd-37-fix-bash-completion.patch
+#Patch28:	systemd-37-fix-bash-completion.patch
 Patch29:	systemd-37-dont-unset-locales-in-getty.patch
+Patch30:	systemd-37-fix-prefdm.service.patch
 
 BuildRequires:	docbook-style-xsl
 BuildRequires:	gperf
@@ -60,6 +68,7 @@ BuildRequires:	pkgconfig(libcryptsetup)
 BuildRequires:	pkgconfig(libnotify)
 BuildRequires:	pkgconfig(libudev) >= 160
 BuildRequires:	pkgconfig(libxslt)
+BuildRequires:	pkgconfig(gee-1.0)
 
 Requires:	systemd-units = %{EVRD}
 Requires:	dbus >= 1.3.2
@@ -88,9 +97,11 @@ Summary:	Non essential systemd tools
 Group:		System/Configuration/Boot and Init
 Requires:	%{name} = %{version}-%{release}
 Conflicts:	%{name} < 35-6
+Requires:	python-dbus
+Requires:	python-cairo
 
 %description tools
-Non essential systemd tools
+Non essential systemd tools.
 
 %package units
 Summary:	Configuration files, directories and installation tool for systemd
@@ -123,7 +134,7 @@ Conflicts:	sysvinit < %sysvinit_version-%sysvinit_release, SysVinit < %sysvinit_
 Drop-in replacement for the System V init tools of systemd.
 
 %package sysv
-Summary:        SysV tools for systemd
+Summary:	SysV tools for systemd
 Group:          System/Configuration/Boot and Init
 Requires:       %{name} = %{version}-%{release}
 
@@ -145,7 +156,7 @@ Requires:	%{libdaemon} = %{version}-%{release}
 Provides:	libsystemd-daemon-devel = %{version}-%{release}
 
 %description -n %{libdaemon_devel}
-This package provides the development files for the systemd-daemon shared library.
+Development files for the systemd-daemon shared library.
 
 %package -n %{liblogin}
 Summary:	Systemd-login library package
@@ -162,7 +173,42 @@ Requires:	%{liblogin} = %{version}-%{release}
 Provides:	libsystemd-login-devel = %{version}-%{release}
 
 %description -n %{liblogin_devel}
-This package provides the development files for the systemd-login shared library.
+Development files for the systemd-login shared library.
+
+%package -n %{libjournal}
+Summary:       Systemd-journal library package
+Group:         System/Libraries
+Provides:      libsystemd-journal = %{version}-%{release}
+
+%description -n %{libjournal}
+This package provides the systemd-journal shared library.
+
+%package -n %{libjournal_devel}
+Summary:       Systemd-journal library development files
+Group:         Development/C
+Requires:      %{libjournal} = %{version}-%{release}
+Provides:      libsystemd-journal-devel = %{version}-%{release}
+
+%description -n %{libjournal_devel}
+Development files for the systemd-journal shared library.
+
+%package -n %{libid128}
+Summary:       Systemd-id128 library package
+Group:         System/Libraries
+Provides:      libsystemd-id128 = %{version}-%{release}
+
+%description -n %{libid128}
+This package provides the systemd-id128 shared library.
+
+%package -n %{libid128_devel}
+Summary:       Systemd-id128 library development files
+Group:         Development/C
+Requires:      %{libid128} = %{version}-%{release}
+Provides:      libsystemd-id128-devel = %{version}-%{release}
+
+%description -n %{libid128_devel}
+Development files for the systemd-id128 shared library.
+
 
 %prep
 %setup -q
@@ -177,9 +223,13 @@ find src/ -name "*.vala" -exec touch '{}' \;
 %endif
 
 %configure2_5x \
-	--with-rootdir= \
+	--with-rootprefix= \
+	--with-rootlibdir=/%{_lib} \
+	--with-distro=mandriva \
 	--enable-plymouth \
-	--disable-static
+	--disable-static \
+	--with-sysvinit-path=%{_initrddir} \
+	--with-sysvrcd-path=%{_sysconfdir}/rc.d
 
 %make
 
@@ -207,7 +257,19 @@ ln -s ../bin/systemctl %{buildroot}/sbin/runlevel
 # they are not owned and hence overriden by rpm after the used deleted
 # them.
 rm -r %{buildroot}%{_sysconfdir}/systemd/system/*.target.wants
-rm -f %{buildroot}%{_sysconfdir}/systemd/system/display-manager.service
+#rm -f %{buildroot}%{_sysconfdir}/systemd/system/display-manager.service
+
+# Make sure the ghost-ing below works
+touch %{buildroot}%{_sysconfdir}/systemd/system/runlevel2.target
+touch %{buildroot}%{_sysconfdir}/systemd/system/runlevel3.target
+touch %{buildroot}%{_sysconfdir}/systemd/system/runlevel4.target
+touch %{buildroot}%{_sysconfdir}/systemd/system/runlevel5.target
+
+# Make sure these directories are properly owned
+mkdir -p %{buildroot}/lib/systemd/system/basic.target.wants
+mkdir -p %{buildroot}/lib/systemd/system/default.target.wants
+mkdir -p %{buildroot}/lib/systemd/system/dbus.target.wants
+mkdir -p %{buildroot}/lib/systemd/system/syslog.target.wants
 
 # And the default symlink we generate automatically based on inittab
 rm -f %{buildroot}%{_sysconfdir}/systemd/system/default.target
@@ -223,9 +285,9 @@ popd
 mkdir -p %{buildroot}/lib/systemd/system/bluetooth.target.wants
 
 # use consistent naming and permissions for completion scriplets
-mv %{buildroot}%{_sysconfdir}/bash_completion.d/systemctl-bash-completion.sh \
-    %{buildroot}%{_sysconfdir}/bash_completion.d/systemctl
-chmod 644 %{buildroot}%{_sysconfdir}/bash_completion.d/systemctl
+mv %{buildroot}%{_sysconfdir}/bash_completion.d/systemd-bash-completion.sh \
+    %{buildroot}%{_sysconfdir}/bash_completion.d/systemd
+chmod 644 %{buildroot}%{_sysconfdir}/bash_completion.d/systemd
 
 # (tpg) use systemd's own mounting capability
 sed -i -e 's/^#MountAuto=yes$/MountAuto=yes/' \
@@ -271,6 +333,7 @@ install -m 0644 -D %{SOURCE1} %{buildroot}%{_sysconfdir}/rpm/macros.d/%{name}.ma
 # Install SysV conversion tool for systemd
 install -m 0755 %{SOURCE2} %{buildroot}%{_bindir}/
 
+
 %triggerin -- glibc
 # reexec daemon on self or glibc update to avoid busy / on shutdown
 # trigger is executed on both self and target install so no need to have
@@ -298,8 +361,10 @@ fi
 	hwclock-load.service \
 	quotaon.service \
 	quotacheck.service \
+	remote-fs.target
 	systemd-readahead-replay.service \
 	systemd-readahead-collect.service \
+	rsyslog.service
 	2>&1 || :
 # rc-local is now enabled by default in base package
 rm -f /etc/systemd/system/multi-user.target.wants/rc-local.service || :
@@ -330,6 +395,16 @@ if [ $1 -eq 1 ] ; then
 		2>&1 || :
 fi
 
+hostname_new=`cat %{_sysconfdir}/hostname 2>/dev/null`
+if [ -z $hostname_new ]; then
+        hostname_old=`cat /etc/sysconfig/network 2>/dev/null | grep HOSTNAME | cut -d "=" -f2`
+	if [ ! -z $hostname_old ]; then
+    		echo $hostname_old >> %{_sysconfdir}/hostname
+        else
+    		echo "localhost" >> %{_sysconfdir}/hostname
+        fi
+fi
+
 %preun units
 if [ $1 -eq 0 ] ; then
         /bin/systemctl --quiet disable \
@@ -353,37 +428,41 @@ fi
 
 %files
 %config(noreplace) %{_sysconfdir}/dbus-1/system.d/org.freedesktop.systemd1.conf
+%config(noreplace) %{_sysconfdir}/dbus-1/system.d/org.freedesktop.hostname1.conf
+%config(noreplace) %{_sysconfdir}/dbus-1/system.d/org.freedesktop.locale1.conf
+%config(noreplace) %{_sysconfdir}/dbus-1/system.d/org.freedesktop.login1.conf
+%config(noreplace) %{_sysconfdir}/dbus-1/system.d/org.freedesktop.timedate1.conf
 %config(noreplace) %{_sysconfdir}/systemd/system.conf
 %config(noreplace) %{_sysconfdir}/systemd/systemd-logind.conf
+%config(noreplace) %{_sysconfdir}/systemd/systemd-journald.conf
 %config(noreplace) %{_sysconfdir}/systemd/user.conf
 %config(noreplace) %{_sysconfdir}/hostname
-%dir %{_sysconfdir}/tmpfiles.d
-%dir %{_sysconfdir}/modules-load.d/modules.conf
-%dir %{_sysconfdir}/modules-load.d/modprobe-preload.conf
+
+%dir /run
+%dir /lib/systemd
+%dir /lib/systemd/system-generators
+%dir /lib/systemd/system-shutdown
+%dir %{_prefix}/lib/tmpfiles.d
+%dir %{_prefix}/lib/sysctl.d
+%dir %{_prefix}/lib/modules-load.d
+%dir %{_prefix}/lib/binfmt.d
+
 %{_sysconfdir}/xdg/systemd
 /bin/systemd
 /bin/systemd-ask-password
 /bin/systemd-loginctl
+/bin/systemd-journalctl
 /bin/systemd-notify
 /bin/systemd-tmpfiles
 /bin/systemd-tty-ask-password-agent
 /sbin/systemd-machine-id-setup
-%dir /lib/systemd
-%dir /lib/systemd/system-generators
-%dir /lib/systemd/system-shutdown
 /lib/systemd/systemd-*
 /lib/systemd/system-generators/*
 /lib/udev/rules.d/*.rules
-%dir /usr/lib/tmpfiles.d/
-%dir /usr/lib/modules-load.d
 /usr/lib/tmpfiles.d/legacy.conf
 /usr/lib/tmpfiles.d/systemd.conf
 /usr/lib/tmpfiles.d/x11.conf
 /usr/lib/tmpfiles.d/tmp.conf
-%{_sysconfdir}/dbus-1/system.d/org.freedesktop.hostname1.conf
-%{_sysconfdir}/dbus-1/system.d/org.freedesktop.locale1.conf
-%{_sysconfdir}/dbus-1/system.d/org.freedesktop.login1.conf
-%{_sysconfdir}/dbus-1/system.d/org.freedesktop.timedate1.conf
 /%{_lib}/security/pam_systemd.so
 %{_bindir}/systemd-cgls
 %{_bindir}/systemd-nspawn
@@ -421,17 +500,29 @@ fi
 %{_bindir}/systemd-analyze
 
 %files units
-/bin/systemctl
 %dir %{_sysconfdir}/systemd
 %dir %{_sysconfdir}/systemd/system
 %dir %{_sysconfdir}/systemd/user
 %dir %{_sysconfdir}/systemd/system/getty.target.wants
+%dir %{_sysconfdir}/tmpfiles.d
+%dir %{_sysconfdir}/sysctl.d
+%dir %{_sysconfdir}/modules-load.d
+%dir %{_sysconfdir}/binfmt.d
+%dir %{_sysconfdir}/bash_completion.d
+
 %{_sysconfdir}/systemd/system/getty.target.wants/getty@*.service
-%{_sysconfdir}/bash_completion.d/systemctl
+%{_sysconfdir}/bash_completion.d/systemd
+%{_sysconfdir}/modules-load.d/*.conf
+/bin/systemctl
 /lib/systemd/system
 /usr/lib/systemd/
 %{_sysconfdir}/rpm/macros.d/%{name}.macros
 %{_mandir}/man1/systemctl.*
+
+%ghost %config(noreplace) %{_sysconfdir}/systemd/system/runlevel2.target
+%ghost %config(noreplace) %{_sysconfdir}/systemd/system/runlevel3.target
+%ghost %config(noreplace) %{_sysconfdir}/systemd/system/runlevel4.target
+%ghost %config(noreplace) %{_sysconfdir}/systemd/system/runlevel5.target
 
 %files gtk
 %{_bindir}/systemadm
@@ -459,19 +550,41 @@ fi
 %{_bindir}/systemd-sysv-convert
 
 %files -n %{libdaemon}
-%{_libdir}/libsystemd-daemon.so.%{libdaemon_major}*
+/%{_lib}/libsystemd-daemon.so.%{libdaemon_major}*
 
 %files -n %{libdaemon_devel}
+%dir %{_includedir}/systemd
 %{_includedir}/systemd/sd-daemon.h
 %{_libdir}/libsystemd-daemon.so
 %{_libdir}/pkgconfig/libsystemd-daemon.pc
 %{_datadir}/pkgconfig/systemd.pc
+%{_includedir}/systemd/sd-messages.h
 
 %files -n %{liblogin}
-%{_libdir}/libsystemd-login.so.%{liblogin_major}*
+/%{_lib}/libsystemd-login.so.%{liblogin_major}*
 
 %files -n %{liblogin_devel}
+%dir %{_includedir}/systemd
 %{_includedir}/systemd/sd-login.h
 %{_libdir}/libsystemd-login.so
 %{_libdir}/pkgconfig/libsystemd-login.pc
 
+%files -n %{libjournal}
+%defattr(-,root,root,-)
+/%{_lib}/libsystemd-journal.so.%{libjournal_major}*
+
+%files -n %{libjournal_devel}
+%dir %{_includedir}/systemd
+%{_includedir}/systemd/sd-journal.h
+%{_libdir}/libsystemd-journal.so
+%{_libdir}/pkgconfig/libsystemd-journal.pc
+
+%files -n %{libid128}
+%defattr(-,root,root,-)
+/%{_lib}/libsystemd-id128.so.%{libid128_major}*
+
+%files -n %{libid128_devel}
+%dir %{_includedir}/systemd
+%{_includedir}/systemd/sd-id128.h
+%{_libdir}/libsystemd-id128.so
+%{_libdir}/pkgconfig/libsystemd-id128.pc
