@@ -28,7 +28,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	38
-Release:	1
+Release:	2
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -51,7 +51,6 @@ Patch22:	systemd-tmpfilesd-utmp-temp-patch.patch
 Patch27:	systemd-33-rc-local.patch
 #Patch28:	systemd-37-fix-bash-completion.patch
 Patch29:	systemd-37-dont-unset-locales-in-getty.patch
-Patch30:	systemd-37-fix-prefdm.service.patch
 
 BuildRequires:	docbook-style-xsl
 BuildRequires:	gperf
