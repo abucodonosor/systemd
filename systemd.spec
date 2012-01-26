@@ -445,6 +445,7 @@ fi
 %dir %{_prefix}/lib/sysctl.d
 %dir %{_prefix}/lib/modules-load.d
 %dir %{_prefix}/lib/binfmt.d
+%{_prefix}/lib/sysctl.d/coredump.conf
 
 %{_sysconfdir}/xdg/systemd
 /bin/systemd
@@ -454,6 +455,7 @@ fi
 /bin/systemd-notify
 /bin/systemd-tmpfiles
 /bin/systemd-tty-ask-password-agent
+
 /sbin/systemd-machine-id-setup
 /lib/systemd/systemd-*
 /lib/systemd/system-generators/*
@@ -466,12 +468,15 @@ fi
 %{_bindir}/systemd-cgls
 %{_bindir}/systemd-nspawn
 %{_bindir}/systemd-stdio-bridge
+%{_bindir}/systemd-cat
+%{_bindir}/systemd-cgtop
 %{_mandir}/man1/systemd.*
 %{_mandir}/man1/systemd-ask-password.*
 %{_mandir}/man1/systemd-loginctl.*
 %{_mandir}/man1/systemd-notify.*
 %{_mandir}/man1/systemd-nspawn.*
 %{_mandir}/man1/systemd-cgls.*
+%{_mandir}/man1/systemd-cgtop.*
 %{_mandir}/man3/*
 %{_mandir}/man5/*
 %{_mandir}/man7/*
