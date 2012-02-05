@@ -81,7 +81,8 @@ Requires(pre):	basesystem-minimal >= 2011.0-2
 %endif
 Requires:	util-linux-ng >= 2.18-2
 Requires:	nss-myhostname
-Requires:	lockdev
+# (tpg) this one needs to be updated
+#Requires:	lockdev
 Conflicts:	initscripts < 9.24
 %rename		readahead
 
