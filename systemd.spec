@@ -28,13 +28,15 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	39
-Release:	1
+Release:	2
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
 Source0:	http://www.freedesktop.org/software/systemd/%{name}-%{version}.tar.xz
 Source1:	%{name}.macros
 Source2:	systemd-sysv-convert
+# Stop-gap, just to ensure things work fine with rsyslog without having to change the package right-away
+Source4:	listen.conf
 # (bor) clean up directories on boot as done by rc.sysinit
 Patch16:	systemd-18-clean-dirs-on-boot.patch
 # (bor) reset /etc/mtab on boot (why is it not a link)?
@@ -51,7 +53,8 @@ Patch22:	systemd-tmpfilesd-utmp-temp-patch.patch
 Patch27:	systemd-33-rc-local.patch
 #Patch28:	systemd-37-fix-bash-completion.patch
 Patch29:	systemd-37-dont-unset-locales-in-getty.patch
-
+# (tpg) patch from mageia, Add a work around for a syslog.socket deadlock on boot+shutdown
+Patch30:	systemd-38-fix-syslog-socket-deadlock.patch
 BuildRequires:	docbook-style-xsl
 BuildRequires:	gperf
 BuildRequires:	intltool
@@ -78,6 +81,7 @@ Requires(pre):	basesystem-minimal >= 2011.0-2
 %endif
 Requires:	util-linux-ng >= 2.18-2
 Requires:	nss-myhostname
+Requires:	lockdev
 Conflicts:	initscripts < 9.24
 %rename		readahead
 
@@ -107,6 +111,8 @@ Summary:	Configuration files, directories and installation tool for systemd
 Group:		System/Configuration/Boot and Init
 Requires(post):	coreutils
 Requires(post):	gawk
+Requires(post): grep
+Requires(post): awk
 
 %description units
 Basic configuration files, directories and installation tool for the systemd
@@ -256,7 +262,7 @@ ln -s ../bin/systemctl %{buildroot}/sbin/runlevel
 # they are not owned and hence overriden by rpm after the used deleted
 # them.
 rm -r %{buildroot}%{_sysconfdir}/systemd/system/*.target.wants
-#rm -f %{buildroot}%{_sysconfdir}/systemd/system/display-manager.service
+rm -f %{buildroot}%{_sysconfdir}/systemd/system/display-manager.service
 
 # Make sure the ghost-ing below works
 touch %{buildroot}%{_sysconfdir}/systemd/system/runlevel2.target
@@ -318,8 +324,19 @@ pushd %{buildroot}/etc/systemd/system/getty.target.wants
 	done
 popd
 
-# add /etc/hostname
+# Create new-style configuration files so that we can ghost-own them
 touch %{buildroot}%{_sysconfdir}/hostname
+touch %{buildroot}%{_sysconfdir}/vconsole.conf
+touch %{buildroot}%{_sysconfdir}/locale.conf
+touch %{buildroot}%{_sysconfdir}/machine-id
+touch %{buildroot}%{_sysconfdir}/machine-info
+touch %{buildroot}%{_sysconfdir}/timezone
+mkdir -p %{buildroot}%{_sysconfdir}/X11/xorg.conf.d
+touch %{buildroot}%{_sysconfdir}/X11/xorg.conf.d/00-keyboard.conf
+
+# Install rsyslog fragment
+mkdir -p %{buildroot}%{_sysconfdir}/rsyslog.d/
+install -m 0644 %{SOURCE4} %{buildroot}%{_sysconfdir}/rsyslog.d/
 
 # create modules.conf as a symlink to /etc/
 ln -s /etc/modules %{buildroot}%{_sysconfdir}/modules-load.d/modules.conf
@@ -331,6 +348,22 @@ install -m 0644 -D %{SOURCE1} %{buildroot}%{_sysconfdir}/rpm/macros.d/%{name}.ma
 
 # Install SysV conversion tool for systemd
 install -m 0755 %{SOURCE2} %{buildroot}%{_bindir}/
+
+# (tpg) from mageia
+# automatic systemd release on rpm installs/removals
+# (see http://wiki.mandriva.com/en/Rpm_filetriggers)
+install -d %{buildroot}%{_var}/lib/rpm/filetriggers
+cat > %{buildroot}%{_var}/lib/rpm/filetriggers/systemd-daemon-reload.filter << EOF
+^./lib/systemd/system/
+^./etc/systemd/system/
+EOF
+cat > %{buildroot}%{_var}/lib/rpm/filetriggers/systemd-daemon-reload.script << EOF
+#!/bin/sh
+if [ -x /bin/systemctl ]; then 
+ /bin/systemctl daemon-reload >/dev/null 2>&1 || : 
+fi
+EOF
+chmod 755 %{buildroot}%{_var}/lib/rpm/filetriggers/systemd-daemon-reload.script
 
 
 %triggerin -- glibc
@@ -353,6 +386,11 @@ fi
 %post
 /sbin/systemd-machine-id-setup > /dev/null 2>&1 || :
 #/sbin/systemctl daemon-reexec > /dev/null 2>&1 || :
+
+# Stop-gap until rsyslog.rpm does this on its own. (This is supposed
+# to fail when the link already exists)
+ln -s /lib/systemd/system/rsyslog.service /etc/systemd/system/syslog.service >/dev/null 2>&1 || :
+
 
 %triggerin units -- %{name}-units < 19-4
 # Enable the services we install by default.
@@ -435,7 +473,14 @@ fi
 %config(noreplace) %{_sysconfdir}/systemd/systemd-logind.conf
 %config(noreplace) %{_sysconfdir}/systemd/systemd-journald.conf
 %config(noreplace) %{_sysconfdir}/systemd/user.conf
-%config(noreplace) %{_sysconfdir}/hostname
+%ghost %config(noreplace) %{_sysconfdir}/hostname
+%ghost %config(noreplace) %{_sysconfdir}/vconsole.conf
+%ghost %config(noreplace) %{_sysconfdir}/locale.conf
+%ghost %config(noreplace) %{_sysconfdir}/machine-id
+%ghost %config(noreplace) %{_sysconfdir}/machine-info
+%ghost %config(noreplace) %{_sysconfdir}/timezone
+%ghost %config(noreplace) %{_sysconfdir}/X11/xorg.conf.d/00-keyboard.conf
+%config(noreplace) %{_sysconfdir}/rsyslog.d/listen.conf
 
 %dir /run
 %dir /lib/systemd
@@ -465,6 +510,7 @@ fi
 /usr/lib/tmpfiles.d/x11.conf
 /usr/lib/tmpfiles.d/tmp.conf
 /%{_lib}/security/pam_systemd.so
+%{_var}/lib/rpm/filetriggers/systemd-daemon-reload.*
 %{_bindir}/systemd-cgls
 %{_bindir}/systemd-nspawn
 %{_bindir}/systemd-stdio-bridge
