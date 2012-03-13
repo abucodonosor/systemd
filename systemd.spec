@@ -27,8 +27,8 @@
 
 Summary:	A System and Session Manager
 Name:		systemd
-Version:	39
-Release:	2
+Version:	43
+Release:	1
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -251,7 +251,7 @@ mkdir -p %{buildroot}/lib/systemd/system-shutdown
 # Create SysV compatibility symlinks. systemctl/systemd are smart
 # enough to detect in which way they are called.
 mkdir -p %{buildroot}/sbin
-ln -s ../bin/systemd %{buildroot}/sbin/init
+ln -s ../lib/systemd/systemd %{buildroot}/sbin/init
 ln -s ../bin/systemctl %{buildroot}/sbin/reboot
 ln -s ../bin/systemctl %{buildroot}/sbin/halt
 ln -s ../bin/systemctl %{buildroot}/sbin/poweroff
@@ -494,7 +494,6 @@ fi
 %{_prefix}/lib/sysctl.d/coredump.conf
 
 %{_sysconfdir}/xdg/systemd
-/bin/systemd
 /bin/systemd-ask-password
 /bin/systemd-loginctl
 /bin/systemd-journalctl
@@ -503,6 +502,7 @@ fi
 /bin/systemd-tty-ask-password-agent
 
 /sbin/systemd-machine-id-setup
+/lib/systemd/systemd
 /lib/systemd/systemd-*
 /lib/systemd/system-generators/*
 /lib/udev/rules.d/*.rules
