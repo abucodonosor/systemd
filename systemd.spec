@@ -1,7 +1,7 @@
 # macros for sysvinit transition - should be equal to
 # sysvinit %version-%release-plus-1
 %define sysvinit_version 2.87
-%define sysvinit_release %mkrel 13
+%define sysvinit_release %mkrel 14
 
 # (eugeni) for backports and old distributions, rely on EVRD as well
 %if %mdkversion < 201100
@@ -27,7 +27,7 @@
 
 Summary:	A System and Session Manager
 Name:		systemd
-Version:	43
+Version:	44
 Release:	1
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
@@ -55,23 +55,29 @@ Patch27:	systemd-33-rc-local.patch
 Patch29:	systemd-37-dont-unset-locales-in-getty.patch
 # (tpg) patch from mageia, Add a work around for a syslog.socket deadlock on boot+shutdown
 Patch30:	systemd-38-fix-syslog-socket-deadlock.patch
+BuildRequires:	autoconf automake m4 libtool
+BuildRequires:	acl-devel
+BuildRequires:	audit-devel
 BuildRequires:	docbook-style-xsl
 BuildRequires:	gperf
 BuildRequires:	intltool
-BuildRequires:	vala >= 0.9
 BuildRequires:	libcap-devel
 BuildRequires:	pam-devel
+BuildRequires:	perl(XML::Parser)
 BuildRequires:	tcp_wrappers-devel
+BuildRequires:	vala >= 0.9
 BuildRequires:	pkgconfig(dbus-1) >= 1.4.0
 BuildRequires:	pkgconfig(dbus-glib-1)
+BuildRequires:	pkgconfig(gee-1.0)
 BuildRequires:	pkgconfig(glib-2.0)
 BuildRequires:	pkgconfig(gtk+-2.0)
 BuildRequires:	pkgconfig(libcryptsetup)
+BuildRequires:	pkgconfig(libkmod)
+BuildRequires:	pkgconfig(liblzma)
 BuildRequires:	pkgconfig(libnotify)
 BuildRequires:	pkgconfig(libudev) >= 160
 BuildRequires:	pkgconfig(libxslt)
-BuildRequires:	pkgconfig(gee-1.0)
-
+BuildRequires:	xsltproc
 Requires:	systemd-units = %{EVRD}
 Requires:	dbus >= 1.3.2
 Requires:	udev >= 160
@@ -519,11 +525,14 @@ fi
 %{_bindir}/systemd-cgtop
 %{_mandir}/man1/systemd.*
 %{_mandir}/man1/systemd-ask-password.*
-%{_mandir}/man1/systemd-loginctl.*
-%{_mandir}/man1/systemd-notify.*
-%{_mandir}/man1/systemd-nspawn.*
+%{_mandir}/man1/systemd-cat.1*
 %{_mandir}/man1/systemd-cgls.*
 %{_mandir}/man1/systemd-cgtop.*
+%{_mandir}/man1/systemd-journalctl.1*
+%{_mandir}/man1/systemd-loginctl.*
+%{_mandir}/man1/systemd-machine-id-setup.1*
+%{_mandir}/man1/systemd-notify.*
+%{_mandir}/man1/systemd-nspawn.*
 %{_mandir}/man3/*
 %{_mandir}/man5/*
 %{_mandir}/man7/*
