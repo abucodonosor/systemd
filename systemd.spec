@@ -35,8 +35,6 @@ Url:		http://www.freedesktop.org/wiki/Software/systemd
 Source0:	http://www.freedesktop.org/software/systemd/%{name}-%{version}.tar.xz
 Source1:	%{name}.macros
 Source2:	systemd-sysv-convert
-# Stop-gap, just to ensure things work fine with rsyslog without having to change the package right-away
-Source4:	listen.conf
 # (bor) clean up directories on boot as done by rc.sysinit
 Patch16:	systemd-18-clean-dirs-on-boot.patch
 # (bor) reset /etc/mtab on boot (why is it not a link)?
@@ -241,7 +239,8 @@ find src/ -name "*.vala" -exec touch '{}' \;
 	--enable-plymouth \
 	--disable-static \
 	--with-sysvinit-path=%{_initrddir} \
-	--with-sysvrcd-path=%{_sysconfdir}/rc.d
+	--with-sysvrcd-path=%{_sysconfdir}/rc.d \
+	--disable-coredump
 
 %make
 
@@ -341,14 +340,18 @@ touch %{buildroot}%{_sysconfdir}/timezone
 mkdir -p %{buildroot}%{_sysconfdir}/X11/xorg.conf.d
 touch %{buildroot}%{_sysconfdir}/X11/xorg.conf.d/00-keyboard.conf
 
-# Install rsyslog fragment
-mkdir -p %{buildroot}%{_sysconfdir}/rsyslog.d/
-install -m 0644 %{SOURCE4} %{buildroot}%{_sysconfdir}/rsyslog.d/
-
 # create modules.conf as a symlink to /etc/
 ln -s /etc/modules %{buildroot}%{_sysconfdir}/modules-load.d/modules.conf
 # (tpg) symlink also modprobe.preload because a lot of modules are inserted there from drak* stuff
 ln -s /etc/modprobe.preload %{buildroot}%{_sysconfdir}/modules-load.d/modprobe-preload.conf
+
+# (cg) Set up the pager to make it generally more useful
+mkdir -p %{buildroot}%{_sysconfdir}/profile.d
+cat > %{buildroot}%{_sysconfdir}/profile.d/40systemd.sh << EOF
+export SYSTEMD_PAGER="/usr/bin/less -FR"
+EOF
+chmod 644 %{buildroot}%{_sysconfdir}/profile.d/40systemd.sh
+
 
 # (tpg) add rpm macros
 install -m 0644 -D %{SOURCE1} %{buildroot}%{_sysconfdir}/rpm/macros.d/%{name}.macros
@@ -394,11 +397,6 @@ fi
 /sbin/systemd-machine-id-setup > /dev/null 2>&1 || :
 #/sbin/systemctl daemon-reexec > /dev/null 2>&1 || :
 
-# Stop-gap until rsyslog.rpm does this on its own. (This is supposed
-# to fail when the link already exists)
-ln -s /lib/systemd/system/rsyslog.service /etc/systemd/system/syslog.service >/dev/null 2>&1 || :
-
-
 %triggerin units -- %{name}-units < 19-4
 # Enable the services we install by default.
 /bin/systemctl --quiet enable \
@@ -408,7 +406,6 @@ ln -s /lib/systemd/system/rsyslog.service /etc/systemd/system/syslog.service >/d
 	remote-fs.target
 	systemd-readahead-replay.service \
 	systemd-readahead-collect.service \
-	rsyslog.service
 	2>&1 || :
 # rc-local is now enabled by default in base package
 rm -f /etc/systemd/system/multi-user.target.wants/rc-local.service || :
@@ -435,7 +432,6 @@ if [ $1 -eq 1 ] ; then
 		remote-fs.target \
 		systemd-readahead-replay.service \
 		systemd-readahead-collect.service \
-		rsyslog.service \
 		2>&1 || :
 fi
 
@@ -459,7 +455,6 @@ if [ $1 -eq 0 ] ; then
 		remote-fs.target \
 		systemd-readahead-replay.service \
 		systemd-readahead-collect.service \
-		rsyslog.service \
 		2>&1 || :
 
         /bin/rm -f /etc/systemd/system/default.target 2>&1 || :
@@ -487,7 +482,6 @@ fi
 %ghost %config(noreplace) %{_sysconfdir}/machine-info
 %ghost %config(noreplace) %{_sysconfdir}/timezone
 %ghost %config(noreplace) %{_sysconfdir}/X11/xorg.conf.d/00-keyboard.conf
-%config(noreplace) %{_sysconfdir}/rsyslog.d/listen.conf
 
 %dir /run
 %dir /lib/systemd
@@ -497,7 +491,6 @@ fi
 %dir %{_prefix}/lib/sysctl.d
 %dir %{_prefix}/lib/modules-load.d
 %dir %{_prefix}/lib/binfmt.d
-%{_prefix}/lib/sysctl.d/coredump.conf
 
 %{_sysconfdir}/xdg/systemd
 /bin/systemd-ask-password
@@ -576,6 +569,7 @@ fi
 /bin/systemctl
 /lib/systemd/system
 /usr/lib/systemd/
+%{_sysconfdir}/profile.d/40systemd.sh
 %{_sysconfdir}/rpm/macros.d/%{name}.macros
 %{_mandir}/man1/systemctl.*
 
