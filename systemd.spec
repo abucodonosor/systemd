@@ -28,7 +28,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	44
-Release:	2
+Release:	3
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -257,6 +257,7 @@ mkdir -p %{buildroot}/lib/systemd/system-shutdown
 # enough to detect in which way they are called.
 mkdir -p %{buildroot}/sbin
 ln -s ../lib/systemd/systemd %{buildroot}/sbin/init
+ln -s ../lib/systemd/systemd %{buildroot}/bin/systemd
 ln -s ../bin/systemctl %{buildroot}/sbin/reboot
 ln -s ../bin/systemctl %{buildroot}/sbin/halt
 ln -s ../bin/systemctl %{buildroot}/sbin/poweroff
@@ -311,6 +312,9 @@ sed -i -e 's/^#SwapAuto=yes$/SwapAuto=yes/' \
 sed -i -e 's/^#SysVConsole=yes$/SysVConsole=no/' \
 	%{buildroot}/etc/systemd/system.conf
 
+# Let rsyslog read from /proc/kmsg for now
+sed -i -e 's/\#ImportKernel=yes/ImportKernel=no/' %{buildroot}%{_sysconfdir}/systemd/systemd-journald.conf
+
 # (bor) enable rpcbind.target by default so we have something to plug
 #	portmapper service into
 ln -s ../rpcbind.target %{buildroot}/lib/systemd/system/multi-user.target.wants
@@ -321,6 +325,9 @@ install -d %{buildroot}/sbin && \
 
 # (eugeni) install /run
 mkdir %{buildroot}/run
+
+# (tpg) create missing dir
+mkdir -p %{buildroot}%{_libdir}/systemd/user/
 
 # add missing ttys (mdv #63600)
 mkdir -p %{buildroot}/etc/systemd/system/getty.target.wants
@@ -352,7 +359,6 @@ export SYSTEMD_PAGER="/usr/bin/less -FR"
 EOF
 chmod 644 %{buildroot}%{_sysconfdir}/profile.d/40systemd.sh
 
-
 # (tpg) add rpm macros
 install -m 0644 -D %{SOURCE1} %{buildroot}%{_sysconfdir}/rpm/macros.d/%{name}.macros
 
@@ -369,12 +375,13 @@ cat > %{buildroot}%{_var}/lib/rpm/filetriggers/systemd-daemon-reload.filter << E
 EOF
 cat > %{buildroot}%{_var}/lib/rpm/filetriggers/systemd-daemon-reload.script << EOF
 #!/bin/sh
-if [ -x /bin/systemctl ]; then 
- /bin/systemctl daemon-reload >/dev/null 2>&1 || : 
+if /bin/mountpoint -q /sys/fs/cgroup/systemd; then
+    if [ -x /bin/systemctl ]; then
+	/bin/systemctl daemon-reload >/dev/null 2>&1 || :
+    fi
 fi
 EOF
 chmod 755 %{buildroot}%{_var}/lib/rpm/filetriggers/systemd-daemon-reload.script
-
 
 %triggerin -- glibc
 # reexec daemon on self or glibc update to avoid busy / on shutdown
