@@ -506,7 +506,7 @@ fi
 /bin/systemd-notify
 /bin/systemd-tmpfiles
 /bin/systemd-tty-ask-password-agent
-
+/bin/systemd
 /sbin/systemd-machine-id-setup
 /lib/systemd/systemd
 /lib/systemd/systemd-*
