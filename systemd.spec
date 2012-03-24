@@ -242,6 +242,14 @@ find src/ -name "*.vala" -exec touch '{}' \;
 	--with-sysvrcd-path=%{_sysconfdir}/rc.d \
 	--disable-coredump
 
+# (tpg) somehow --with-distro option doesn't work
+# just be sure we have a nice mandriva release output :)
+for i in `grep -r -i -l "/etc/os-release" src`;
+    do
+    sed -i -e  's#/etc/os-release#/etc/mandriva-release#g' $i;
+done
+
+
 %make
 
 %install
