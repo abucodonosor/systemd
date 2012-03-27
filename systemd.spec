@@ -240,7 +240,8 @@ find src/ -name "*.vala" -exec touch '{}' \;
 	--disable-static \
 	--with-sysvinit-path=%{_initrddir} \
 	--with-sysvrcd-path=%{_sysconfdir}/rc.d \
-	--disable-coredump
+	--disable-coredump \
+	--enable-split-usr
 
 # (tpg) somehow --with-distro option doesn't work
 # just be sure we have a nice mandriva release output :)
