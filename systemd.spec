@@ -100,7 +100,7 @@ state, maintains mount and automount points and implements an
 elaborate transactional dependency-based service control logic. It can
 work as a drop-in replacement for sysvinit.
 
-%package tools
+%package	tools
 Summary:	Non essential systemd tools
 Group:		System/Configuration/Boot and Init
 Requires:	%{name} = %{version}-%{release}
@@ -108,10 +108,10 @@ Conflicts:	%{name} < 35-6
 Requires:	python-dbus
 Requires:	python-cairo
 
-%description tools
+%description	tools
 Non essential systemd tools.
 
-%package units
+%package	units
 Summary:	Configuration files, directories and installation tool for systemd
 Group:		System/Configuration/Boot and Init
 Requires(post):	coreutils
@@ -119,20 +119,20 @@ Requires(post):	gawk
 Requires(post): grep
 Requires(post): awk
 
-%description units
+%description	units
 Basic configuration files, directories and installation tool for the systemd
 system and session manager.
 
-%package gtk
+%package	gtk
 Summary:	Graphical frontend for systemd
 Group:		System/Configuration/Boot and Init
 Requires:	%{name} = %{version}-%{release}
 Requires:	polkit
 
-%description gtk
+%description	gtk
 Graphical front-end for systemd.
 
-%package sysvinit
+%package	sysvinit
 Summary:	System V init tools
 Group:		System/Configuration/Boot and Init
 Requires:	%{name} = %{version}-%{release}
@@ -140,81 +140,81 @@ Requires:	%{name} = %{version}-%{release}
 Provides:	sysvinit = %sysvinit_version-%sysvinit_release, SysVinit = %sysvinit_release-%sysvinit_release
 Conflicts:	sysvinit < %sysvinit_version-%sysvinit_release, SysVinit < %sysvinit_release-%sysvinit_release
 
-%description sysvinit
+%description	sysvinit
 Drop-in replacement for the System V init tools of systemd.
 
-%package sysv
+%package	sysv
 Summary:	SysV tools for systemd
 Group:          System/Configuration/Boot and Init
 Requires:       %{name} = %{version}-%{release}
 
-%description sysv
+%description	sysv
 SysV compatibility tools for systemd
 
-%package -n %{libdaemon}
+%package -n	%{libdaemon}
 Summary:	Systemd-daemon library package
 Group:		System/Libraries
 Provides:	libsystemd-daemon = %{version}-%{release}
 
-%description -n %{libdaemon}
+%description -n	%{libdaemon}
 This package provides the systemd-daemon shared library.
 
-%package -n %{libdaemon_devel}
+%package -n	%{libdaemon_devel}
 Summary:	Systemd-daemon library development files
 Group:		Development/C
 Requires:	%{libdaemon} = %{version}-%{release}
 Provides:	libsystemd-daemon-devel = %{version}-%{release}
 
-%description -n %{libdaemon_devel}
+%description -n	%{libdaemon_devel}
 Development files for the systemd-daemon shared library.
 
-%package -n %{liblogin}
+%package -n	%{liblogin}
 Summary:	Systemd-login library package
 Group:		System/Libraries
 Provides:	libsystemd-login = %{version}-%{release}
 
-%description -n %{liblogin}
+%description -n	%{liblogin}
 This package provides the systemd-login shared library.
 
-%package -n %{liblogin_devel}
+%package -n	%{liblogin_devel}
 Summary:	Systemd-login library development files
 Group:		Development/C
 Requires:	%{liblogin} = %{version}-%{release}
 Provides:	libsystemd-login-devel = %{version}-%{release}
 
-%description -n %{liblogin_devel}
+%description -n	%{liblogin_devel}
 Development files for the systemd-login shared library.
 
-%package -n %{libjournal}
-Summary:       Systemd-journal library package
-Group:         System/Libraries
-Provides:      libsystemd-journal = %{version}-%{release}
+%package -n	%{libjournal}
+Summary:	Systemd-journal library package
+Group:		System/Libraries
+Provides:	libsystemd-journal = %{version}-%{release}
 
-%description -n %{libjournal}
+%description -n	%{libjournal}
 This package provides the systemd-journal shared library.
 
-%package -n %{libjournal_devel}
-Summary:       Systemd-journal library development files
-Group:         Development/C
-Requires:      %{libjournal} = %{version}-%{release}
-Provides:      libsystemd-journal-devel = %{version}-%{release}
+%package -n	%{libjournal_devel}
+Summary:	Systemd-journal library development files
+Group:		Development/C
+Requires:	%{libjournal} = %{version}-%{release}
+Provides:	libsystemd-journal-devel = %{version}-%{release}
 
-%description -n %{libjournal_devel}
+%description -n	%{libjournal_devel}
 Development files for the systemd-journal shared library.
 
-%package -n %{libid128}
-Summary:       Systemd-id128 library package
-Group:         System/Libraries
-Provides:      libsystemd-id128 = %{version}-%{release}
+%package -n	%{libid128}
+Summary:	Systemd-id128 library package
+Group:		System/Libraries
+Provides:	libsystemd-id128 = %{version}-%{release}
 
-%description -n %{libid128}
+%description -n	%{libid128}
 This package provides the systemd-id128 shared library.
 
-%package -n %{libid128_devel}
-Summary:       Systemd-id128 library development files
-Group:         Development/C
-Requires:      %{libid128} = %{version}-%{release}
-Provides:      libsystemd-id128-devel = %{version}-%{release}
+%package -n	%{libid128_devel}
+Summary:	Systemd-id128 library development files
+Group:		Development/C
+Requires:	%{libid128} = %{version}-%{release}
+Provides:	libsystemd-id128-devel = %{version}-%{release}
 
 %description -n %{libid128_devel}
 Development files for the systemd-id128 shared library.
@@ -254,10 +254,7 @@ done
 %make
 
 %install
-rm -rf %{buildroot}
-
 %makeinstall_std
-find %{buildroot} \( -name '*.a' -o -name '*.la' \) -exec rm {} \;
 
 # (bor) create late shutdown directory
 mkdir -p %{buildroot}/lib/systemd/system-shutdown
@@ -640,7 +637,6 @@ fi
 %{_libdir}/pkgconfig/libsystemd-login.pc
 
 %files -n %{libjournal}
-%defattr(-,root,root,-)
 /%{_lib}/libsystemd-journal.so.%{libjournal_major}*
 
 %files -n %{libjournal_devel}
@@ -650,7 +646,6 @@ fi
 %{_libdir}/pkgconfig/libsystemd-journal.pc
 
 %files -n %{libid128}
-%defattr(-,root,root,-)
 /%{_lib}/libsystemd-id128.so.%{libid128_major}*
 
 %files -n %{libid128_devel}
