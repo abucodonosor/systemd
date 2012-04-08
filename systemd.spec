@@ -28,13 +28,15 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	44
-Release:	4
+Release:	5
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
 Source0:	http://www.freedesktop.org/software/systemd/%{name}-%{version}.tar.xz
 Source1:	%{name}.macros
 Source2:	systemd-sysv-convert
+# (bero) http://cgit.freedesktop.org/systemd/systemd/patch/?id=75c8e3cffd7da8eede614cf61384957af2c82a29
+Patch15:	systemd-44-dont-kill-su.patch
 # (bor) clean up directories on boot as done by rc.sysinit
 Patch16:	systemd-18-clean-dirs-on-boot.patch
 # (bor) reset /etc/mtab on boot (why is it not a link)?
