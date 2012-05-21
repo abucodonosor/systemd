@@ -28,7 +28,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	44
-Release:	5
+Release:	6
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -87,8 +87,7 @@ Requires(pre):	basesystem-minimal >= 2011.0-2
 %endif
 Requires:	util-linux-ng >= 2.18-2
 Requires:	nss-myhostname
-# (tpg) this one needs to be updated
-#Requires:	lockdev
+Requires:	lockdev
 Conflicts:	initscripts < 9.24
 %rename		readahead
 
