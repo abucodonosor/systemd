@@ -27,8 +27,8 @@
 
 Summary:	A System and Session Manager
 Name:		systemd
-Version:	44
-Release:	6
+Version:	183
+Release:	1
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -80,7 +80,7 @@ BuildRequires:	pkgconfig(libxslt)
 BuildRequires:	xsltproc
 Requires:	systemd-units = %{EVRD}
 Requires:	dbus >= 1.3.2
-Requires:	udev >= 160
+Obsoletes:	udev < 183
 Requires(pre):	initscripts >= 9.21-3
 %if %mdkver >= 201200
 Requires(pre):	basesystem-minimal >= 2011.0-2
