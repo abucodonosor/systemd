@@ -3,6 +3,8 @@
 %define sysvinit_version 2.87
 %define sysvinit_release %mkrel 14
 
+%bcond_with bootstrap
+
 # (eugeni) for backports and old distributions, rely on EVRD as well
 %if %mdkversion < 201100
 %define EVRD %{?epoch:%{epoch}:}%{?version:%{version}}%{?release:-%{release}}%{?distepoch::%{distepoch}}
@@ -25,6 +27,19 @@
 %define libid128 %mklibname systemd-id128 %{libid128_major}
 %define libid128_devel %mklibname -d systemd-id128 %{libid128_major}
 
+%define udev_major 1
+%define gudev_api 1.0
+%define gudev_major 0
+%define libudev %mklibname udev %{udev_major}
+%define libudev_devel %mklibname udev -d
+%define libgudev %mklibname gudev %{gudev_api} %{gudev_major}
+%define libgudev_devel %mklibname gudev %{gudev_api} -d
+%define girgudev %mklibname gudev-gir %{gudev_api}
+
+%define udev_libdir /lib/udev
+%define udev_rules_dir %{udev_libdir}/rules.d
+%define udev_user_rules_dir %{_sysconfdir}/udev/rules.d
+
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	183
@@ -35,8 +50,6 @@ Url:		http://www.freedesktop.org/wiki/Software/systemd
 Source0:	http://www.freedesktop.org/software/systemd/%{name}-%{version}.tar.xz
 Source1:	%{name}.macros
 Source2:	systemd-sysv-convert
-# (bero) http://cgit.freedesktop.org/systemd/systemd/patch/?id=75c8e3cffd7da8eede614cf61384957af2c82a29
-Patch15:	systemd-44-dont-kill-su.patch
 # (bor) clean up directories on boot as done by rc.sysinit
 Patch16:	systemd-18-clean-dirs-on-boot.patch
 # (bor) reset /etc/mtab on boot (why is it not a link)?
@@ -44,7 +57,7 @@ Patch16:	systemd-18-clean-dirs-on-boot.patch
 # (bor) allow explicit stdout configuration for SysV scripts
 #Patch18:	systemd-19-sysv_std_output.patch
 # (bor) fix potential deadlock when onseshot unit is not finished
-Patch19:	systemd-19-apply-timeoutsec-to-oneshot-too.patch
+#Patch19:	systemd-19-apply-timeoutsec-to-oneshot-too.patch
 # (bor) network filesystems do not need quota service (mdv#62746)
 #Patch21:	systemd-19-no-quotacheck-for-netfs.patch
 Patch22:	systemd-tmpfilesd-utmp-temp-patch.patch
@@ -52,10 +65,13 @@ Patch22:	systemd-tmpfilesd-utmp-temp-patch.patch
 #Patch26:	systemd-halt-pre.patch
 Patch27:	systemd-33-rc-local.patch
 #Patch28:	systemd-37-fix-bash-completion.patch
-Patch29:	systemd-37-dont-unset-locales-in-getty.patch
+#Patch29:	systemd-37-dont-unset-locales-in-getty.patch
 # (tpg) patch from mageia, Add a work around for a syslog.socket deadlock on boot+shutdown
-Patch30:	systemd-38-fix-syslog-socket-deadlock.patch
-BuildRequires:	autoconf automake m4 libtool
+#Patch30:	systemd-38-fix-syslog-socket-deadlock.patch
+BuildRequires:	autoconf
+BuildRequires:	automake
+BuildRequires:	m4
+BuildRequires:	libtool
 BuildRequires:	acl-devel
 BuildRequires:	audit-devel
 BuildRequires:	docbook-style-xsl
@@ -75,13 +91,22 @@ BuildRequires:	pkgconfig(libcryptsetup)
 BuildRequires:	pkgconfig(libkmod)
 BuildRequires:	pkgconfig(liblzma)
 BuildRequires:	pkgconfig(libnotify)
-BuildRequires:	pkgconfig(libudev) >= 160
 BuildRequires:	pkgconfig(libxslt)
 BuildRequires:	xsltproc
-Requires:	systemd-units = %{EVRD}
+BuildRequires:	libblkid-devel
+BuildRequires:	usbutils >= 005-3
+BuildRequires:	pciutils-devel
+BuildRequires:	ldetect-lst
+%if !%{with bootstrap}
+BuildRequires: gobject-introspection-devel >= 0.6.2
+%endif
+Requires(pre,post):	coreutils
+Requires(post):	gawk
+Requires(post):	grep
+Requires(post):	awk
 Requires:	dbus >= 1.3.2
-Obsoletes:	udev < 183
-Requires(pre):	initscripts >= 9.21-3
+Conflicts:	udev < 183
+Requires(pre):	initscripts > 9.24
 %if %mdkver >= 201200
 Requires(pre):	basesystem-minimal >= 2011.0-2
 %endif
@@ -100,6 +125,210 @@ Linux cgroups, supports snapshotting and restoring of the system
 state, maintains mount and automount points and implements an
 elaborate transactional dependency-based service control logic. It can
 work as a drop-in replacement for sysvinit.
+
+
+#################
+#	UDEV	#
+#	SHIT	#
+#################
+
+%package -n udev
+Summary:	Device manager for the Linux kernel
+Group:		System/Configuration/Hardware
+Requires:	%{name} = %{version}-%{release}
+Requires:	ldetect-lst
+Requires:	coreutils
+Requires:	setup >= 2.7.16
+Requires:	util-linux-ng >= 2.15
+Requires:	acl
+# for disk/lp groups
+Requires(pre):	setup
+Requires(pre):	fileutils
+Requires(post,preun):	rpm-helper
+
+%description -n udev
+A collection of tools and a daemon to manage events received
+from the kernel and deal with them in user-space. Primarily this
+involves managing permissions, and creating and removing meaningful
+symlinks to device nodes in /dev when hardware is discovered or
+removed from the system
+
+%files -n udev
+%dir /lib/firmware
+%dir /lib/firmware/updates
+%dir %{udev_libdir}
+%dir %{_sysconfdir}/udev
+#%dir %{udev_rules_dir}
+#%dir %attr(0644,root,root)
+%{_libdir}/udev/keymaps
+%dir %{_sysconfdir}/udev/agents.d
+%dir %{_sysconfdir}/udev/agents.d/usb
+#%config(noreplace) %{_sysconfdir}/sysconfig/udev
+#%config(noreplace) %{_sysconfdir}/sysconfig/udev_net
+%config(noreplace) %{_sysconfdir}/udev/*.conf
+%ghost %config(noreplace,missingok) %attr(0644,root,root) %{_sysconfdir}/scsi_id.config
+
+%{_bindir}/udevadm
+%attr(0755,root,root) /sbin/udevadm
+%attr(0755,root,root) %{_sbindir}/udevadm
+%attr(0755,root,root) /sbin/udevd
+%attr(0755,root,root) /sbin/usb_id
+#%attr(0755,root,root) %{udev_libdir}/udevd
+%{udev_libdir}/keymap
+%{_libdir}/udev/rules.d/*.rules
+
+%attr(0755,root,root) %{udev_libdir}/accelerometer
+%attr(0755,root,root) %{udev_libdir}/ata_id
+%attr(0755,root,root) %{udev_libdir}/cdrom_id
+%attr(0755,root,root) %{udev_libdir}/scsi_id
+%attr(0755,root,root) %{udev_libdir}/collect
+#%attr(0755,root,root) %{udev_libdir}/create_floppy_devices
+#%attr(0755,root,root) %{udev_libdir}/rule_generator.functions
+#%attr(0755,root,root) %{udev_libdir}/write_cd_rules
+#%attr(0755,root,root) %{udev_libdir}/write_net_rules
+#%attr(0755,root,root) %{udev_libdir}/net_create_ifcfg
+#%attr(0755,root,root) %{udev_libdir}/net_action
+%attr(0755,root,root) %{udev_libdir}/v4l_id
+%attr(0755,root,root) %{udev_libdir}/mtd_probe
+
+#%attr(0755,root,root) %{udev_libdir}/findkeyboards
+#%attr(0755,root,root) %{udev_libdir}/keyboard-force-release.sh
+%{_libdir}/udev/findkeyboards
+%{_libdir}/udev/keyboard-force-release.sh
+%attr(0644,root,root) %{_libdir}/udev/keymaps/*
+
+# From previous Mandriva /etc/udev/devices.d and patches
+%attr(0666,root,root) %dev(c,1,3) %{udev_libdir}/devices/null
+%attr(0600,root,root) %dev(b,2,0) %{udev_libdir}/devices/fd0
+%attr(0600,root,root) %dev(b,2,1) %{udev_libdir}/devices/fd1
+%attr(0600,root,root) %dev(c,21,0) %{udev_libdir}/devices/sg0
+%attr(0600,root,root) %dev(c,21,1) %{udev_libdir}/devices/sg1
+%attr(0600,root,root) %dev(c,9,0) %{udev_libdir}/devices/st0
+%attr(0600,root,root) %dev(c,9,1) %{udev_libdir}/devices/st1
+%attr(0600,root,root) %dev(c,99,0) %{udev_libdir}/devices/parport0
+%dir %{udev_libdir}/devices/cpu
+%dir %{udev_libdir}/devices/cpu/0
+%attr(0600,root,root) %dev(c,203,0) %{udev_libdir}/devices/cpu/0/cpuid
+%attr(0600,root,root) %dev(c,10,184) %{udev_libdir}/devices/cpu/0/microcode
+%attr(0600,root,root) %dev(c,202,0) %{udev_libdir}/devices/cpu/0/msr
+%attr(0600,root,root) %dev(c,162,0) %{udev_libdir}/devices/rawctl
+%attr(0600,root,root) %dev(c,195,0) %{udev_libdir}/devices/nvidia0
+%attr(0600,root,root) %dev(c,195,255) %{udev_libdir}/devices/nvidiactl
+# Default static nodes to copy to /dev on udevd start
+%dir %{udev_libdir}/devices
+# From Fedora RPM
+%attr(0755,root,root) %dir %{udev_libdir}/devices/net
+%attr(0755,root,root) %dir %{udev_libdir}/devices/hugepages
+%attr(0755,root,root) %dir %{udev_libdir}/devices/pts
+%attr(0755,root,root) %dir %{udev_libdir}/devices/shm
+%attr(666,root,root) %dev(c,10,200) %{udev_libdir}/devices/net/tun
+%attr(600,root,root) %dev(c,108,0) %{udev_libdir}/devices/ppp
+%attr(666,root,root) %dev(c,10,229) %{udev_libdir}/devices/fuse
+%attr(660,root,lp) %dev(c,6,0) %{udev_libdir}/devices/lp0
+%attr(660,root,lp) %dev(c,6,1) %{udev_libdir}/devices/lp1
+%attr(660,root,lp) %dev(c,6,2) %{udev_libdir}/devices/lp2
+%attr(660,root,lp) %dev(c,6,3) %{udev_libdir}/devices/lp3
+%attr(640,root,disk) %dev(b,7,0) %{udev_libdir}/devices/loop0
+%attr(640,root,disk) %dev(b,7,1) %{udev_libdir}/devices/loop1
+%attr(640,root,disk) %dev(b,7,2) %{udev_libdir}/devices/loop2
+%attr(640,root,disk) %dev(b,7,3) %{udev_libdir}/devices/loop3
+%attr(640,root,disk) %dev(b,7,4) %{udev_libdir}/devices/loop4
+%attr(640,root,disk) %dev(b,7,5) %{udev_libdir}/devices/loop5
+%attr(640,root,disk) %dev(b,7,6) %{udev_libdir}/devices/loop6
+%attr(640,root,disk) %dev(b,7,7) %{udev_libdir}/devices/loop7
+%{_mandir}/man8/systemd-udevd.8.*
+%{_mandir}/man8/udevadm.8.*
+
+%package -n %{libudev}
+Summary:	Library for udev
+Group:		System/Libraries
+
+%description -n %{libudev}
+Library for udev.
+
+%files -n %{libudev}
+/%{_lib}/libudev.so.%{udev_major}*
+
+%package -n %{libudev_devel}
+Summary:	Devel library for udev
+Group:		Development/C
+License:	LGPLv2+
+Provides:	udev-devel = %{EVRD}
+Requires:	%{libudev} = %{EVRD}
+Obsoletes:	%{_lib}udev0-devel
+Obsoletes:	%{name}-doc
+
+%description -n %{libudev_devel}
+Devel library for udev.
+
+%files -n %{libudev_devel}
+#%doc COPYING README TODO ChangeLog NEWS src/keymap/README.keymap.txt
+#%doc %{_datadir}/gtk-doc/html/libudev
+%{_libdir}/libudev.*
+%if %{with dietlibc}
+%{_prefix}/lib/dietlibc/lib-%{_arch}/libudev.a
+%endif
+%{_libdir}/pkgconfig/libudev.pc
+%{_datadir}/pkgconfig/udev.pc
+%{_includedir}/libudev.h
+
+%if !%{with bootstrap}
+%package -n %{libgudev}
+Summary:	Libraries for adding libudev support to applications that use glib
+Group:		System/Libraries
+#gw please don't remove this again, it is needed by the noarch package
+#gudev-sharp
+Provides:	libgudev = %{EVRD}
+
+%description -n %{libgudev}
+This package contains the libraries that make it easier to use libudev
+functionality from applications that use glib.
+
+%files -n %{libgudev}
+/%{_lib}/libgudev-%{gudev_api}.so.%{gudev_major}*
+
+%package -n %{girgudev}
+Group:		System/Libraries
+Summary:	GObject Introspection interface library for gudev
+Conflicts:	%{_lib}gudev1.0_0 < 182-5
+Obsoletes:	%{_lib}udev-gir1.0
+
+%description -n %{girgudev}
+GObject Introspection interface library for gudev.
+
+%files -n %{girgudev}
+%{_libdir}/girepository-1.0/GUdev-%{gudev_api}.typelib
+
+%package -n %{libgudev_devel}
+Summary:	Header files for adding libudev support to applications that use glib
+Group:		Development/C
+Requires:	%{libgudev} = %{EVRD}
+
+%description -n %{libgudev_devel}
+This package contains the header and pkg-config files for developing
+glib-based applications using libudev functionality.
+
+%files -n %{libgudev_devel}
+#%doc %{_datadir}/gtk-doc/html/gudev
+%{_libdir}/libgudev-%{gudev_api}.so
+%{_includedir}/gudev-%{gudev_api}
+%{_datadir}/gir-1.0/GUdev-%{gudev_api}.gir
+%{_libdir}/pkgconfig/gudev-%{gudev_api}.pc
+%endif
+
+
+%package -n udev-doc
+Summary:	Udev documentation
+Group:		Books/Computer books
+
+%description -n udev-doc
+This package contains documentation of udev.
+
+#################
+#	UDEV	#
+#	END	#
+#################
+
 
 %package	tools
 Summary:	Non essential systemd tools
@@ -123,15 +352,6 @@ Requires(post): awk
 %description	units
 Basic configuration files, directories and installation tool for the systemd
 system and session manager.
-
-%package	gtk
-Summary:	Graphical frontend for systemd
-Group:		System/Configuration/Boot and Init
-Requires:	%{name} = %{version}-%{release}
-Requires:	polkit
-
-%description	gtk
-Graphical front-end for systemd.
 
 %package	sysvinit
 Summary:	System V init tools
@@ -236,13 +456,22 @@ find src/ -name "*.vala" -exec touch '{}' \;
 %configure2_5x \
 	--with-rootprefix= \
 	--with-rootlibdir=/%{_lib} \
+	--libexecdir=%{_prefix}/lib \
 	--with-distro=mandriva \
+	--with-firmware-path=/lib/firmware/updates:/lib/firmware \
 	--enable-plymouth \
 	--disable-static \
 	--with-sysvinit-path=%{_initrddir} \
 	--with-sysvrcd-path=%{_sysconfdir}/rc.d \
-	--disable-coredump \
-	--enable-split-usr
+	--disable-selinux \
+	--enable-split-usr \
+	%if %{with bootstrap}
+	--enable-introspection=no \
+	%else
+	--enable-introspection=yes \
+	%endif
+	--with-usb-ids-path=/usr/share/usb.ids \
+	--with-pci-ids-path=/usr/share/pci.ids
 
 # (tpg) somehow --with-distro option doesn't work
 # just be sure we have a nice mandriva release output :)
@@ -256,6 +485,10 @@ done
 
 %install
 %makeinstall_std
+
+find %{buildroot} \( -name '*.a' -o -name '*.la' \) -exec rm {} \;
+mkdir -p %{buildroot}/%{_sbindir}
+
 
 # (bor) create late shutdown directory
 mkdir -p %{buildroot}/lib/systemd/system-shutdown
@@ -271,6 +504,7 @@ ln -s ../bin/systemctl %{buildroot}/sbin/poweroff
 ln -s ../bin/systemctl %{buildroot}/sbin/shutdown
 ln -s ../bin/systemctl %{buildroot}/sbin/telinit
 ln -s ../bin/systemctl %{buildroot}/sbin/runlevel
+ln -s loginctl %{buildroot}%{_bindir}/systemd-loginct
 
 # We create all wants links manually at installation time to make sure
 # they are not owned and hence overriden by rpm after the used deleted
@@ -293,6 +527,9 @@ mkdir -p %{buildroot}/lib/systemd/system/syslog.target.wants
 # And the default symlink we generate automatically based on inittab
 rm -f %{buildroot}%{_sysconfdir}/systemd/system/default.target
 
+# (tpg) this is needed
+mkdir -p %{buildroot}%{_prefix}/lib/systemd/user-generators
+
 # We are not prepared to deal with tmpfs /var/run or /var/lock
 pushd %{buildroot}/lib/systemd/system/local-fs.target.wants && {
         rm -f var-lock.mount
@@ -304,31 +541,24 @@ popd
 mkdir -p %{buildroot}/lib/systemd/system/bluetooth.target.wants
 
 # use consistent naming and permissions for completion scriplets
-mv %{buildroot}%{_sysconfdir}/bash_completion.d/systemd-bash-completion.sh \
-    %{buildroot}%{_sysconfdir}/bash_completion.d/systemd
+mv %{buildroot}%{_sysconfdir}/bash_completion.d/systemd-bash-completion.sh %{buildroot}%{_sysconfdir}/bash_completion.d/systemd
 chmod 644 %{buildroot}%{_sysconfdir}/bash_completion.d/systemd
 
 # (tpg) use systemd's own mounting capability
-sed -i -e 's/^#MountAuto=yes$/MountAuto=yes/' \
-	%{buildroot}/etc/systemd/system.conf
-
-sed -i -e 's/^#SwapAuto=yes$/SwapAuto=yes/' \
-	%{buildroot}/etc/systemd/system.conf
+sed -i -e 's/^#MountAuto=yes$/MountAuto=yes/' %{buildroot}/etc/systemd/system.conf
+sed -i -e 's/^#SwapAuto=yes$/SwapAuto=yes/' %{buildroot}/etc/systemd/system.conf
 
 # (bor) disable legacy output to console, it just messes things up
-sed -i -e 's/^#SysVConsole=yes$/SysVConsole=no/' \
-	%{buildroot}/etc/systemd/system.conf
+sed -i -e 's/^#SysVConsole=yes$/SysVConsole=no/' %{buildroot}/etc/systemd/system.conf
 
 # Let rsyslog read from /proc/kmsg for now
-sed -i -e 's/\#ImportKernel=yes/ImportKernel=no/' %{buildroot}%{_sysconfdir}/systemd/systemd-journald.conf
+sed -i -e 's/\#ImportKernel=yes/ImportKernel=no/' %{buildroot}%{_sysconfdir}/systemd/journald.conf
 
-# (bor) enable rpcbind.target by default so we have something to plug
-#	portmapper service into
+# (bor) enable rpcbind.target by default so we have something to plug portmapper service into
 ln -s ../rpcbind.target %{buildroot}/lib/systemd/system/multi-user.target.wants
 
 # (bor) machine-id-setup is in /sbin in post-v20
-install -d %{buildroot}/sbin && \
-	mv %{buildroot}/bin/systemd-machine-id-setup %{buildroot}/sbin
+install -d %{buildroot}/sbin && mv %{buildroot}/bin/systemd-machine-id-setup %{buildroot}/sbin
 
 # (eugeni) install /run
 mkdir %{buildroot}/run
@@ -390,6 +620,29 @@ fi
 EOF
 chmod 755 %{buildroot}%{_var}/lib/rpm/filetriggers/systemd-daemon-reload.script
 
+#################
+#	UDEV	#
+#	SHIT	#
+#################
+ln -sf ../bin/udevadm %{buildroot}%{_sbindir}/udevadm
+ln -sf ../bin/udevadm %{buildroot}/sbin/udevadm
+mkdir -p %{buildroot}%{_prefix}/lib/firmware/updates
+mkdir -p %{buildroot}%{_sysconfdir}/udev/agents.d/usb
+touch %{buildroot}%{_sysconfdir}/scsi_id.config
+# (blino) usb_id are used by drakx
+ln -s ..%{udev_libdir}/usb_id %{buildroot}/sbin/
+ln -s ..%{udev_libdir}/udevd %{buildroot}/sbin/
+mkdir -p %{buildroot}/lib/firmware/updates
+# default /dev content, from Fedora RPM
+mkdir -p %{buildroot}%{udev_libdir}/devices/{net,hugepages,pts,shm}
+# From previous Mandriva /etc/udev/devices.d
+mkdir -p %{buildroot}%{udev_libdir}/devices/cpu/0
+
+#################
+#	UDEV	#
+#	END	#
+#################
+
 %triggerin -- glibc
 # reexec daemon on self or glibc update to avoid busy / on shutdown
 # trigger is executed on both self and target install so no need to have
@@ -407,9 +660,17 @@ if [ $1 -ge 1 -o $2 -ge 2 ] ; then
 	fi
 fi
 
+%pre
+systemctl stop systemd-udev.service systemd-udev-control.socket systemd-udev-kernel.socket >/dev/null 2>&1 || :
+
 %post
-/sbin/systemd-machine-id-setup > /dev/null 2>&1 || :
-#/sbin/systemctl daemon-reexec > /dev/null 2>&1 || :
+/usr/bin/systemd-machine-id-setup > /dev/null 2>&1 || :
+/usr/lib/systemd/systemd-random-seed save > /dev/null 2>&1 || :
+/bin/systemctl daemon-reexec > /dev/null 2>&1 || :
+/bin/systemctl start systemd-udev.service >/dev/null 2>&1 || :
+
+# (tpg) this is needed for rsyslog
+/bin/ln -s /usr/lib/systemd/system/rsyslog.service /etc/systemd/system/syslog.service >/dev/null 2>&1 || :
 
 %triggerin units -- %{name}-units < 19-4
 # Enable the services we install by default.
@@ -486,9 +747,10 @@ fi
 %config(noreplace) %{_sysconfdir}/dbus-1/system.d/org.freedesktop.login1.conf
 %config(noreplace) %{_sysconfdir}/dbus-1/system.d/org.freedesktop.timedate1.conf
 %config(noreplace) %{_sysconfdir}/systemd/system.conf
-%config(noreplace) %{_sysconfdir}/systemd/systemd-logind.conf
-%config(noreplace) %{_sysconfdir}/systemd/systemd-journald.conf
+%config(noreplace) %{_sysconfdir}/systemd/logind.conf
+%config(noreplace) %{_sysconfdir}/systemd/journald.conf
 %config(noreplace) %{_sysconfdir}/systemd/user.conf
+%config(noreplace) /usr/lib/sysctl.d/coredump.conf
 %ghost %config(noreplace) %{_sysconfdir}/hostname
 %ghost %config(noreplace) %{_sysconfdir}/vconsole.conf
 %ghost %config(noreplace) %{_sysconfdir}/locale.conf
@@ -508,17 +770,23 @@ fi
 
 %{_sysconfdir}/xdg/systemd
 /bin/systemd-ask-password
-/bin/systemd-loginctl
-/bin/systemd-journalctl
+#/bin/systemd-loginctl
+#/bin/systemd-journalctl
 /bin/systemd-notify
 /bin/systemd-tmpfiles
 /bin/systemd-tty-ask-password-agent
 /bin/systemd
+/bin/journalctl
+/bin/loginctl
+/bin/systemd-inhibit
 /sbin/systemd-machine-id-setup
+%{_bindir}/systemd-delta
+%{_bindir}/systemd-detect-virt
+%{_bindir}/systemd-loginct
 /lib/systemd/systemd
 /lib/systemd/systemd-*
 /lib/systemd/system-generators/*
-/lib/udev/rules.d/*.rules
+#/lib/udev/rules.d/*.rules
 /usr/lib/tmpfiles.d/legacy.conf
 /usr/lib/tmpfiles.d/systemd.conf
 /usr/lib/tmpfiles.d/x11.conf
@@ -535,11 +803,14 @@ fi
 %{_mandir}/man1/systemd-cat.1*
 %{_mandir}/man1/systemd-cgls.*
 %{_mandir}/man1/systemd-cgtop.*
-%{_mandir}/man1/systemd-journalctl.1*
-%{_mandir}/man1/systemd-loginctl.*
+%{_mandir}/man1/journalctl.1*
+%{_mandir}/man1/loginctl.*
 %{_mandir}/man1/systemd-machine-id-setup.1*
 %{_mandir}/man1/systemd-notify.*
 %{_mandir}/man1/systemd-nspawn.*
+%{_mandir}/man1//systemd-delta.1.*
+%{_mandir}/man1//systemd-detect-virt.1.*
+%{_mandir}/man1//systemd-inhibit.1.*
 %{_mandir}/man3/*
 %{_mandir}/man5/*
 %{_mandir}/man7/*
@@ -592,11 +863,6 @@ fi
 %ghost %config(noreplace) %{_sysconfdir}/systemd/system/runlevel4.target
 %ghost %config(noreplace) %{_sysconfdir}/systemd/system/runlevel5.target
 
-%files gtk
-%{_bindir}/systemadm
-%{_bindir}/systemd-gnome-ask-password-agent
-%{_mandir}/man1/systemadm.*
-
 %files sysvinit
 /sbin/init
 /sbin/reboot
@@ -627,6 +893,8 @@ fi
 %{_libdir}/pkgconfig/libsystemd-daemon.pc
 %{_datadir}/pkgconfig/systemd.pc
 %{_includedir}/systemd/sd-messages.h
+%{_includedir}/systemd/sd-readahead.h
+%{_includedir}/systemd/sd-shutdown.h
 
 %files -n %{liblogin}
 /%{_lib}/libsystemd-login.so.%{liblogin_major}*
