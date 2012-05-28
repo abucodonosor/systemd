@@ -84,7 +84,7 @@ BuildRequires:	tcp_wrappers-devel
 BuildRequires:	vala >= 0.9
 BuildRequires:	pkgconfig(dbus-1) >= 1.4.0
 BuildRequires:	pkgconfig(dbus-glib-1)
-BuildRequires:	pkgconfig(gee-1.0)
+BuildRequires:	pkgconfig(gee-0.8)
 BuildRequires:	pkgconfig(glib-2.0)
 BuildRequires:	pkgconfig(gtk+-2.0)
 BuildRequires:	pkgconfig(libcryptsetup)
@@ -247,7 +247,7 @@ Group:		System/Libraries
 Library for udev.
 
 %files -n %{libudev}
-/%{_lib}/libudev.so.%{udev_major}*
+#/%{_lib}/libudev.so.%{udev_major}*
 
 %package -n %{libudev_devel}
 Summary:	Devel library for udev
