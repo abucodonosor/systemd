@@ -159,8 +159,7 @@ removed from the system
 %dir %{udev_libdir}
 %dir %{_sysconfdir}/udev
 #%dir %{udev_rules_dir}
-#%dir %attr(0644,root,root)
-%{_prefix}/lib/udev/keymaps
+%dir %attr(0644,root,root) %{_prefix}/lib/udev/keymaps
 %dir %{_sysconfdir}/udev/agents.d
 %dir %{_sysconfdir}/udev/agents.d/usb
 #%config(noreplace) %{_sysconfdir}/sysconfig/udev
