@@ -246,7 +246,7 @@ Group:		System/Libraries
 Library for udev.
 
 %files -n %{libudev}
-#/%{_lib}/libudev.so.%{udev_major}*
+/%{_lib}/libudev.so.%{udev_major}*
 
 %package -n %{libudev_devel}
 Summary:	Devel library for udev
