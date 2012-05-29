@@ -674,7 +674,6 @@ systemctl stop systemd-udev.service systemd-udev-control.socket systemd-udev-ker
 %triggerin units -- %{name}-units < 19-4
 # Enable the services we install by default.
 /bin/systemctl --quiet enable \
-	hwclock-load.service \
 	quotaon.service \
 	quotacheck.service \
 	remote-fs.target
@@ -699,7 +698,6 @@ if [ $1 -eq 1 ] ; then
 
 	# Enable the services we install by default.
 	/bin/systemctl --quiet enable \
-		hwclock-load.service \
 		getty@.service \
 		quotaon.service \
 		quotacheck.service \
@@ -722,7 +720,6 @@ fi
 %preun units
 if [ $1 -eq 0 ] ; then
         /bin/systemctl --quiet disable \
-		hwclock-load.service \
 		getty@.service \
 		quotaon.service \
 		quotacheck.service \
