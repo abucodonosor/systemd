@@ -812,6 +812,11 @@ fi
 %{_mandir}/man7/*
 %{_mandir}/man8/pam_systemd.*
 %{_mandir}/man8/systemd-tmpfiles.*
+%{_mandir}/man8/systemd-binfmt*
+%{_mandir}/man8/systemd-journald*
+%{_mandir}/man8/systemd-logind*
+%{_mandir}/man8/systemd-modules-load*
+%{_mandir}/man8/systemd-sysctl*
 %{_datadir}/dbus-1/services/org.freedesktop.systemd1.service
 %{_datadir}/dbus-1/system-services/org.freedesktop.hostname1.service
 %{_datadir}/dbus-1/system-services/org.freedesktop.systemd1.service
