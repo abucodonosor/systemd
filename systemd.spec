@@ -474,7 +474,6 @@ find src/ -name "*.vala" -exec touch '{}' \;
 	--libexecdir=%{_prefix}/lib \
 	--with-distro=mandriva \
 	--with-firmware-path=/lib/firmware/updates:/lib/firmware \
-	--enable-plymouth \
 	--disable-static \
 	--with-sysvinit-path=%{_initrddir} \
 	--with-sysvrcd-path=%{_sysconfdir}/rc.d \
@@ -637,16 +636,16 @@ chmod 755 %{buildroot}%{_var}/lib/rpm/filetriggers/systemd-daemon-reload.script
 #	SHIT	#
 #################
 
-install -m 644 %{SOURCE2} %{buildroot}%{system_rules_dir}/
-install -m 644 %{SOURCE3} %{buildroot}%{system_rules_dir}/
+install -m 644 %{SOURCE2} %{buildroot}%{udev_rules_dir}/
+install -m 644 %{SOURCE3} %{buildroot}%{udev_rules_dir}/
 install -m 0644 %{SOURCE5} -D %{buildroot}%{_sysconfdir}/sysconfig/udev
 # net rules
-install -m 0644 %{SOURCE6} %{buildroot}%{system_rules_dir}/
+install -m 0644 %{SOURCE6} %{buildroot}%{udev_rules_dir}/
 install -m 0755 %{SOURCE7} %{buildroot}%{lib_udev_dir}/net_create_ifcfg
 install -m 0755 %{SOURCE8} %{buildroot}%{lib_udev_dir}/net_action
 install -m 0644 %{SOURCE9} %{buildroot}/etc/sysconfig/udev_net
 
-install -m 0644 %{SOURCE10} %{buildroot}%{system_rules_dir}/
+install -m 0644 %{SOURCE10} %{buildroot}%{udev_rules_dir}/
 
 ln -sf ../bin/udevadm %{buildroot}%{_sbindir}/udevadm
 ln -sf ../bin/udevadm %{buildroot}/sbin/udevadm
