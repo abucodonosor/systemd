@@ -1,3 +1,7 @@
+
+%bcond_with dietlibc
+%bcond_with bootstrap
+
 # macros for sysvinit transition - should be equal to
 # sysvinit %version-%release-plus-1
 %define sysvinit_version 2.87
@@ -42,32 +46,45 @@
 
 Summary:	A System and Session Manager
 Name:		systemd
-Version:	185
+Version:	186
 Release:	1
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
 Source0:	http://www.freedesktop.org/software/systemd/%{name}-%{version}.tar.xz
 Source1:	%{name}.macros
-Source2:	systemd-sysv-convert
+Source2:	50-udev-mandriva.rules
+Source3:	69-printeracl.rules
+Source5:	udev.sysconfig
+# (blino) net rules and helpers
+Source6:	76-net.rules
+Source7:	udev_net_create_ifcfg
+Source8:	udev_net_action
+Source9:	udev_net.sysconfig
+# (hk) udev rules for zte 3g modems with drakx-net
+Source10:	61-mobile-zte-drakx-net.rules
+
+### SYSTEMD ###
+
 # (bor) clean up directories on boot as done by rc.sysinit
-Patch16:	systemd-18-clean-dirs-on-boot.patch
-# (bor) reset /etc/mtab on boot (why is it not a link)?
-#Patch17:	systemd-18-reset-mtab-on-boot.patch
-# (bor) allow explicit stdout configuration for SysV scripts
-#Patch18:	systemd-19-sysv_std_output.patch
-# (bor) fix potential deadlock when onseshot unit is not finished
-#Patch19:	systemd-19-apply-timeoutsec-to-oneshot-too.patch
-# (bor) network filesystems do not need quota service (mdv#62746)
-#Patch21:	systemd-19-no-quotacheck-for-netfs.patch
-Patch22:	systemd-tmpfilesd-utmp-temp-patch.patch
-# (tpg) Patches from upstream git
-#Patch26:	systemd-halt-pre.patch
-Patch27:	systemd-33-rc-local.patch
-#Patch28:	systemd-37-fix-bash-completion.patch
-#Patch29:	systemd-37-dont-unset-locales-in-getty.patch
-# (tpg) patch from mageia, Add a work around for a syslog.socket deadlock on boot+shutdown
-#Patch30:	systemd-38-fix-syslog-socket-deadlock.patch
+Patch0:		systemd-18-clean-dirs-on-boot.patch
+Patch1:		systemd-tmpfilesd-utmp-temp-patch.patch
+Patch2:		systemd-33-rc-local.patch
+
+### UDEV ###
+# from Mandriva
+# disable coldplug for storage and device pci
+Patch100:	udev-182-coldplug.patch
+Patch101:	0509-udev-Allow-the-udevadm-settle-timeout-to-be-set-via-.patch
+Patch102:	0507-Allow-booting-from-live-cd-in-virtualbox.patch
+# (cg) timeout handling patch from Arch
+# https://bugs.archlinux.org/task/27938
+Patch103:	0508-reinstate-TIMEOUT-handling.patch
+
+%if %{with dietlibc}
+BuildRequires: dietlibc
+%endif
+
 BuildRequires:	autoconf
 BuildRequires:	automake
 BuildRequires:	m4
@@ -88,17 +105,17 @@ BuildRequires:	pkgconfig(gee-0.8)
 BuildRequires:	pkgconfig(glib-2.0)
 BuildRequires:	pkgconfig(gtk+-2.0)
 BuildRequires:	pkgconfig(libcryptsetup)
-BuildRequires:	pkgconfig(libkmod)
+BuildRequires:	pkgconfig(libkmod) >= 5
 BuildRequires:	pkgconfig(liblzma)
 BuildRequires:	pkgconfig(libnotify)
 BuildRequires:	pkgconfig(libxslt)
 BuildRequires:	xsltproc
-BuildRequires:	libblkid-devel
+BuildRequires:	pkgconfig(blkid)
 BuildRequires:	usbutils >= 005-3
 BuildRequires:	pciutils-devel
 BuildRequires:	ldetect-lst
 %if !%{with bootstrap}
-BuildRequires: gobject-introspection-devel >= 0.6.2
+BuildRequires:	pkgconfig(gobject-introspection-1.0)
 %endif
 Requires(pre,post):	coreutils
 Requires(post):	gawk
@@ -315,7 +332,6 @@ glib-based applications using libudev functionality.
 %{_libdir}/pkgconfig/gudev-%{gudev_api}.pc
 %endif
 
-
 %package -n udev-doc
 Summary:	Udev documentation
 Group:		Books/Computer books
@@ -329,7 +345,7 @@ This package contains documentation of udev.
 #################
 
 
-%package	tools
+%package tools
 Summary:	Non essential systemd tools
 Group:		System/Configuration/Boot and Init
 Requires:	%{name} = %{version}-%{release}
@@ -337,10 +353,10 @@ Conflicts:	%{name} < 35-6
 Requires:	python-dbus
 Requires:	python-cairo
 
-%description	tools
+%description tools
 Non essential systemd tools.
 
-%package	units
+%package units
 Summary:	Configuration files, directories and installation tool for systemd
 Group:		System/Configuration/Boot and Init
 Requires(post):	coreutils
@@ -348,11 +364,11 @@ Requires(post):	gawk
 Requires(post): grep
 Requires(post): awk
 
-%description	units
+%description units
 Basic configuration files, directories and installation tool for the systemd
 system and session manager.
 
-%package	sysvinit
+%package sysvinit
 Summary:	System V init tools
 Group:		System/Configuration/Boot and Init
 Requires:	%{name} = %{version}-%{release}
@@ -360,18 +376,18 @@ Requires:	%{name} = %{version}-%{release}
 Provides:	sysvinit = %sysvinit_version-%sysvinit_release, SysVinit = %sysvinit_release-%sysvinit_release
 Conflicts:	sysvinit < %sysvinit_version-%sysvinit_release, SysVinit < %sysvinit_release-%sysvinit_release
 
-%description	sysvinit
+%description sysvinit
 Drop-in replacement for the System V init tools of systemd.
 
-%package	sysv
+%package sysv
 Summary:	SysV tools for systemd
 Group:          System/Configuration/Boot and Init
 Requires:       %{name} = %{version}-%{release}
 
-%description	sysv
-SysV compatibility tools for systemd
+%description sysv
+SysV compatibility tools for systemd.
 
-%package -n	%{libdaemon}
+%package -n %{libdaemon}
 Summary:	Systemd-daemon library package
 Group:		System/Libraries
 Provides:	libsystemd-daemon = %{version}-%{release}
@@ -379,7 +395,7 @@ Provides:	libsystemd-daemon = %{version}-%{release}
 %description -n	%{libdaemon}
 This package provides the systemd-daemon shared library.
 
-%package -n	%{libdaemon_devel}
+%package -n %{libdaemon_devel}
 Summary:	Systemd-daemon library development files
 Group:		Development/C
 Requires:	%{libdaemon} = %{version}-%{release}
@@ -388,7 +404,7 @@ Provides:	libsystemd-daemon-devel = %{version}-%{release}
 %description -n	%{libdaemon_devel}
 Development files for the systemd-daemon shared library.
 
-%package -n	%{liblogin}
+%package -n %{liblogin}
 Summary:	Systemd-login library package
 Group:		System/Libraries
 Provides:	libsystemd-login = %{version}-%{release}
@@ -396,7 +412,7 @@ Provides:	libsystemd-login = %{version}-%{release}
 %description -n	%{liblogin}
 This package provides the systemd-login shared library.
 
-%package -n	%{liblogin_devel}
+%package -n %{liblogin_devel}
 Summary:	Systemd-login library development files
 Group:		Development/C
 Requires:	%{liblogin} = %{version}-%{release}
@@ -405,7 +421,7 @@ Provides:	libsystemd-login-devel = %{version}-%{release}
 %description -n	%{liblogin_devel}
 Development files for the systemd-login shared library.
 
-%package -n	%{libjournal}
+%package -n %{libjournal}
 Summary:	Systemd-journal library package
 Group:		System/Libraries
 Provides:	libsystemd-journal = %{version}-%{release}
@@ -413,7 +429,7 @@ Provides:	libsystemd-journal = %{version}-%{release}
 %description -n	%{libjournal}
 This package provides the systemd-journal shared library.
 
-%package -n	%{libjournal_devel}
+%package -n %{libjournal_devel}
 Summary:	Systemd-journal library development files
 Group:		Development/C
 Requires:	%{libjournal} = %{version}-%{release}
@@ -422,7 +438,7 @@ Provides:	libsystemd-journal-devel = %{version}-%{release}
 %description -n	%{libjournal_devel}
 Development files for the systemd-journal shared library.
 
-%package -n	%{libid128}
+%package -n %{libid128}
 Summary:	Systemd-id128 library package
 Group:		System/Libraries
 Provides:	libsystemd-id128 = %{version}-%{release}
@@ -430,7 +446,7 @@ Provides:	libsystemd-id128 = %{version}-%{release}
 %description -n	%{libid128}
 This package provides the systemd-id128 shared library.
 
-%package -n	%{libid128_devel}
+%package -n %{libid128_devel}
 Summary:	Systemd-id128 library development files
 Group:		Development/C
 Requires:	%{libid128} = %{version}-%{release}
@@ -485,9 +501,12 @@ done
 %install
 %makeinstall_std
 
+%if %{with dietlibc}
+install -d %{buildroot}%{_prefix}/lib/dietlibc/lib-%{_arch}
+%endif
+
 find %{buildroot} \( -name '*.a' -o -name '*.la' \) -exec rm {} \;
 mkdir -p %{buildroot}/%{_sbindir}
-
 
 # (bor) create late shutdown directory
 mkdir -p %{buildroot}/lib/systemd/system-shutdown
@@ -546,12 +565,6 @@ chmod 644 %{buildroot}%{_sysconfdir}/bash_completion.d/systemd
 # (tpg) use systemd's own mounting capability
 sed -i -e 's/^#MountAuto=yes$/MountAuto=yes/' %{buildroot}/etc/systemd/system.conf
 sed -i -e 's/^#SwapAuto=yes$/SwapAuto=yes/' %{buildroot}/etc/systemd/system.conf
-
-# (bor) disable legacy output to console, it just messes things up
-sed -i -e 's/^#SysVConsole=yes$/SysVConsole=no/' %{buildroot}/etc/systemd/system.conf
-
-# Let rsyslog read from /proc/kmsg for now
-sed -i -e 's/\#ImportKernel=yes/ImportKernel=no/' %{buildroot}%{_sysconfdir}/systemd/journald.conf
 
 # (bor) enable rpcbind.target by default so we have something to plug portmapper service into
 ln -s ../rpcbind.target %{buildroot}/lib/systemd/system/multi-user.target.wants
@@ -623,6 +636,18 @@ chmod 755 %{buildroot}%{_var}/lib/rpm/filetriggers/systemd-daemon-reload.script
 #	UDEV	#
 #	SHIT	#
 #################
+
+install -m 644 %{SOURCE2} %{buildroot}%{system_rules_dir}/
+install -m 644 %{SOURCE3} %{buildroot}%{system_rules_dir}/
+install -m 0644 %{SOURCE5} -D %{buildroot}%{_sysconfdir}/sysconfig/udev
+# net rules
+install -m 0644 %{SOURCE6} %{buildroot}%{system_rules_dir}/
+install -m 0755 %{SOURCE7} %{buildroot}%{lib_udev_dir}/net_create_ifcfg
+install -m 0755 %{SOURCE8} %{buildroot}%{lib_udev_dir}/net_action
+install -m 0644 %{SOURCE9} %{buildroot}/etc/sysconfig/udev_net
+
+install -m 0644 %{SOURCE10} %{buildroot}%{system_rules_dir}/
+
 ln -sf ../bin/udevadm %{buildroot}%{_sbindir}/udevadm
 ln -sf ../bin/udevadm %{buildroot}/sbin/udevadm
 mkdir -p %{buildroot}%{_prefix}/lib/firmware/updates
@@ -631,6 +656,10 @@ touch %{buildroot}%{_sysconfdir}/scsi_id.config
 # (blino) usb_id are used by drakx
 ln -s ..%{udev_libdir}/usb_id %{buildroot}/sbin/
 ln -s ..%{udev_libdir}/udevd %{buildroot}/sbin/
+
+# udev rules for zte 3g modems and drakx-net
+
+
 mkdir -p %{buildroot}/lib/firmware/updates
 # default /dev content, from Fedora RPM
 mkdir -p %{buildroot}%{udev_libdir}/devices/{net,hugepages,pts,shm}
@@ -658,6 +687,17 @@ if [ $1 -ge 1 -o $2 -ge 2 ] ; then
 	    sed -i -e 's/^SPEEDBOOT=.*$/SPEEDBOOT=no/g' /etc/sysconfig/speedboot
 	fi
 fi
+
+%pre -n udev
+if [ -d /lib/hotplug/firmware ]; then
+	echo "Moving /lib/hotplug/firmware to /lib/firmware"
+	mkdir -p /lib/firmware
+	mv /lib/hotplug/firmware/* /lib/firmware/ 2>/dev/null
+	rmdir -p --ignore-fail-on-non-empty /lib/hotplug/firmware
+	:
+fi
+
+
 
 %pre
 systemctl stop systemd-udev.service systemd-udev-control.socket systemd-udev-kernel.socket >/dev/null 2>&1 || :
