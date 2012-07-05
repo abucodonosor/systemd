@@ -40,7 +40,7 @@
 %define libgudev_devel %mklibname gudev %{gudev_api} -d
 %define girgudev %mklibname gudev-gir %{gudev_api}
 
-%define udev_libdir /lib/udev
+%define udev_libdir[MB_' /lib/udev
 %define udev_rules_dir %{udev_libdir}/rules.d
 %define udev_user_rules_dir %{_sysconfdir}/udev/rules.d
 
@@ -641,8 +641,8 @@ install -m 644 %{SOURCE3} %{buildroot}%{udev_rules_dir}/
 install -m 0644 %{SOURCE5} -D %{buildroot}%{_sysconfdir}/sysconfig/udev
 # net rules
 install -m 0644 %{SOURCE6} %{buildroot}%{udev_rules_dir}/
-install -m 0755 %{SOURCE7} %{buildroot}%{lib_udev_dir}/net_create_ifcfg
-install -m 0755 %{SOURCE8} %{buildroot}%{lib_udev_dir}/net_action
+install -m 0755 %{SOURCE7} %{buildroot}%{udev_libdir}/net_create_ifcfg
+install -m 0755 %{SOURCE8} %{buildroot}%{udev_libdir}/net_action
 install -m 0644 %{SOURCE9} %{buildroot}/etc/sysconfig/udev_net
 
 install -m 0644 %{SOURCE10} %{buildroot}%{udev_rules_dir}/
