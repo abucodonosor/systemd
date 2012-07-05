@@ -377,14 +377,6 @@ Conflicts:	sysvinit < %sysvinit_version-%sysvinit_release, SysVinit < %sysvinit_
 %description sysvinit
 Drop-in replacement for the System V init tools of systemd.
 
-%package sysv
-Summary:	SysV tools for systemd
-Group:          System/Configuration/Boot and Init
-Requires:       %{name} = %{version}-%{release}
-
-%description sysv
-SysV compatibility tools for systemd.
-
 %package -n %{libdaemon}
 Summary:	Systemd-daemon library package
 Group:		System/Libraries
@@ -607,9 +599,6 @@ chmod 644 %{buildroot}%{_sysconfdir}/profile.d/40systemd.sh
 
 # (tpg) add rpm macros
 install -m 0644 -D %{SOURCE1} %{buildroot}%{_sysconfdir}/rpm/macros.d/%{name}.macros
-
-# Install SysV conversion tool for systemd
-install -m 0755 %{SOURCE2} %{buildroot}%{_bindir}/
 
 # (tpg) from mageia
 # automatic systemd release on rpm installs/removals
@@ -917,9 +906,6 @@ fi
 %{_mandir}/man8/telinit.*
 %{_mandir}/man8/runlevel.*
 %dir /run
-
-%files sysv
-%{_bindir}/systemd-sysv-convert
 
 %files -n %{libdaemon}
 /%{_lib}/libsystemd-daemon.so.%{libdaemon_major}*
