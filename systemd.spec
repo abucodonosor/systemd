@@ -7,8 +7,6 @@
 %define sysvinit_version 2.87
 %define sysvinit_release %mkrel 14
 
-%bcond_with bootstrap
-
 # (eugeni) for backports and old distributions, rely on EVRD as well
 %if %mdkversion < 201100
 %define EVRD %{?epoch:%{epoch}:}%{?version:%{version}}%{?release:-%{release}}%{?distepoch::%{distepoch}}
@@ -176,7 +174,7 @@ removed from the system
 %dir %{udev_libdir}
 %dir %{_sysconfdir}/udev
 #%dir %{udev_rules_dir}
-%dir %attr(0644,root,root) %{_prefix}/lib/udev/keymaps
+#%dir %attr(0644,root,root) %{_prefix}/lib/udev/keymaps
 %dir %{_sysconfdir}/udev/agents.d
 %dir %{_sysconfdir}/udev/agents.d/usb
 #%config(noreplace) %{_sysconfdir}/sysconfig/udev
@@ -191,7 +189,7 @@ removed from the system
 %attr(0755,root,root) /sbin/usb_id
 #%attr(0755,root,root) %{udev_libdir}/udevd
 %{udev_libdir}/keymap
-%{_prefix}/lib/udev/rules.d/*.rules
+#%{_prefix}/lib/udev/rules.d/*.rules
 
 %attr(0755,root,root) %{udev_libdir}/accelerometer
 %attr(0755,root,root) %{udev_libdir}/ata_id
@@ -209,9 +207,9 @@ removed from the system
 
 #%attr(0755,root,root) %{udev_libdir}/findkeyboards
 #%attr(0755,root,root) %{udev_libdir}/keyboard-force-release.sh
-%{_prefix}/lib/udev/findkeyboards
-%{_prefix}/lib/udev/keyboard-force-release.sh
-%attr(0644,root,root) %{_prefix}/lib/udev/keymaps/*
+#%{_prefix}/lib/udev/findkeyboards
+#%{_prefix}/lib/udev/keyboard-force-release.sh
+#%attr(0644,root,root) %{_prefix}/lib/udev/keymaps/*
 
 # From previous Mandriva /etc/udev/devices.d and patches
 %attr(0666,root,root) %dev(c,1,3) %{udev_libdir}/devices/null
