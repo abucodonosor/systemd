@@ -173,8 +173,9 @@ removed from the system
 %dir /lib/firmware/updates
 %dir %{udev_libdir}
 %dir %{_sysconfdir}/udev
-#%dir %{udev_rules_dir}
-#%dir %attr(0644,root,root) %{_prefix}/lib/udev/keymaps
+%dir %{udev_rules_dir}
+
+%dir %attr(0644,root,root) %{udev_libdir}/keymaps
 %dir %{_sysconfdir}/udev/agents.d
 %dir %{_sysconfdir}/udev/agents.d/usb
 #%config(noreplace) %{_sysconfdir}/sysconfig/udev
@@ -188,8 +189,8 @@ removed from the system
 %attr(0755,root,root) /sbin/udevd
 %attr(0755,root,root) /sbin/usb_id
 #%attr(0755,root,root) %{udev_libdir}/udevd
-%{udev_libdir}/keymap
-#%{_prefix}/lib/udev/rules.d/*.rules
+%{udev_libdir}/keymaps/*
+%{udev_rules_dir}/*.rules
 
 %attr(0755,root,root) %{udev_libdir}/accelerometer
 %attr(0755,root,root) %{udev_libdir}/ata_id
@@ -200,16 +201,13 @@ removed from the system
 #%attr(0755,root,root) %{udev_libdir}/rule_generator.functions
 #%attr(0755,root,root) %{udev_libdir}/write_cd_rules
 #%attr(0755,root,root) %{udev_libdir}/write_net_rules
-#%attr(0755,root,root) %{udev_libdir}/net_create_ifcfg
-#%attr(0755,root,root) %{udev_libdir}/net_action
+%attr(0755,root,root) %{udev_libdir}/net_create_ifcfg
+%attr(0755,root,root) %{udev_libdir}/net_action
 %attr(0755,root,root) %{udev_libdir}/v4l_id
 %attr(0755,root,root) %{udev_libdir}/mtd_probe
-
-#%attr(0755,root,root) %{udev_libdir}/findkeyboards
-#%attr(0755,root,root) %{udev_libdir}/keyboard-force-release.sh
-#%{_prefix}/lib/udev/findkeyboards
-#%{_prefix}/lib/udev/keyboard-force-release.sh
-#%attr(0644,root,root) %{_prefix}/lib/udev/keymaps/*
+%attr(0755,root,root) %{udev_libdir}/findkeyboards
+%attr(0755,root,root) %{udev_libdir}/keyboard-force-release.sh
+%attr(0755,root,root) %{udev_libdir}/findkeyboards
 
 # From previous Mandriva /etc/udev/devices.d and patches
 %attr(0666,root,root) %dev(c,1,3) %{udev_libdir}/devices/null
@@ -630,7 +628,7 @@ install -m 0644 %{SOURCE5} -D %{buildroot}%{_sysconfdir}/sysconfig/udev
 install -m 0644 %{SOURCE6} %{buildroot}%{udev_rules_dir}/
 install -m 0755 %{SOURCE7} %{buildroot}%{udev_libdir}/net_create_ifcfg
 install -m 0755 %{SOURCE8} %{buildroot}%{udev_libdir}/net_action
-install -m 0644 %{SOURCE9} %{buildroot}/etc/sysconfig/udev_net
+install -m 0644 %{SOURCE9} %{buildroot}%{_sysconfig}/sysconfig/udev_net
 
 install -m 0644 %{SOURCE10} %{buildroot}%{udev_rules_dir}/
 
@@ -808,7 +806,7 @@ fi
 /lib/systemd/systemd
 /lib/systemd/systemd-*
 /lib/systemd/system-generators/*
-#/lib/udev/rules.d/*.rules
+
 /usr/lib/tmpfiles.d/legacy.conf
 /usr/lib/tmpfiles.d/systemd.conf
 /usr/lib/tmpfiles.d/x11.conf
@@ -837,12 +835,7 @@ fi
 %{_mandir}/man5/*
 %{_mandir}/man7/*
 %{_mandir}/man8/pam_systemd.*
-%{_mandir}/man8/systemd-tmpfiles.*
-%{_mandir}/man8/systemd-binfmt*
-%{_mandir}/man8/systemd-journald*
-%{_mandir}/man8/systemd-logind*
-%{_mandir}/man8/systemd-modules-load*
-%{_mandir}/man8/systemd-sysctl*
+%{_mandir}/man8/systemd-*
 %{_datadir}/dbus-1/services/org.freedesktop.systemd1.service
 %{_datadir}/dbus-1/system-services/org.freedesktop.hostname1.service
 %{_datadir}/dbus-1/system-services/org.freedesktop.systemd1.service
@@ -863,6 +856,7 @@ fi
 
 %files tools
 %{_bindir}/systemd-analyze
+%{_mandir}/man1/systemd-analyze.1*
 
 %files units
 %dir %{_sysconfdir}/systemd
