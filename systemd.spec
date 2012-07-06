@@ -207,7 +207,6 @@ removed from the system
 %attr(0755,root,root) %{udev_libdir}/mtd_probe
 %attr(0755,root,root) %{udev_libdir}/findkeyboards
 %attr(0755,root,root) %{udev_libdir}/keyboard-force-release.sh
-%attr(0755,root,root) %{udev_libdir}/findkeyboards
 
 # From previous Mandriva /etc/udev/devices.d and patches
 %attr(0666,root,root) %dev(c,1,3) %{udev_libdir}/devices/null
