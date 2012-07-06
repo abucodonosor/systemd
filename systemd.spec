@@ -192,6 +192,7 @@ removed from the system
 %{udev_libdir}/keymaps/*
 %{udev_rules_dir}/*.rules
 
+%attr(0755,root,root) %{udev_libdir}/keymap
 %attr(0755,root,root) %{udev_libdir}/accelerometer
 %attr(0755,root,root) %{udev_libdir}/ata_id
 %attr(0755,root,root) %{udev_libdir}/cdrom_id
