@@ -45,7 +45,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	186
-Release:	1
+Release:	2
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -116,11 +116,11 @@ BuildRequires:	ldetect-lst
 BuildRequires:	pkgconfig(gobject-introspection-1.0)
 %endif
 Requires(pre,post):	coreutils
+Requires(pre):	udev = %{version}-%{release}
 Requires(post):	gawk
 Requires(post):	grep
 Requires(post):	awk
 Requires:	dbus >= 1.3.2
-Conflicts:	udev < 183
 Requires(pre):	initscripts > 9.24
 %if %mdkver >= 201200
 Requires(pre):	basesystem-minimal >= 2011.0-2
@@ -130,6 +130,7 @@ Requires:	nss-myhostname
 Requires:	lockdev
 Conflicts:	initscripts < 9.24
 %rename		readahead
+Provides:	should-restart = system
 
 %description
 systemd is a system and session manager for Linux, compatible with
@@ -152,14 +153,14 @@ Summary:	Device manager for the Linux kernel
 Group:		System/Configuration/Hardware
 Requires:	%{name} = %{version}-%{release}
 Requires:	ldetect-lst
-Requires:	coreutils
 Requires:	setup >= 2.7.16
 Requires:	util-linux-ng >= 2.15
 Requires:	acl
 # for disk/lp groups
 Requires(pre):	setup
-Requires(pre):	fileutils
+Requires(pre):	coreutils
 Requires(post,preun):	rpm-helper
+Provides:	should-restart = system
 
 %description -n udev
 A collection of tools and a daemon to manage events received
