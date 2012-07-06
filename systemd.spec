@@ -178,8 +178,8 @@ removed from the system
 %dir %attr(0644,root,root) %{udev_libdir}/keymaps
 %dir %{_sysconfdir}/udev/agents.d
 %dir %{_sysconfdir}/udev/agents.d/usb
-#%config(noreplace) %{_sysconfdir}/sysconfig/udev
-#%config(noreplace) %{_sysconfdir}/sysconfig/udev_net
+%config(noreplace) %{_sysconfdir}/sysconfig/udev
+%config(noreplace) %{_sysconfdir}/sysconfig/udev_net
 %config(noreplace) %{_sysconfdir}/udev/*.conf
 %ghost %config(noreplace,missingok) %attr(0644,root,root) %{_sysconfdir}/scsi_id.config
 
@@ -247,7 +247,7 @@ removed from the system
 %attr(640,root,disk) %dev(b,7,5) %{udev_libdir}/devices/loop5
 %attr(640,root,disk) %dev(b,7,6) %{udev_libdir}/devices/loop6
 %attr(640,root,disk) %dev(b,7,7) %{udev_libdir}/devices/loop7
-%{_mandir}/man8/systemd-udevd.8.*
+#%{_mandir}/man8/systemd-udevd.8.*
 %{_mandir}/man8/udevadm.8.*
 
 %package -n %{libudev}
@@ -819,6 +819,7 @@ fi
 %{_bindir}/systemd-cgtop
 %{_mandir}/man1/systemd.*
 %{_mandir}/man1/systemd-ask-password.*
+%{_mandir}/man1/systemd-tty-ask-password-agent.*
 %{_mandir}/man1/systemd-cat.1*
 %{_mandir}/man1/systemd-cgls.*
 %{_mandir}/man1/systemd-cgtop.*
@@ -876,6 +877,7 @@ fi
 /usr/lib/systemd/
 %{_sysconfdir}/profile.d/40systemd.sh
 %{_sysconfdir}/rpm/macros.d/%{name}.macros
+%{_sysconfdir}/rpm/macros.systemd
 %{_mandir}/man1/systemctl.*
 
 %ghost %config(noreplace) %{_sysconfdir}/systemd/system/runlevel2.target
