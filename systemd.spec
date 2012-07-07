@@ -45,7 +45,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	186
-Release:	2
+Release:	3
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -616,6 +616,12 @@ if /bin/mountpoint -q /sys/fs/cgroup/systemd; then
 fi
 EOF
 chmod 755 %{buildroot}%{_var}/lib/rpm/filetriggers/systemd-daemon-reload.script
+
+# (tpg) just delete this for now
+# file /usr/share/man/man5/crypttab.5.xz 
+# from install of systemd-186-2.x86_64 
+# conflicts with file from package initscripts-9.25-10.x86_64
+rm -rf %{buildroot}%{_mandir}/man5/crypttab.5.*
 
 #################
 #	UDEV	#
