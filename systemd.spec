@@ -45,7 +45,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	186
-Release:	3
+Release:	4
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -116,7 +116,7 @@ BuildRequires:	ldetect-lst
 BuildRequires:	pkgconfig(gobject-introspection-1.0)
 %endif
 Requires(pre,post):	coreutils
-Requires(pre):	udev = %{version}-%{release}
+Requires:	udev = %{version}-%{release}
 Requires(post):	gawk
 Requires(post):	grep
 Requires(post):	awk
@@ -184,12 +184,12 @@ removed from the system
 %config(noreplace) %{_sysconfdir}/udev/*.conf
 %ghost %config(noreplace,missingok) %attr(0644,root,root) %{_sysconfdir}/scsi_id.config
 
+/lib/systemd/systemd-udevd
 %{_bindir}/udevadm
 %attr(0755,root,root) /sbin/udevadm
 %attr(0755,root,root) %{_sbindir}/udevadm
 %attr(0755,root,root) /sbin/udevd
-%attr(0755,root,root) /sbin/usb_id
-#%attr(0755,root,root) %{udev_libdir}/udevd
+%attr(0755,root,root) %{udev_libdir}/udevd
 %{udev_libdir}/keymaps/*
 %{udev_rules_dir}/*.rules
 
@@ -341,7 +341,6 @@ This package contains documentation of udev.
 #	END	#
 #################
 
-
 %package tools
 Summary:	Non essential systemd tools
 Group:		System/Configuration/Boot and Init
@@ -443,7 +442,6 @@ Provides:	libsystemd-id128-devel = %{version}-%{release}
 
 %description -n %{libid128_devel}
 Development files for the systemd-id128 shared library.
-
 
 %prep
 %setup -q
@@ -617,12 +615,6 @@ fi
 EOF
 chmod 755 %{buildroot}%{_var}/lib/rpm/filetriggers/systemd-daemon-reload.script
 
-# (tpg) just delete this for now
-# file /usr/share/man/man5/crypttab.5.xz 
-# from install of systemd-186-2.x86_64 
-# conflicts with file from package initscripts-9.25-10.x86_64
-rm -rf %{buildroot}%{_mandir}/man5/crypttab.5.*
-
 #################
 #	UDEV	#
 #	SHIT	#
@@ -639,14 +631,14 @@ install -m 0644 %{SOURCE9} %{buildroot}%{_sysconfdir}/sysconfig/udev_net
 
 install -m 0644 %{SOURCE10} %{buildroot}%{udev_rules_dir}/
 
-ln -sf ../bin/udevadm %{buildroot}%{_sbindir}/udevadm
-ln -sf ../bin/udevadm %{buildroot}/sbin/udevadm
+ln -sf ..%{_bindir}/udevadm %{buildroot}%{_sbindir}/udevadm
+ln -sf ..%{_bindir}/udevadm %{buildroot}/sbin/udevadm
 mkdir -p %{buildroot}%{_prefix}/lib/firmware/updates
 mkdir -p %{buildroot}%{_sysconfdir}/udev/agents.d/usb
 touch %{buildroot}%{_sysconfdir}/scsi_id.config
-# (blino) usb_id are used by drakx
-ln -s ..%{udev_libdir}/usb_id %{buildroot}/sbin/
-ln -s ..%{udev_libdir}/udevd %{buildroot}/sbin/
+
+ln -s ..%{_unitdir}/systemd-udevd %{buildroot}/sbin/udevd
+ln -s ..%{_unitdir}/systemd-udevd %{buildroot}%{udev_libdir}/udevd
 
 # udev rules for zte 3g modems and drakx-net
 
@@ -661,6 +653,12 @@ mkdir -p %{buildroot}%{udev_libdir}/devices/cpu/0
 #	UDEV	#
 #	END	#
 #################
+
+# (tpg) just delete this for now
+# file /usr/share/man/man5/crypttab.5.xz 
+# from install of systemd-186-2.x86_64 
+# conflicts with file from package initscripts-9.25-10.x86_64
+rm -rf %{buildroot}%{_mandir}/man5/crypttab.5.*
 
 %triggerin -- glibc
 # reexec daemon on self or glibc update to avoid busy / on shutdown
@@ -797,8 +795,6 @@ fi
 
 %{_sysconfdir}/xdg/systemd
 /bin/systemd-ask-password
-#/bin/systemd-loginctl
-#/bin/systemd-journalctl
 /bin/systemd-notify
 /bin/systemd-tmpfiles
 /bin/systemd-tty-ask-password-agent
@@ -811,13 +807,25 @@ fi
 %{_bindir}/systemd-detect-virt
 %{_bindir}/systemd-loginct
 /lib/systemd/systemd
-/lib/systemd/systemd-*
+/lib/systemd/systemd-ac-power
+/lib/systemd/systemd-binfmt
+/lib/systemd/systemd-c*
+/lib/systemd/systemd-fsck
+/lib/systemd/systemd-hostnamed
+/lib/systemd/systemd-initctl
+/lib/systemd/systemd-journald
+/lib/systemd/systemd-lo*
+/lib/systemd/systemd-m*
+/lib/systemd/systemd-quotacheck
+/lib/systemd/systemd-random-seed
+/lib/systemd/systemd-re*
+/lib/systemd/systemd-s*
+/lib/systemd/systemd-time*
+/lib/systemd/systemd-update-utmp
+/lib/systemd/systemd-user-sessions
+/lib/systemd/systemd-vconsole-setup
 /lib/systemd/system-generators/*
-
-/usr/lib/tmpfiles.d/legacy.conf
-/usr/lib/tmpfiles.d/systemd.conf
-/usr/lib/tmpfiles.d/x11.conf
-/usr/lib/tmpfiles.d/tmp.conf
+/usr/lib/tmpfiles.d/*.conf
 /%{_lib}/security/pam_systemd.so
 %{_var}/lib/rpm/filetriggers/systemd-daemon-reload.*
 %{_bindir}/systemd-cgls
@@ -836,9 +844,9 @@ fi
 %{_mandir}/man1/systemd-machine-id-setup.1*
 %{_mandir}/man1/systemd-notify.*
 %{_mandir}/man1/systemd-nspawn.*
-%{_mandir}/man1//systemd-delta.1.*
-%{_mandir}/man1//systemd-detect-virt.1.*
-%{_mandir}/man1//systemd-inhibit.1.*
+%{_mandir}/man1/systemd-delta.1.*
+%{_mandir}/man1/systemd-detect-virt.1.*
+%{_mandir}/man1/systemd-inhibit.1.*
 %{_mandir}/man3/*
 %{_mandir}/man5/*
 %{_mandir}/man7/*
