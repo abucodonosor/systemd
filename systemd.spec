@@ -45,7 +45,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	186
-Release:	4
+Release:	5
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -129,6 +129,7 @@ Requires:	util-linux-ng >= 2.18-2
 Requires:	nss-myhostname
 Requires:	lockdev
 Conflicts:	initscripts < 9.24
+Conflicts:	udev < 186-5
 %rename		readahead
 Provides:	should-restart = system
 
@@ -658,7 +659,7 @@ mkdir -p %{buildroot}%{udev_libdir}/devices/cpu/0
 # file /usr/share/man/man5/crypttab.5.xz 
 # from install of systemd-186-2.x86_64 
 # conflicts with file from package initscripts-9.25-10.x86_64
-rm -rf %{buildroot}%{_mandir}/man5/crypttab.5.*
+rm -rf %{buildroot}%{_mandir}/man5/crypttab*
 
 %triggerin -- glibc
 # reexec daemon on self or glibc update to avoid busy / on shutdown
