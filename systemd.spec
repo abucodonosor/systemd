@@ -38,6 +38,7 @@
 %define libgudev_devel %mklibname gudev %{gudev_api} -d
 %define girgudev %mklibname gudev-gir %{gudev_api}
 
+%define systemd_libdir /lib/systemd
 %define udev_libdir /lib/udev
 %define udev_rules_dir %{udev_libdir}/rules.d
 %define udev_user_rules_dir %{_sysconfdir}/udev/rules.d
@@ -185,7 +186,7 @@ removed from the system
 %config(noreplace) %{_sysconfdir}/udev/*.conf
 %ghost %config(noreplace,missingok) %attr(0644,root,root) %{_sysconfdir}/scsi_id.config
 
-/lib/systemd/systemd-udevd
+%{systemd_libdir}/systemd-udevd
 %{_bindir}/udevadm
 %attr(0755,root,root) /sbin/udevadm
 %attr(0755,root,root) %{_sbindir}/udevadm
@@ -496,20 +497,23 @@ find %{buildroot} \( -name '*.a' -o -name '*.la' \) -exec rm {} \;
 mkdir -p %{buildroot}/%{_sbindir}
 
 # (bor) create late shutdown directory
-mkdir -p %{buildroot}/lib/systemd/system-shutdown
+mkdir -p %{buildroot}%{systemd_libdir}/system-shutdown
 
 # Create SysV compatibility symlinks. systemctl/systemd are smart
 # enough to detect in which way they are called.
 mkdir -p %{buildroot}/sbin
-ln -s ../lib/systemd/systemd %{buildroot}/sbin/init
-ln -s ../lib/systemd/systemd %{buildroot}/bin/systemd
+ln -s ..%{systemd_libdir}/systemd %{buildroot}/sbin/init
+ln -s ..%{systemd_libdir}/systemd %{buildroot}/bin/systemd
 ln -s ../bin/systemctl %{buildroot}/sbin/reboot
 ln -s ../bin/systemctl %{buildroot}/sbin/halt
 ln -s ../bin/systemctl %{buildroot}/sbin/poweroff
 ln -s ../bin/systemctl %{buildroot}/sbin/shutdown
 ln -s ../bin/systemctl %{buildroot}/sbin/telinit
 ln -s ../bin/systemctl %{buildroot}/sbin/runlevel
-ln -s loginctl %{buildroot}%{_bindir}/systemd-loginct
+ln -s loginctl %{buildroot}%{_bindir}/systemd-loginctl
+
+# (tpg) dracut needs this
+ln -s ../bin/systemctl %{buildroot}%{_bindir}/systemctl
 
 # We create all wants links manually at installation time to make sure
 # they are not owned and hence overriden by rpm after the used deleted
@@ -524,26 +528,30 @@ touch %{buildroot}%{_sysconfdir}/systemd/system/runlevel4.target
 touch %{buildroot}%{_sysconfdir}/systemd/system/runlevel5.target
 
 # Make sure these directories are properly owned
-mkdir -p %{buildroot}/lib/systemd/system/basic.target.wants
-mkdir -p %{buildroot}/lib/systemd/system/default.target.wants
-mkdir -p %{buildroot}/lib/systemd/system/dbus.target.wants
-mkdir -p %{buildroot}/lib/systemd/system/syslog.target.wants
+mkdir -p %{buildroot}/%{systemd_libdir}/system/basic.target.wants
+mkdir -p %{buildroot}/%{systemd_libdir}/system/default.target.wants
+mkdir -p %{buildroot}/%{systemd_libdir}/system/dbus.target.wants
+mkdir -p %{buildroot}/%{systemd_libdir}/system/syslog.target.wants
+
+ln -s %{systemd_libdir}/system/systemd-udevd.service %{buildroot}/%{systemd_libdir}/system/udev.service
+ln -s %{systemd_libdir}/system/systemd-udev-settle.service %{buildroot}/%{systemd_libdir}/system/udev-settle.service
 
 # And the default symlink we generate automatically based on inittab
 rm -f %{buildroot}%{_sysconfdir}/systemd/system/default.target
 
 # (tpg) this is needed
+mkdir -p %{buildroot}%{_prefix}/lib/systemd/system-generators
 mkdir -p %{buildroot}%{_prefix}/lib/systemd/user-generators
 
 # We are not prepared to deal with tmpfs /var/run or /var/lock
-pushd %{buildroot}/lib/systemd/system/local-fs.target.wants && {
+pushd %{buildroot}/%{systemd_libdir}/system/local-fs.target.wants && {
         rm -f var-lock.mount
         rm -f var-run.mount
 popd
 }
 
 # (bor) make sure we own directory for bluez to install service
-mkdir -p %{buildroot}/lib/systemd/system/bluetooth.target.wants
+mkdir -p %{buildroot}/%{systemd_libdir}/system/bluetooth.target.wants
 
 # use consistent naming and permissions for completion scriplets
 mv %{buildroot}%{_sysconfdir}/bash_completion.d/systemd-bash-completion.sh %{buildroot}%{_sysconfdir}/bash_completion.d/systemd
@@ -554,7 +562,7 @@ sed -i -e 's/^#MountAuto=yes$/MountAuto=yes/' %{buildroot}/etc/systemd/system.co
 sed -i -e 's/^#SwapAuto=yes$/SwapAuto=yes/' %{buildroot}/etc/systemd/system.conf
 
 # (bor) enable rpcbind.target by default so we have something to plug portmapper service into
-ln -s ../rpcbind.target %{buildroot}/lib/systemd/system/multi-user.target.wants
+ln -s ../rpcbind.target %{buildroot}/%{systemd_libdir}/system/multi-user.target.wants
 
 # (bor) machine-id-setup is in /sbin in post-v20
 install -d %{buildroot}/sbin && mv %{buildroot}/bin/systemd-machine-id-setup %{buildroot}/sbin
@@ -569,7 +577,7 @@ mkdir -p %{buildroot}%{_libdir}/systemd/user/
 mkdir -p %{buildroot}/etc/systemd/system/getty.target.wants
 pushd %{buildroot}/etc/systemd/system/getty.target.wants
 	for _term in 1 2 3 4 5 6 ; do
-	ln -s /lib/systemd/system/getty@.service getty@tty$_term.service
+	ln -s %{systemd_libdir}/system/getty@.service getty@tty$_term.service
 	done
 popd
 
@@ -690,13 +698,13 @@ fi
 
 
 %pre
-systemctl stop systemd-udev.service systemd-udev-control.socket systemd-udev-kernel.socket >/dev/null 2>&1 || :
+systemctl stop systemd-udevd.service systemd-udev.service systemd-udev-control.socket systemd-udev-kernel.socket >/dev/null 2>&1 || :
 
 %post
 /usr/bin/systemd-machine-id-setup > /dev/null 2>&1 || :
 /usr/lib/systemd/systemd-random-seed save > /dev/null 2>&1 || :
 /bin/systemctl daemon-reexec > /dev/null 2>&1 || :
-/bin/systemctl start systemd-udev.service >/dev/null 2>&1 || :
+/bin/systemctl start systemd-udevd.service systemd-udev.service >/dev/null 2>&1 || :
 
 # (tpg) this is needed for rsyslog
 /bin/ln -s /usr/lib/systemd/system/rsyslog.service /etc/systemd/system/syslog.service >/dev/null 2>&1 || :
@@ -786,9 +794,9 @@ fi
 %ghost %config(noreplace) %{_sysconfdir}/X11/xorg.conf.d/00-keyboard.conf
 
 %dir /run
-%dir /lib/systemd
-%dir /lib/systemd/system-generators
-%dir /lib/systemd/system-shutdown
+%dir %{systemd_libdir}
+%dir %{systemd_libdir}/*-generators
+%dir %{systemd_libdir}/system-shutdown
 %dir %{_prefix}/lib/tmpfiles.d
 %dir %{_prefix}/lib/sysctl.d
 %dir %{_prefix}/lib/modules-load.d
@@ -804,28 +812,29 @@ fi
 /bin/loginctl
 /bin/systemd-inhibit
 /sbin/systemd-machine-id-setup
+%{_bindir}/systemctl
 %{_bindir}/systemd-delta
 %{_bindir}/systemd-detect-virt
-%{_bindir}/systemd-loginct
-/lib/systemd/systemd
-/lib/systemd/systemd-ac-power
-/lib/systemd/systemd-binfmt
-/lib/systemd/systemd-c*
-/lib/systemd/systemd-fsck
-/lib/systemd/systemd-hostnamed
-/lib/systemd/systemd-initctl
-/lib/systemd/systemd-journald
-/lib/systemd/systemd-lo*
-/lib/systemd/systemd-m*
-/lib/systemd/systemd-quotacheck
-/lib/systemd/systemd-random-seed
-/lib/systemd/systemd-re*
-/lib/systemd/systemd-s*
-/lib/systemd/systemd-time*
-/lib/systemd/systemd-update-utmp
-/lib/systemd/systemd-user-sessions
-/lib/systemd/systemd-vconsole-setup
-/lib/systemd/system-generators/*
+%{_bindir}/systemd-loginctl
+%{systemd_libdir}/systemd
+%{systemd_libdir}/systemd-ac-power
+%{systemd_libdir}/systemd-binfmt
+%{systemd_libdir}/systemd-c*
+%{systemd_libdir}/systemd-fsck
+%{systemd_libdir}/systemd-hostnamed
+%{systemd_libdir}/systemd-initctl
+%{systemd_libdir}/systemd-journald
+%{systemd_libdir}/systemd-lo*
+%{systemd_libdir}/systemd-m*
+%{systemd_libdir}/systemd-quotacheck
+%{systemd_libdir}/systemd-random-seed
+%{systemd_libdir}/systemd-re*
+%{systemd_libdir}/systemd-s*
+%{systemd_libdir}/systemd-time*
+%{systemd_libdir}/systemd-update-utmp
+%{systemd_libdir}/systemd-user-sessions
+%{systemd_libdir}/systemd-vconsole-setup
+%{systemd_libdir}/*-generators/*
 /usr/lib/tmpfiles.d/*.conf
 /%{_lib}/security/pam_systemd.so
 %{_var}/lib/rpm/filetriggers/systemd-daemon-reload.*
@@ -890,7 +899,7 @@ fi
 %{_sysconfdir}/bash_completion.d/systemd
 %{_sysconfdir}/modules-load.d/*.conf
 /bin/systemctl
-/lib/systemd/system
+%{systemd_libdir}/system
 /usr/lib/systemd/
 %{_sysconfdir}/profile.d/40systemd.sh
 %{_sysconfdir}/rpm/macros.d/%{name}.macros
