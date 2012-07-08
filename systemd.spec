@@ -46,7 +46,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	186
-Release:	6
+Release:	7
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -510,10 +510,10 @@ ln -s ../bin/systemctl %{buildroot}/sbin/poweroff
 ln -s ../bin/systemctl %{buildroot}/sbin/shutdown
 ln -s ../bin/systemctl %{buildroot}/sbin/telinit
 ln -s ../bin/systemctl %{buildroot}/sbin/runlevel
-ln -s loginctl %{buildroot}%{_bindir}/systemd-loginctl
+ln -s /bin/loginctl %{buildroot}%{_bindir}/systemd-loginctl
 
 # (tpg) dracut needs this
-ln -s ../bin/systemctl %{buildroot}%{_bindir}/systemctl
+ln -s /bin/systemctl %{buildroot}%{_bindir}/systemctl
 
 # We create all wants links manually at installation time to make sure
 # they are not owned and hence overriden by rpm after the used deleted
@@ -533,6 +533,7 @@ mkdir -p %{buildroot}/%{systemd_libdir}/system/default.target.wants
 mkdir -p %{buildroot}/%{systemd_libdir}/system/dbus.target.wants
 mkdir -p %{buildroot}/%{systemd_libdir}/system/syslog.target.wants
 
+#(tpg) keep these compat symlink
 ln -s %{systemd_libdir}/system/systemd-udevd.service %{buildroot}/%{systemd_libdir}/system/udev.service
 ln -s %{systemd_libdir}/system/systemd-udev-settle.service %{buildroot}/%{systemd_libdir}/system/udev-settle.service
 
@@ -812,7 +813,6 @@ fi
 /bin/loginctl
 /bin/systemd-inhibit
 /sbin/systemd-machine-id-setup
-%{_bindir}/systemctl
 %{_bindir}/systemd-delta
 %{_bindir}/systemd-detect-virt
 %{_bindir}/systemd-loginctl
@@ -899,6 +899,7 @@ fi
 %{_sysconfdir}/bash_completion.d/systemd
 %{_sysconfdir}/modules-load.d/*.conf
 /bin/systemctl
+%{_bindir}/systemctl
 %{systemd_libdir}/system
 /usr/lib/systemd/
 %{_sysconfdir}/profile.d/40systemd.sh
