@@ -46,7 +46,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	186
-Release:	7
+Release:	8
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -647,8 +647,8 @@ mkdir -p %{buildroot}%{_prefix}/lib/firmware/updates
 mkdir -p %{buildroot}%{_sysconfdir}/udev/agents.d/usb
 touch %{buildroot}%{_sysconfdir}/scsi_id.config
 
-ln -s ..%{_unitdir}/systemd-udevd %{buildroot}/sbin/udevd
-ln -s ..%{_unitdir}/systemd-udevd %{buildroot}%{udev_libdir}/udevd
+ln -s ..%{systemd_libdir}/systemd-udevd %{buildroot}/sbin/udevd
+ln -s ..%{systemd_libdir}/systemd-udevd %{buildroot}%{udev_libdir}/udevd
 
 # udev rules for zte 3g modems and drakx-net
 
