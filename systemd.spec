@@ -506,8 +506,12 @@ install -m 0644 %{SOURCE9} %{buildroot}%{_sysconfdir}/sysconfig/udev_net
 
 install -m 0644 %{SOURCE10} %{buildroot}%{udev_rules_dir}/
 
-ln -sf ..%{_bindir}/udevadm %{buildroot}%{_sbindir}/udevadm
-ln -sf ..%{_bindir}/udevadm %{buildroot}/sbin/udevadm
+# unless we make a decission to merge /*bin with /usr/*bin, we'll aim for FHS
+# compliance and make sure to keep thing in their traditional locations
+mv %{buildroot}%{_bindir}/udevadm %{buildroot}/sbin
+# probably not required, but let's just be on the safe side for now..
+ln -sf /sbin/udevadm %{buildroot}%{_bindir}/udevadm
+ln -sf /sbin/udevadm %{buildroot}%{_sbindir}/udevadm
 mkdir -p %{buildroot}%{_prefix}/lib/firmware/updates
 mkdir -p %{buildroot}%{_sysconfdir}/udev/agents.d/usb
 touch %{buildroot}%{_sysconfdir}/scsi_id.config
