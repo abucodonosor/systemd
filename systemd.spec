@@ -1,5 +1,3 @@
-
-%bcond_with dietlibc
 %bcond_with bootstrap
 
 # macros for sysvinit transition - should be equal to
@@ -82,10 +80,6 @@ Patch103:	0508-reinstate-TIMEOUT-handling.patch
 # (proyvind):	FIXME: setting udev_log to 'info' royally screws everything up
 #		for some reason, revert to 'err' for now..
 Patch104:	systemd-186-set-udev_log-to-err.patch
-
-%if %{with dietlibc}
-BuildRequires: dietlibc
-%endif
 
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -370,10 +364,6 @@ done
 
 %install
 %makeinstall_std
-
-%if %{with dietlibc}
-install -d %{buildroot}%{_prefix}/lib/dietlibc/lib-%{_arch}
-%endif
 
 mkdir -p %{buildroot}/%{_sbindir}
 
