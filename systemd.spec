@@ -375,7 +375,6 @@ done
 install -d %{buildroot}%{_prefix}/lib/dietlibc/lib-%{_arch}
 %endif
 
-find %{buildroot} \( -name '*.a' -o -name '*.la' \) -exec rm {} \;
 mkdir -p %{buildroot}/%{_sbindir}
 
 # (bor) create late shutdown directory
