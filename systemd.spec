@@ -130,6 +130,8 @@ Conflicts:	initscripts < 9.24
 Conflicts:	udev < 186-5
 %rename		readahead
 Provides:	should-restart = system
+# make sure we have /etc/os-release available, required by --with-distro
+BuildRequires:	mandriva-release-common = 1:2012.0-0.4
 
 %description
 systemd is a system and session manager for Linux, compatible with
@@ -351,14 +353,6 @@ find src/ -name "*.vala" -exec touch '{}' \;
 %endif
 	--with-usb-ids-path=/usr/share/usb.ids \
 	--with-pci-ids-path=/usr/share/pci.ids
-
-# (tpg) somehow --with-distro option doesn't work
-# just be sure we have a nice mandriva release output :)
-for i in `grep -r -i -l "/etc/os-release" src`;
-    do
-    sed -i -e  's#/etc/os-release#/etc/mandriva-release#g' $i;
-done
-
 
 %make
 
