@@ -928,9 +928,6 @@ fi
 #%doc COPYING README TODO ChangeLog NEWS src/keymap/README.keymap.txt
 #%doc %{_datadir}/gtk-doc/html/libudev
 %{_libdir}/libudev.*
-%if %{with dietlibc}
-%{_prefix}/lib/dietlibc/lib-%{_arch}/libudev.a
-%endif
 %{_libdir}/pkgconfig/libudev.pc
 %{_datadir}/pkgconfig/udev.pc
 %{_includedir}/libudev.h
