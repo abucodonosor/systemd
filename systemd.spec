@@ -46,7 +46,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	186
-Release:	8
+Release:	9
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -79,6 +79,9 @@ Patch102:	0507-Allow-booting-from-live-cd-in-virtualbox.patch
 # (cg) timeout handling patch from Arch
 # https://bugs.archlinux.org/task/27938
 Patch103:	0508-reinstate-TIMEOUT-handling.patch
+# (proyvind):	FIXME: setting udev_log to 'info' royally screws everything up
+#		for some reason, revert to 'err' for now..
+Patch104:	systemd-186-set-udev_log-to-err.patch
 
 %if %{with dietlibc}
 BuildRequires: dietlibc
