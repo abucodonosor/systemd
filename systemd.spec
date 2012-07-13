@@ -147,206 +147,7 @@ state, maintains mount and automount points and implements an
 elaborate transactional dependency-based service control logic. It can
 work as a drop-in replacement for sysvinit.
 
-
-#################
-#	UDEV	#
-#	SHIT	#
-#################
-
-%package -n udev
-Summary:	Device manager for the Linux kernel
-Group:		System/Configuration/Hardware
-Requires:	%{name} = %{version}-%{release}
-Requires:	ldetect-lst
-Requires:	setup >= 2.7.16
-Requires:	util-linux-ng >= 2.15
-Requires:	acl
-# for disk/lp groups
-Requires(pre):	setup
-Requires(pre):	coreutils
-Requires(post,preun):	rpm-helper
-Provides:	should-restart = system
-
-%description -n udev
-A collection of tools and a daemon to manage events received
-from the kernel and deal with them in user-space. Primarily this
-involves managing permissions, and creating and removing meaningful
-symlinks to device nodes in /dev when hardware is discovered or
-removed from the system
-
-%files -n udev
-%dir /lib/firmware
-%dir /lib/firmware/updates
-%dir %{udev_libdir}
-%dir %{_sysconfdir}/udev
-%dir %{udev_rules_dir}
-
-%dir %attr(0644,root,root) %{udev_libdir}/keymaps
-%dir %{_sysconfdir}/udev/agents.d
-%dir %{_sysconfdir}/udev/agents.d/usb
-%config(noreplace) %{_sysconfdir}/sysconfig/udev
-%config(noreplace) %{_sysconfdir}/sysconfig/udev_net
-%config(noreplace) %{_sysconfdir}/udev/*.conf
-%ghost %config(noreplace,missingok) %attr(0644,root,root) %{_sysconfdir}/scsi_id.config
-
-%{systemd_libdir}/systemd-udevd
-%{_bindir}/udevadm
-%attr(0755,root,root) /sbin/udevadm
-%attr(0755,root,root) %{_sbindir}/udevadm
-%attr(0755,root,root) /sbin/udevd
-%attr(0755,root,root) %{udev_libdir}/udevd
-%{udev_libdir}/keymaps/*
-%{udev_rules_dir}/*.rules
-
-%attr(0755,root,root) %{udev_libdir}/keymap
-%attr(0755,root,root) %{udev_libdir}/accelerometer
-%attr(0755,root,root) %{udev_libdir}/ata_id
-%attr(0755,root,root) %{udev_libdir}/cdrom_id
-%attr(0755,root,root) %{udev_libdir}/scsi_id
-%attr(0755,root,root) %{udev_libdir}/collect
-#%attr(0755,root,root) %{udev_libdir}/create_floppy_devices
-#%attr(0755,root,root) %{udev_libdir}/rule_generator.functions
-#%attr(0755,root,root) %{udev_libdir}/write_cd_rules
-#%attr(0755,root,root) %{udev_libdir}/write_net_rules
-%attr(0755,root,root) %{udev_libdir}/net_create_ifcfg
-%attr(0755,root,root) %{udev_libdir}/net_action
-%attr(0755,root,root) %{udev_libdir}/v4l_id
-%attr(0755,root,root) %{udev_libdir}/mtd_probe
-%attr(0755,root,root) %{udev_libdir}/findkeyboards
-%attr(0755,root,root) %{udev_libdir}/keyboard-force-release.sh
-
-# From previous Mandriva /etc/udev/devices.d and patches
-%attr(0666,root,root) %dev(c,1,3) %{udev_libdir}/devices/null
-%attr(0600,root,root) %dev(b,2,0) %{udev_libdir}/devices/fd0
-%attr(0600,root,root) %dev(b,2,1) %{udev_libdir}/devices/fd1
-%attr(0600,root,root) %dev(c,21,0) %{udev_libdir}/devices/sg0
-%attr(0600,root,root) %dev(c,21,1) %{udev_libdir}/devices/sg1
-%attr(0600,root,root) %dev(c,9,0) %{udev_libdir}/devices/st0
-%attr(0600,root,root) %dev(c,9,1) %{udev_libdir}/devices/st1
-%attr(0600,root,root) %dev(c,99,0) %{udev_libdir}/devices/parport0
-%dir %{udev_libdir}/devices/cpu
-%dir %{udev_libdir}/devices/cpu/0
-%attr(0600,root,root) %dev(c,203,0) %{udev_libdir}/devices/cpu/0/cpuid
-%attr(0600,root,root) %dev(c,10,184) %{udev_libdir}/devices/cpu/0/microcode
-%attr(0600,root,root) %dev(c,202,0) %{udev_libdir}/devices/cpu/0/msr
-%attr(0600,root,root) %dev(c,162,0) %{udev_libdir}/devices/rawctl
-%attr(0600,root,root) %dev(c,195,0) %{udev_libdir}/devices/nvidia0
-%attr(0600,root,root) %dev(c,195,255) %{udev_libdir}/devices/nvidiactl
-# Default static nodes to copy to /dev on udevd start
-%dir %{udev_libdir}/devices
-# From Fedora RPM
-%attr(0755,root,root) %dir %{udev_libdir}/devices/net
-%attr(0755,root,root) %dir %{udev_libdir}/devices/hugepages
-%attr(0755,root,root) %dir %{udev_libdir}/devices/pts
-%attr(0755,root,root) %dir %{udev_libdir}/devices/shm
-%attr(666,root,root) %dev(c,10,200) %{udev_libdir}/devices/net/tun
-%attr(600,root,root) %dev(c,108,0) %{udev_libdir}/devices/ppp
-%attr(666,root,root) %dev(c,10,229) %{udev_libdir}/devices/fuse
-%attr(660,root,lp) %dev(c,6,0) %{udev_libdir}/devices/lp0
-%attr(660,root,lp) %dev(c,6,1) %{udev_libdir}/devices/lp1
-%attr(660,root,lp) %dev(c,6,2) %{udev_libdir}/devices/lp2
-%attr(660,root,lp) %dev(c,6,3) %{udev_libdir}/devices/lp3
-%attr(640,root,disk) %dev(b,7,0) %{udev_libdir}/devices/loop0
-%attr(640,root,disk) %dev(b,7,1) %{udev_libdir}/devices/loop1
-%attr(640,root,disk) %dev(b,7,2) %{udev_libdir}/devices/loop2
-%attr(640,root,disk) %dev(b,7,3) %{udev_libdir}/devices/loop3
-%attr(640,root,disk) %dev(b,7,4) %{udev_libdir}/devices/loop4
-%attr(640,root,disk) %dev(b,7,5) %{udev_libdir}/devices/loop5
-%attr(640,root,disk) %dev(b,7,6) %{udev_libdir}/devices/loop6
-%attr(640,root,disk) %dev(b,7,7) %{udev_libdir}/devices/loop7
-#%{_mandir}/man8/systemd-udevd.8.*
-%{_mandir}/man8/udevadm.8.*
-
-%package -n %{libudev}
-Summary:	Library for udev
-Group:		System/Libraries
-
-%description -n %{libudev}
-Library for udev.
-
-%files -n %{libudev}
-/%{_lib}/libudev.so.%{udev_major}*
-
-%package -n %{libudev_devel}
-Summary:	Devel library for udev
-Group:		Development/C
-License:	LGPLv2+
-Provides:	udev-devel = %{EVRD}
-Requires:	%{libudev} = %{EVRD}
-Obsoletes:	%{_lib}udev0-devel
-Obsoletes:	%{name}-doc
-
-%description -n %{libudev_devel}
-Devel library for udev.
-
-%files -n %{libudev_devel}
-#%doc COPYING README TODO ChangeLog NEWS src/keymap/README.keymap.txt
-#%doc %{_datadir}/gtk-doc/html/libudev
-%{_libdir}/libudev.*
-%if %{with dietlibc}
-%{_prefix}/lib/dietlibc/lib-%{_arch}/libudev.a
-%endif
-%{_libdir}/pkgconfig/libudev.pc
-%{_datadir}/pkgconfig/udev.pc
-%{_includedir}/libudev.h
-
-%if !%{with bootstrap}
-%package -n %{libgudev}
-Summary:	Libraries for adding libudev support to applications that use glib
-Group:		System/Libraries
-#gw please don't remove this again, it is needed by the noarch package
-#gudev-sharp
-Provides:	libgudev = %{EVRD}
-
-%description -n %{libgudev}
-This package contains the libraries that make it easier to use libudev
-functionality from applications that use glib.
-
-%files -n %{libgudev}
-/%{_lib}/libgudev-%{gudev_api}.so.%{gudev_major}*
-
-%package -n %{girgudev}
-Group:		System/Libraries
-Summary:	GObject Introspection interface library for gudev
-Conflicts:	%{_lib}gudev1.0_0 < 182-5
-Obsoletes:	%{_lib}udev-gir1.0
-
-%description -n %{girgudev}
-GObject Introspection interface library for gudev.
-
-%files -n %{girgudev}
-%{_libdir}/girepository-1.0/GUdev-%{gudev_api}.typelib
-
-%package -n %{libgudev_devel}
-Summary:	Header files for adding libudev support to applications that use glib
-Group:		Development/C
-Requires:	%{libgudev} = %{EVRD}
-
-%description -n %{libgudev_devel}
-This package contains the header and pkg-config files for developing
-glib-based applications using libudev functionality.
-
-%files -n %{libgudev_devel}
-#%doc %{_datadir}/gtk-doc/html/gudev
-%{_libdir}/libgudev-%{gudev_api}.so
-%{_includedir}/gudev-%{gudev_api}
-%{_datadir}/gir-1.0/GUdev-%{gudev_api}.gir
-%{_libdir}/pkgconfig/gudev-%{gudev_api}.pc
-%endif
-
-%package -n udev-doc
-Summary:	Udev documentation
-Group:		Books/Computer books
-
-%description -n udev-doc
-This package contains documentation of udev.
-
-#################
-#	UDEV	#
-#	END	#
-#################
-
-%package tools
+%package	tools
 Summary:	Non essential systemd tools
 Group:		System/Configuration/Boot and Init
 Requires:	%{name} = %{version}-%{release}
@@ -354,10 +155,10 @@ Conflicts:	%{name} < 35-6
 Requires:	python-dbus
 Requires:	python-cairo
 
-%description tools
+%description	tools
 Non essential systemd tools.
 
-%package units
+%package	units
 Summary:	Configuration files, directories and installation tool for systemd
 Group:		System/Configuration/Boot and Init
 Requires(post):	coreutils
@@ -365,11 +166,11 @@ Requires(post):	gawk
 Requires(post): grep
 Requires(post): awk
 
-%description units
+%description	units
 Basic configuration files, directories and installation tool for the systemd
 system and session manager.
 
-%package sysvinit
+%package	sysvinit
 Summary:	System V init tools
 Group:		System/Configuration/Boot and Init
 Requires:	%{name} = %{version}-%{release}
@@ -380,7 +181,7 @@ Conflicts:	sysvinit < %sysvinit_version-%sysvinit_release, SysVinit < %sysvinit_
 %description sysvinit
 Drop-in replacement for the System V init tools of systemd.
 
-%package -n %{libdaemon}
+%package -n	%{libdaemon}
 Summary:	Systemd-daemon library package
 Group:		System/Libraries
 Provides:	libsystemd-daemon = %{version}-%{release}
@@ -388,7 +189,7 @@ Provides:	libsystemd-daemon = %{version}-%{release}
 %description -n	%{libdaemon}
 This package provides the systemd-daemon shared library.
 
-%package -n %{libdaemon_devel}
+%package -n	%{libdaemon_devel}
 Summary:	Systemd-daemon library development files
 Group:		Development/C
 Requires:	%{libdaemon} = %{version}-%{release}
@@ -397,7 +198,7 @@ Provides:	libsystemd-daemon-devel = %{version}-%{release}
 %description -n	%{libdaemon_devel}
 Development files for the systemd-daemon shared library.
 
-%package -n %{liblogin}
+%package -n	%{liblogin}
 Summary:	Systemd-login library package
 Group:		System/Libraries
 Provides:	libsystemd-login = %{version}-%{release}
@@ -405,7 +206,7 @@ Provides:	libsystemd-login = %{version}-%{release}
 %description -n	%{liblogin}
 This package provides the systemd-login shared library.
 
-%package -n %{liblogin_devel}
+%package -n	%{liblogin_devel}
 Summary:	Systemd-login library development files
 Group:		Development/C
 Requires:	%{liblogin} = %{version}-%{release}
@@ -414,7 +215,7 @@ Provides:	libsystemd-login-devel = %{version}-%{release}
 %description -n	%{liblogin_devel}
 Development files for the systemd-login shared library.
 
-%package -n %{libjournal}
+%package -n	%{libjournal}
 Summary:	Systemd-journal library package
 Group:		System/Libraries
 Provides:	libsystemd-journal = %{version}-%{release}
@@ -422,7 +223,7 @@ Provides:	libsystemd-journal = %{version}-%{release}
 %description -n	%{libjournal}
 This package provides the systemd-journal shared library.
 
-%package -n %{libjournal_devel}
+%package -n	%{libjournal_devel}
 Summary:	Systemd-journal library development files
 Group:		Development/C
 Requires:	%{libjournal} = %{version}-%{release}
@@ -431,7 +232,7 @@ Provides:	libsystemd-journal-devel = %{version}-%{release}
 %description -n	%{libjournal_devel}
 Development files for the systemd-journal shared library.
 
-%package -n %{libid128}
+%package -n	%{libid128}
 Summary:	Systemd-id128 library package
 Group:		System/Libraries
 Provides:	libsystemd-id128 = %{version}-%{release}
@@ -439,7 +240,7 @@ Provides:	libsystemd-id128 = %{version}-%{release}
 %description -n	%{libid128}
 This package provides the systemd-id128 shared library.
 
-%package -n %{libid128_devel}
+%package -n	%{libid128_devel}
 Summary:	Systemd-id128 library development files
 Group:		Development/C
 Requires:	%{libid128} = %{version}-%{release}
@@ -447,6 +248,70 @@ Provides:	libsystemd-id128-devel = %{version}-%{release}
 
 %description -n %{libid128_devel}
 Development files for the systemd-id128 shared library.
+
+%description -n	udev
+A collection of tools and a daemon to manage events received
+from the kernel and deal with them in user-space. Primarily this
+involves managing permissions, and creating and removing meaningful
+symlinks to device nodes in /dev when hardware is discovered or
+removed from the system
+
+%package -n	%{libudev}
+Summary:	Library for udev
+Group:		System/Libraries
+
+%description -n	%{libudev}
+Library for udev.
+
+%package -n	%{libudev_devel}
+Summary:	Devel library for udev
+Group:		Development/C
+License:	LGPLv2+
+Provides:	udev-devel = %{EVRD}
+Requires:	%{libudev} = %{EVRD}
+Obsoletes:	%{_lib}udev0-devel
+Obsoletes:	%{name}-doc
+
+%description -n	%{libudev_devel}
+Devel library for udev.
+
+%if !%{with bootstrap}
+%package -n	%{libgudev}
+Summary:	Libraries for adding libudev support to applications that use glib
+Group:		System/Libraries
+#gw please don't remove this again, it is needed by the noarch package
+#gudev-sharp
+Provides:	libgudev = %{EVRD}
+
+%description -n	%{libgudev}
+This package contains the libraries that make it easier to use libudev
+functionality from applications that use glib.
+
+%package -n	%{girgudev}
+Group:		System/Libraries
+Summary:	GObject Introspection interface library for gudev
+Conflicts:	%{_lib}gudev1.0_0 < 182-5
+Obsoletes:	%{_lib}udev-gir1.0
+
+%description -n %{girgudev}
+GObject Introspection interface library for gudev.
+
+%package -n	%{libgudev_devel}
+Summary:	Header files for adding libudev support to applications that use glib
+Group:		Development/C
+Requires:	%{libgudev} = %{EVRD}
+
+%description -n	%{libgudev_devel}
+This package contains the header and pkg-config files for developing
+glib-based applications using libudev functionality.
+%endif
+
+%package -n	udev-doc
+Summary:	Udev documentation
+Group:		Books/Computer books
+
+%description -n	udev-doc
+This package contains documentation of udev.
 
 %prep
 %setup -q
@@ -471,11 +336,11 @@ find src/ -name "*.vala" -exec touch '{}' \;
 	--with-sysvrcd-path=%{_sysconfdir}/rc.d \
 	--disable-selinux \
 	--enable-split-usr \
-	%if %{with bootstrap}
+%if %{with bootstrap}
 	--enable-introspection=no \
-	%else
+%else
 	--enable-introspection=yes \
-	%endif
+%endif
 	--with-usb-ids-path=/usr/share/usb.ids \
 	--with-pci-ids-path=/usr/share/pci.ids
 
@@ -971,3 +836,115 @@ fi
 %{_includedir}/systemd/sd-id128.h
 %{_libdir}/libsystemd-id128.so
 %{_libdir}/pkgconfig/libsystemd-id128.pc
+
+%files -n udev
+%dir /lib/firmware
+%dir /lib/firmware/updates
+%dir %{udev_libdir}
+%dir %{_sysconfdir}/udev
+%dir %{udev_rules_dir}
+
+%dir %attr(0644,root,root) %{udev_libdir}/keymaps
+%dir %{_sysconfdir}/udev/agents.d
+%dir %{_sysconfdir}/udev/agents.d/usb
+%config(noreplace) %{_sysconfdir}/sysconfig/udev
+%config(noreplace) %{_sysconfdir}/sysconfig/udev_net
+%config(noreplace) %{_sysconfdir}/udev/*.conf
+%ghost %config(noreplace,missingok) %attr(0644,root,root) %{_sysconfdir}/scsi_id.config
+
+%{systemd_libdir}/systemd-udevd
+%{_bindir}/udevadm
+%attr(0755,root,root) /sbin/udevadm
+%attr(0755,root,root) %{_sbindir}/udevadm
+%attr(0755,root,root) /sbin/udevd
+%attr(0755,root,root) %{udev_libdir}/udevd
+%{udev_libdir}/keymaps/*
+%{udev_rules_dir}/*.rules
+
+%attr(0755,root,root) %{udev_libdir}/keymap
+%attr(0755,root,root) %{udev_libdir}/accelerometer
+%attr(0755,root,root) %{udev_libdir}/ata_id
+%attr(0755,root,root) %{udev_libdir}/cdrom_id
+%attr(0755,root,root) %{udev_libdir}/scsi_id
+%attr(0755,root,root) %{udev_libdir}/collect
+#%attr(0755,root,root) %{udev_libdir}/create_floppy_devices
+#%attr(0755,root,root) %{udev_libdir}/rule_generator.functions
+#%attr(0755,root,root) %{udev_libdir}/write_cd_rules
+#%attr(0755,root,root) %{udev_libdir}/write_net_rules
+%attr(0755,root,root) %{udev_libdir}/net_create_ifcfg
+%attr(0755,root,root) %{udev_libdir}/net_action
+%attr(0755,root,root) %{udev_libdir}/v4l_id
+%attr(0755,root,root) %{udev_libdir}/mtd_probe
+%attr(0755,root,root) %{udev_libdir}/findkeyboards
+%attr(0755,root,root) %{udev_libdir}/keyboard-force-release.sh
+
+# From previous Mandriva /etc/udev/devices.d and patches
+%attr(0666,root,root) %dev(c,1,3) %{udev_libdir}/devices/null
+%attr(0600,root,root) %dev(b,2,0) %{udev_libdir}/devices/fd0
+%attr(0600,root,root) %dev(b,2,1) %{udev_libdir}/devices/fd1
+%attr(0600,root,root) %dev(c,21,0) %{udev_libdir}/devices/sg0
+%attr(0600,root,root) %dev(c,21,1) %{udev_libdir}/devices/sg1
+%attr(0600,root,root) %dev(c,9,0) %{udev_libdir}/devices/st0
+%attr(0600,root,root) %dev(c,9,1) %{udev_libdir}/devices/st1
+%attr(0600,root,root) %dev(c,99,0) %{udev_libdir}/devices/parport0
+%dir %{udev_libdir}/devices/cpu
+%dir %{udev_libdir}/devices/cpu/0
+%attr(0600,root,root) %dev(c,203,0) %{udev_libdir}/devices/cpu/0/cpuid
+%attr(0600,root,root) %dev(c,10,184) %{udev_libdir}/devices/cpu/0/microcode
+%attr(0600,root,root) %dev(c,202,0) %{udev_libdir}/devices/cpu/0/msr
+%attr(0600,root,root) %dev(c,162,0) %{udev_libdir}/devices/rawctl
+%attr(0600,root,root) %dev(c,195,0) %{udev_libdir}/devices/nvidia0
+%attr(0600,root,root) %dev(c,195,255) %{udev_libdir}/devices/nvidiactl
+# Default static nodes to copy to /dev on udevd start
+%dir %{udev_libdir}/devices
+# From Fedora RPM
+%attr(0755,root,root) %dir %{udev_libdir}/devices/net
+%attr(0755,root,root) %dir %{udev_libdir}/devices/hugepages
+%attr(0755,root,root) %dir %{udev_libdir}/devices/pts
+%attr(0755,root,root) %dir %{udev_libdir}/devices/shm
+%attr(666,root,root) %dev(c,10,200) %{udev_libdir}/devices/net/tun
+%attr(600,root,root) %dev(c,108,0) %{udev_libdir}/devices/ppp
+%attr(666,root,root) %dev(c,10,229) %{udev_libdir}/devices/fuse
+%attr(660,root,lp) %dev(c,6,0) %{udev_libdir}/devices/lp0
+%attr(660,root,lp) %dev(c,6,1) %{udev_libdir}/devices/lp1
+%attr(660,root,lp) %dev(c,6,2) %{udev_libdir}/devices/lp2
+%attr(660,root,lp) %dev(c,6,3) %{udev_libdir}/devices/lp3
+%attr(640,root,disk) %dev(b,7,0) %{udev_libdir}/devices/loop0
+%attr(640,root,disk) %dev(b,7,1) %{udev_libdir}/devices/loop1
+%attr(640,root,disk) %dev(b,7,2) %{udev_libdir}/devices/loop2
+%attr(640,root,disk) %dev(b,7,3) %{udev_libdir}/devices/loop3
+%attr(640,root,disk) %dev(b,7,4) %{udev_libdir}/devices/loop4
+%attr(640,root,disk) %dev(b,7,5) %{udev_libdir}/devices/loop5
+%attr(640,root,disk) %dev(b,7,6) %{udev_libdir}/devices/loop6
+%attr(640,root,disk) %dev(b,7,7) %{udev_libdir}/devices/loop7
+#%{_mandir}/man8/systemd-udevd.8.*
+%{_mandir}/man8/udevadm.8.*
+
+%files -n %{libudev}
+/%{_lib}/libudev.so.%{udev_major}*
+
+%files -n %{libudev_devel}
+#%doc COPYING README TODO ChangeLog NEWS src/keymap/README.keymap.txt
+#%doc %{_datadir}/gtk-doc/html/libudev
+%{_libdir}/libudev.*
+%if %{with dietlibc}
+%{_prefix}/lib/dietlibc/lib-%{_arch}/libudev.a
+%endif
+%{_libdir}/pkgconfig/libudev.pc
+%{_datadir}/pkgconfig/udev.pc
+%{_includedir}/libudev.h
+
+%if !%{with bootstrap}
+%files -n %{libgudev}
+/%{_lib}/libgudev-%{gudev_api}.so.%{gudev_major}*
+
+%files -n %{girgudev}
+%{_libdir}/girepository-1.0/GUdev-%{gudev_api}.typelib
+
+%files -n %{libgudev_devel}
+#%doc %{_datadir}/gtk-doc/html/gudev
+%{_libdir}/libgudev-%{gudev_api}.so
+%{_includedir}/gudev-%{gudev_api}
+%{_datadir}/gir-1.0/GUdev-%{gudev_api}.gir
+%{_libdir}/pkgconfig/gudev-%{gudev_api}.pc
+%endif
