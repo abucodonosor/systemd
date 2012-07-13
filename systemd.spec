@@ -249,6 +249,20 @@ Provides:	libsystemd-id128-devel = %{version}-%{release}
 %description -n %{libid128_devel}
 Development files for the systemd-id128 shared library.
 
+%package -n	udev
+Summary:	Device manager for the Linux kernel
+Group:		System/Configuration/Hardware
+Requires:	%{name} = %{version}-%{release}
+Requires:	ldetect-lst
+Requires:	setup >= 2.7.16
+Requires:	util-linux-ng >= 2.15
+Requires:	acl
+# for disk/lp groups
+Requires(pre):	setup
+Requires(pre):	coreutils
+Requires(post,preun):	rpm-helper
+Provides:	should-restart = system
+
 %description -n	udev
 A collection of tools and a daemon to manage events received
 from the kernel and deal with them in user-space. Primarily this
