@@ -43,8 +43,8 @@
 
 Summary:	A System and Session Manager
 Name:		systemd
-Version:	186
-Release:	9
+Version:	187
+Release:	1
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -128,6 +128,7 @@ Requires:	nss-myhostname
 Requires:	lockdev
 Conflicts:	initscripts < 9.24
 Conflicts:	udev < 186-5
+Requires:	kmod
 %rename		readahead
 Provides:	should-restart = system
 # make sure we have /etc/os-release available, required by --with-distro
@@ -457,10 +458,12 @@ touch %{buildroot}%{_sysconfdir}/timezone
 mkdir -p %{buildroot}%{_sysconfdir}/X11/xorg.conf.d
 touch %{buildroot}%{_sysconfdir}/X11/xorg.conf.d/00-keyboard.conf
 
+%if %mdvver < 201200
 # create modules.conf as a symlink to /etc/
 ln -s /etc/modules %{buildroot}%{_sysconfdir}/modules-load.d/modules.conf
 # (tpg) symlink also modprobe.preload because a lot of modules are inserted there from drak* stuff
 ln -s /etc/modprobe.preload %{buildroot}%{_sysconfdir}/modules-load.d/modprobe-preload.conf
+%endif
 
 # (cg) Set up the pager to make it generally more useful
 mkdir -p %{buildroot}%{_sysconfdir}/profile.d
@@ -471,6 +474,9 @@ chmod 644 %{buildroot}%{_sysconfdir}/profile.d/40systemd.sh
 
 # (tpg) add rpm macros
 install -m 0644 -D %{SOURCE1} %{buildroot}%{_sysconfdir}/rpm/macros.d/%{name}.macros
+
+# Make sure the NTP units dir exists
+mkdir -p %{buildroot}%{systemd_libdir}/ntp-units.d/
 
 # (tpg) from mageia
 # automatic systemd release on rpm installs/removals
@@ -492,7 +498,7 @@ chmod 755 %{buildroot}%{_var}/lib/rpm/filetriggers/systemd-daemon-reload.script
 
 #################
 #	UDEV	#
-#	SHIT	#
+#	START	#
 #################
 
 install -m 644 %{SOURCE2} %{buildroot}%{udev_rules_dir}/
@@ -667,6 +673,7 @@ fi
 %dir %{systemd_libdir}
 %dir %{systemd_libdir}/*-generators
 %dir %{systemd_libdir}/system-shutdown
+%dir %{systemd_libdir}/ntp-units.d
 %dir %{_prefix}/lib/tmpfiles.d
 %dir %{_prefix}/lib/sysctl.d
 %dir %{_prefix}/lib/modules-load.d
@@ -766,7 +773,11 @@ fi
 
 %{_sysconfdir}/systemd/system/getty.target.wants/getty@*.service
 %{_sysconfdir}/bash_completion.d/systemd
+
+%if %mdvver < 201200
 %{_sysconfdir}/modules-load.d/*.conf
+%endif
+
 /bin/systemctl
 %{_bindir}/systemctl
 %{systemd_libdir}/system
