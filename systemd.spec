@@ -144,7 +144,7 @@ state, maintains mount and automount points and implements an
 elaborate transactional dependency-based service control logic. It can
 work as a drop-in replacement for sysvinit.
 
-%package	tools
+%package tools
 Summary:	Non essential systemd tools
 Group:		System/Configuration/Boot and Init
 Requires:	%{name} = %{version}-%{release}
@@ -152,22 +152,22 @@ Conflicts:	%{name} < 35-6
 Requires:	python-dbus
 Requires:	python-cairo
 
-%description	tools
+%description tools
 Non essential systemd tools.
 
-%package	units
+%package units
 Summary:	Configuration files, directories and installation tool for systemd
 Group:		System/Configuration/Boot and Init
 Requires(post):	coreutils
 Requires(post):	gawk
-Requires(post): grep
-Requires(post): awk
+Requires(post):	grep
+Requires(post):	awk
 
-%description	units
+%description units
 Basic configuration files, directories and installation tool for the systemd
 system and session manager.
 
-%package	sysvinit
+%package sysvinit
 Summary:	System V init tools
 Group:		System/Configuration/Boot and Init
 Requires:	%{name} = %{version}-%{release}
@@ -178,7 +178,7 @@ Conflicts:	sysvinit < %sysvinit_version-%sysvinit_release, SysVinit < %sysvinit_
 %description sysvinit
 Drop-in replacement for the System V init tools of systemd.
 
-%package -n	%{libdaemon}
+%package -n %{libdaemon}
 Summary:	Systemd-daemon library package
 Group:		System/Libraries
 Provides:	libsystemd-daemon = %{version}-%{release}
@@ -186,7 +186,7 @@ Provides:	libsystemd-daemon = %{version}-%{release}
 %description -n	%{libdaemon}
 This package provides the systemd-daemon shared library.
 
-%package -n	%{libdaemon_devel}
+%package -n %{libdaemon_devel}
 Summary:	Systemd-daemon library development files
 Group:		Development/C
 Requires:	%{libdaemon} = %{version}-%{release}
@@ -195,7 +195,7 @@ Provides:	libsystemd-daemon-devel = %{version}-%{release}
 %description -n	%{libdaemon_devel}
 Development files for the systemd-daemon shared library.
 
-%package -n	%{liblogin}
+%package -n %{liblogin}
 Summary:	Systemd-login library package
 Group:		System/Libraries
 Provides:	libsystemd-login = %{version}-%{release}
@@ -203,7 +203,7 @@ Provides:	libsystemd-login = %{version}-%{release}
 %description -n	%{liblogin}
 This package provides the systemd-login shared library.
 
-%package -n	%{liblogin_devel}
+%package -n %{liblogin_devel}
 Summary:	Systemd-login library development files
 Group:		Development/C
 Requires:	%{liblogin} = %{version}-%{release}
@@ -212,7 +212,7 @@ Provides:	libsystemd-login-devel = %{version}-%{release}
 %description -n	%{liblogin_devel}
 Development files for the systemd-login shared library.
 
-%package -n	%{libjournal}
+%package -n %{libjournal}
 Summary:	Systemd-journal library package
 Group:		System/Libraries
 Provides:	libsystemd-journal = %{version}-%{release}
@@ -220,7 +220,7 @@ Provides:	libsystemd-journal = %{version}-%{release}
 %description -n	%{libjournal}
 This package provides the systemd-journal shared library.
 
-%package -n	%{libjournal_devel}
+%package -n %{libjournal_devel}
 Summary:	Systemd-journal library development files
 Group:		Development/C
 Requires:	%{libjournal} = %{version}-%{release}
@@ -229,7 +229,7 @@ Provides:	libsystemd-journal-devel = %{version}-%{release}
 %description -n	%{libjournal_devel}
 Development files for the systemd-journal shared library.
 
-%package -n	%{libid128}
+%package -n %{libid128}
 Summary:	Systemd-id128 library package
 Group:		System/Libraries
 Provides:	libsystemd-id128 = %{version}-%{release}
@@ -237,7 +237,7 @@ Provides:	libsystemd-id128 = %{version}-%{release}
 %description -n	%{libid128}
 This package provides the systemd-id128 shared library.
 
-%package -n	%{libid128_devel}
+%package -n %{libid128_devel}
 Summary:	Systemd-id128 library development files
 Group:		Development/C
 Requires:	%{libid128} = %{version}-%{release}
@@ -246,7 +246,7 @@ Provides:	libsystemd-id128-devel = %{version}-%{release}
 %description -n %{libid128_devel}
 Development files for the systemd-id128 shared library.
 
-%package -n	udev
+%package -n udev
 Summary:	Device manager for the Linux kernel
 Group:		System/Configuration/Hardware
 Requires:	%{name} = %{version}-%{release}
@@ -267,14 +267,14 @@ involves managing permissions, and creating and removing meaningful
 symlinks to device nodes in /dev when hardware is discovered or
 removed from the system
 
-%package -n	%{libudev}
+%package -n %{libudev}
 Summary:	Library for udev
 Group:		System/Libraries
 
 %description -n	%{libudev}
 Library for udev.
 
-%package -n	%{libudev_devel}
+%package -n %{libudev_devel}
 Summary:	Devel library for udev
 Group:		Development/C
 License:	LGPLv2+
@@ -287,7 +287,7 @@ Obsoletes:	%{name}-doc
 Devel library for udev.
 
 %if !%{with bootstrap}
-%package -n	%{libgudev}
+%package -n %{libgudev}
 Summary:	Libraries for adding libudev support to applications that use glib
 Group:		System/Libraries
 #gw please don't remove this again, it is needed by the noarch package
@@ -298,7 +298,7 @@ Provides:	libgudev = %{EVRD}
 This package contains the libraries that make it easier to use libudev
 functionality from applications that use glib.
 
-%package -n	%{girgudev}
+%package -n %{girgudev}
 Group:		System/Libraries
 Summary:	GObject Introspection interface library for gudev
 Conflicts:	%{_lib}gudev1.0_0 < 182-5
@@ -307,7 +307,7 @@ Obsoletes:	%{_lib}udev-gir1.0
 %description -n %{girgudev}
 GObject Introspection interface library for gudev.
 
-%package -n	%{libgudev_devel}
+%package -n %{libgudev_devel}
 Summary:	Header files for adding libudev support to applications that use glib
 Group:		Development/C
 Requires:	%{libgudev} = %{EVRD}
@@ -317,7 +317,7 @@ This package contains the header and pkg-config files for developing
 glib-based applications using libudev functionality.
 %endif
 
-%package -n	udev-doc
+%package -n udev-doc
 Summary:	Udev documentation
 Group:		Books/Computer books
 
