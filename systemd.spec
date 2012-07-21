@@ -132,7 +132,7 @@ Requires:	kmod
 %rename		readahead
 Provides:	should-restart = system
 # make sure we have /etc/os-release available, required by --with-distro
-BuildRequires:	mandriva-release-common = 1:2012.0-0.4
+BuildRequires:	mandriva-release-common >= 1:2012.0-0.4
 
 %description
 systemd is a system and session manager for Linux, compatible with
