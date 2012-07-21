@@ -819,7 +819,6 @@ fi
 %{_libdir}/pkgconfig/libsystemd-daemon.pc
 %{_datadir}/pkgconfig/systemd.pc
 %{_includedir}/systemd/sd-messages.h
-%{_includedir}/systemd/sd-readahead.h
 %{_includedir}/systemd/sd-shutdown.h
 
 %files -n %{liblogin}
