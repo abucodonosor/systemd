@@ -44,7 +44,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	187
-Release:	2
+Release:	3
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -518,12 +518,17 @@ mv %{buildroot}%{_bindir}/udevadm %{buildroot}/sbin
 # probably not required, but let's just be on the safe side for now..
 ln -sf /sbin/udevadm %{buildroot}%{_bindir}/udevadm
 ln -sf /sbin/udevadm %{buildroot}%{_sbindir}/udevadm
+
+# (tpg) this is needed, because udevadm is in /sbin
+# altering the path allows to boot on before root pivot
+sed -i -e 's#/usr/bin/udevadm#/sbin/udevadm#g' %{buildroot}/%{systemd_libdir}/system/*.service
+
 mkdir -p %{buildroot}%{_prefix}/lib/firmware/updates
 mkdir -p %{buildroot}%{_sysconfdir}/udev/agents.d/usb
 touch %{buildroot}%{_sysconfdir}/scsi_id.config
 
 ln -s ..%{systemd_libdir}/systemd-udevd %{buildroot}/sbin/udevd
-ln -s ..%{systemd_libdir}/systemd-udevd %{buildroot}%{udev_libdir}/udevd
+ln -s %{systemd_libdir}/systemd-udevd %{buildroot}%{udev_libdir}/udevd
 
 # udev rules for zte 3g modems and drakx-net
 
