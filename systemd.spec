@@ -44,7 +44,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	187
-Release:	3
+Release:	4
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -575,9 +575,6 @@ if [ -d /lib/hotplug/firmware ]; then
 	rmdir -p --ignore-fail-on-non-empty /lib/hotplug/firmware
 	:
 fi
-
-%triggerpostin -n udev -- udev < 187
-/usr/bin/udevadm info --convert-db
 
 %post -n udev
 /bin/systemctl --quiet try-restart systemd-udevd.service >/dev/null 2>&1 || :
