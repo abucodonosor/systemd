@@ -44,7 +44,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	187
-Release:	5
+Release:	6
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -264,6 +264,7 @@ Requires(pre):	setup
 Requires(pre):	coreutils
 Requires(post,preun):	rpm-helper
 Provides:	should-restart = system
+Obsoletes:	hal <= 0.5.14-6
 
 %description -n	udev
 A collection of tools and a daemon to manage events received
@@ -275,6 +276,7 @@ removed from the system
 %package -n %{libudev}
 Summary:	Library for udev
 Group:		System/Libraries
+Obsoletes:	%{mklibname hal 1} <= 0.5.14-6
 
 %description -n	%{libudev}
 Library for udev.
