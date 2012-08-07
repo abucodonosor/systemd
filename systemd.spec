@@ -44,7 +44,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	187
-Release:	4
+Release:	5
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -133,6 +133,11 @@ Requires:	kmod
 Provides:	should-restart = system
 # make sure we have /etc/os-release available, required by --with-distro
 BuildRequires:	mandriva-release-common >= 1:2012.0-0.4
+# (tpg) just to be sure we install this libraries
+Requires:	libsystemd-daemon = %{version}-%{release}
+Requires:	libsystemd-login = %{version}-%{release}
+Requires:	libsystemd-journal = %{version}-%{release}
+Requires:	libsystemd-id128 = %{version}-%{release}
 
 %description
 systemd is a system and session manager for Linux, compatible with
