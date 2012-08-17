@@ -44,7 +44,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	188
-Release:	1
+Release:	2
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -67,6 +67,9 @@ Source10:	61-mobile-zte-drakx-net.rules
 Patch0:		systemd-18-clean-dirs-on-boot.patch
 Patch1:		systemd-tmpfilesd-utmp-temp-patch.patch
 Patch2:		systemd-33-rc-local.patch
+
+# GIT
+Patch105:	systemd-188-switch_root_remount_to_MS_PRIVATE.patch 
 
 ### UDEV ###
 # from Mandriva
