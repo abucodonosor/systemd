@@ -43,8 +43,8 @@
 
 Summary:	A System and Session Manager
 Name:		systemd
-Version:	188
-Release:	2
+Version:	189
+Release:	1
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -60,7 +60,7 @@ Source8:	udev_net_action
 Source9:	udev_net.sysconfig
 # (hk) udev rules for zte 3g modems with drakx-net
 Source10:	61-mobile-zte-drakx-net.rules
-
+Source11:	listen.conf
 ### SYSTEMD ###
 
 # (bor) clean up directories on boot as done by rc.sysinit
@@ -69,7 +69,6 @@ Patch1:		systemd-tmpfilesd-utmp-temp-patch.patch
 Patch2:		systemd-33-rc-local.patch
 
 # GIT
-Patch105:	systemd-188-switch_root_remount_to_MS_PRIVATE.patch 
 
 ### UDEV ###
 # from Mandriva
@@ -126,7 +125,7 @@ Requires(pre):	initscripts > 9.24
 %if %mdkver >= 201200
 Requires(pre):	basesystem-minimal >= 2011.0-2
 %endif
-Requires:	util-linux-ng >= 2.18-2
+Requires(pre):	util-linux >= 2.18-2
 Requires:	nss-myhostname
 Requires:	lockdev
 Conflicts:	initscripts < 9.24
@@ -488,6 +487,10 @@ install -m 0644 -D %{SOURCE1} %{buildroot}%{_sysconfdir}/rpm/macros.d/%{name}.ma
 # Make sure the NTP units dir exists
 mkdir -p %{buildroot}%{systemd_libdir}/ntp-units.d/
 
+# Install rsyslog fragment
+mkdir -p %{buildroot}%{_sysconfdir}/rsyslog.d/
+install -m 0644 %{SOURCE11} %{buildroot}%{_sysconfdir}/rsyslog.d/
+
 # (tpg) from mageia
 # automatic systemd release on rpm installs/removals
 # (see http://wiki.mandriva.com/en/Rpm_filetriggers)
@@ -678,6 +681,7 @@ fi
 %config(noreplace) %{_sysconfdir}/systemd/logind.conf
 %config(noreplace) %{_sysconfdir}/systemd/journald.conf
 %config(noreplace) %{_sysconfdir}/systemd/user.conf
+%config(noreplace) %{_sysconfdir}/rsyslog.d/listen.conf
 %config(noreplace) /usr/lib/sysctl.d/coredump.conf
 %ghost %config(noreplace) %{_sysconfdir}/hostname
 %ghost %config(noreplace) %{_sysconfdir}/vconsole.conf
