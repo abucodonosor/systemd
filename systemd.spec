@@ -44,7 +44,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	189
-Release:	3
+Release:	4
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -69,6 +69,7 @@ Source12:	99-default.preset
 Patch0:		systemd-18-clean-dirs-on-boot.patch
 Patch1:		systemd-tmpfilesd-utmp-temp-patch.patch
 Patch2:		systemd-33-rc-local.patch
+Patch3:		0502-main-Add-failsafe-to-the-sysvinit-compat-cmdline-key.patch
 
 # GIT
 
