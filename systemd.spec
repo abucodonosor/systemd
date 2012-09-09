@@ -44,7 +44,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	189
-Release:	2
+Release:	3
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -61,6 +61,8 @@ Source9:	udev_net.sysconfig
 # (hk) udev rules for zte 3g modems with drakx-net
 Source10:	61-mobile-zte-drakx-net.rules
 Source11:	listen.conf
+# (tpg) default preset for services
+Source12:	99-default.preset
 ### SYSTEMD ###
 
 # (bor) clean up directories on boot as done by rc.sysinit
@@ -371,8 +373,9 @@ find src/ -name "*.vala" -exec touch '{}' \;
 
 mkdir -p %{buildroot}/%{_sbindir}
 
-# (bor) create late shutdown directory
+# (bor) create late shutdown and sleep directory
 mkdir -p %{buildroot}%{systemd_libdir}/system-shutdown
+mkdir -p %{buildroot}%{systemd_libdir}/system-sleep
 
 # Create SysV compatibility symlinks. systemctl/systemd are smart
 # enough to detect in which way they are called.
@@ -486,6 +489,11 @@ install -m 0644 -D %{SOURCE1} %{buildroot}%{_sysconfdir}/rpm/macros.d/%{name}.ma
 
 # Make sure the NTP units dir exists
 mkdir -p %{buildroot}%{systemd_libdir}/ntp-units.d/
+
+# (tpg) Install default Mandriva preset policy for services
+mkdir -p %{buildroot}%{systemd_libdir}/system-preset/
+mkdir -p %{buildroot}%{systemd_libdir}/user-preset/
+install -m 0644 %{SOURCE12} %{buildroot}%{systemd_libdir}/system-preset/
 
 # Install rsyslog fragment
 mkdir -p %{buildroot}%{_sysconfdir}/rsyslog.d/
@@ -695,7 +703,10 @@ fi
 %dir %{systemd_libdir}
 %dir %{systemd_libdir}/*-generators
 %dir %{systemd_libdir}/system-shutdown
+%dir %{systemd_libdir}/system-sleep
 %dir %{systemd_libdir}/ntp-units.d
+%dir %{systemd_libdir}/system-preset
+%dir %{systemd_libdir}/user-preset
 %dir %{_prefix}/lib/tmpfiles.d
 %dir %{_prefix}/lib/sysctl.d
 %dir %{_prefix}/lib/modules-load.d
@@ -733,6 +744,7 @@ fi
 %{systemd_libdir}/systemd-user-sessions
 %{systemd_libdir}/systemd-vconsole-setup
 %{systemd_libdir}/*-generators/*
+%{systemd_libdir}/system-preset/99-default.preset
 /usr/lib/tmpfiles.d/*.conf
 /%{_lib}/security/pam_systemd.so
 %{_var}/lib/rpm/filetriggers/systemd-daemon-reload.*
