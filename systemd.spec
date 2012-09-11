@@ -182,6 +182,8 @@ Summary:	System V init tools
 Group:		System/Configuration/Boot and Init
 Requires:	%{name} = %{version}-%{release}
 # (eugeni) systemd should work as a drop-in replacement for sysvinit, but not obsolete it
+#SysVinit < %sysvinit_release-%sysvinit_release It's provides something
+#like that SysVinit < 14-14 when it should be SysVinit 2.87-14
 Provides:	sysvinit = %sysvinit_version-%sysvinit_release, SysVinit = %sysvinit_version-%sysvinit_release
 Conflicts:	sysvinit < %sysvinit_version-%sysvinit_release, SysVinit < %sysvinit_version-%sysvinit_release
 
