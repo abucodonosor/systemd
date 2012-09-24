@@ -41,10 +41,12 @@
 %define udev_rules_dir %{udev_libdir}/rules.d
 %define udev_user_rules_dir %{_sysconfdir}/udev/rules.d
 
+%bcond_without	uclibc
+
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	191
-Release:	1
+Release:	2
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -85,6 +87,9 @@ Patch103:	0508-reinstate-TIMEOUT-handling.patch
 # (proyvind):	FIXME: setting udev_log to 'info' royally screws everything up
 #		for some reason, revert to 'err' for now..
 Patch104:	systemd-186-set-udev_log-to-err.patch
+Patch105:	systemd-191-support-build-without-secure_getenv.patch
+Patch106:	systemd-191-uclibc-no-mkostemp.patch
+Patch107:	systemd-191-link-against-librt.patch
 
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -118,6 +123,9 @@ BuildRequires:	ldetect-lst
 %if !%{with bootstrap}
 BuildRequires:	pkgconfig(gobject-introspection-1.0)
 %endif
+%if %{with uclibc}
+BuildRequires:	uClibc-devel >= 0.9.33.2-9
+%endif
 Requires(pre,post):	coreutils
 Requires:	udev = %{version}-%{release}
 Requires(post):	gawk
@@ -145,6 +153,24 @@ Requires:	libsystemd-journal = %{version}-%{release}
 Requires:	libsystemd-id128 = %{version}-%{release}
 
 %description
+systemd is a system and session manager for Linux, compatible with
+SysV and LSB init scripts. systemd provides aggressive parallelization
+capabilities, uses socket and D-Bus activation for starting services,
+offers on-demand starting of daemons, keeps track of processes using
+Linux cgroups, supports snapshotting and restoring of the system
+state, maintains mount and automount points and implements an
+elaborate transactional dependency-based service control logic. It can
+work as a drop-in replacement for sysvinit.
+
+%package -n	uclibc-%{name}
+Requires:	%{name} = %{EVRD}
+Requires:	uclibc-udev = %{EVRD}
+Requires:	uclibc-%{libdaemon} = %{EVRD}
+Requires:	uclibc-%{liblogin} = %{EVRD}
+Requires:	uclibc-%{liblogin} = %{EVRD}
+Requires:	uclibc-%{liblogin} = %{EVRD}
+
+%description -n	uclibc-%{name}
 systemd is a system and session manager for Linux, compatible with
 SysV and LSB init scripts. systemd provides aggressive parallelization
 capabilities, uses socket and D-Bus activation for starting services,
@@ -198,10 +224,20 @@ Provides:	libsystemd-daemon = %{version}-%{release}
 %description -n	%{libdaemon}
 This package provides the systemd-daemon shared library.
 
+%package -n	uclibc-%{libdaemon}
+Summary:	Systemd-daemon library package (uClibc linked)
+Group:		System/Libraries
+
+%description -n	uclibc-%{libdaemon}
+This package provides the systemd-daemon shared library.
+
 %package -n %{libdaemon_devel}
 Summary:	Systemd-daemon library development files
 Group:		Development/C
 Requires:	%{libdaemon} = %{version}-%{release}
+%if %{with uclibc}
+Requires:	uclibc-%{libdaemon} = %{version}-%{release}
+%endif
 Provides:	libsystemd-daemon-devel = %{version}-%{release}
 
 %description -n	%{libdaemon_devel}
@@ -215,10 +251,20 @@ Provides:	libsystemd-login = %{version}-%{release}
 %description -n	%{liblogin}
 This package provides the systemd-login shared library.
 
+%package -n	uclibc-%{liblogin}
+Summary:	Systemd-login library package (uClibc linked)
+Group:		System/Libraries
+
+%description -n	uclibc-%{liblogin}
+This package provides the systemd-login shared library.
+
 %package -n %{liblogin_devel}
 Summary:	Systemd-login library development files
 Group:		Development/C
 Requires:	%{liblogin} = %{version}-%{release}
+%if %{with uclibc}
+Requires:	uclibc-%{liblogin} = %{version}-%{release}
+%endif
 Provides:	libsystemd-login-devel = %{version}-%{release}
 
 %description -n	%{liblogin_devel}
@@ -232,10 +278,20 @@ Provides:	libsystemd-journal = %{version}-%{release}
 %description -n	%{libjournal}
 This package provides the systemd-journal shared library.
 
+%package -n	uclibc-%{libjournal}
+Summary:	Systemd-journal library package (uClibc linked)
+Group:		System/Libraries
+
+%description -n	uclibc-%{libjournal}
+This package provides the systemd-journal shared library.
+
 %package -n %{libjournal_devel}
 Summary:	Systemd-journal library development files
 Group:		Development/C
 Requires:	%{libjournal} = %{version}-%{release}
+%if %{with uclibc}
+Requires:	uclibc-%{libjournal} = %{version}-%{release}
+%endif
 Provides:	libsystemd-journal-devel = %{version}-%{release}
 
 %description -n	%{libjournal_devel}
@@ -249,10 +305,20 @@ Provides:	libsystemd-id128 = %{version}-%{release}
 %description -n	%{libid128}
 This package provides the systemd-id128 shared library.
 
+%package -n	uclibc-%{libid128}
+Summary:	Systemd-id128 library package (uClibc linked)
+Group:		System/Libraries
+
+%description -n	uclibc-%{libid128}
+This package provides the systemd-id128 shared library.
+
 %package -n %{libid128_devel}
 Summary:	Systemd-id128 library development files
 Group:		Development/C
 Requires:	%{libid128} = %{version}-%{release}
+%if %{with uclibc}
+Requires:	uclibc-%{libid128} = %{version}-%{release}
+%endif
 Provides:	libsystemd-id128-devel = %{version}-%{release}
 
 %description -n %{libid128_devel}
@@ -280,6 +346,27 @@ involves managing permissions, and creating and removing meaningful
 symlinks to device nodes in /dev when hardware is discovered or
 removed from the system
 
+%package -n	uclibc-udev
+Summary:	Device manager for the Linux kernel (uClibc linked)
+Group:		System/Configuration/Hardware
+Requires:	udev = %{EVRD}
+#Requires:	ldetect-lst
+#Requires:	setup >= 2.7.16
+#Requires:	util-linux-ng >= 2.15
+#Requires:	acl
+# for disk/lp groups
+#Requires(pre):	setup
+#Requires(pre):	coreutils
+#Requires(post,preun):	rpm-helper
+#Provides:	should-restart = system
+
+%description -n	uclibc-udev
+A collection of tools and a daemon to manage events received
+from the kernel and deal with them in user-space. Primarily this
+involves managing permissions, and creating and removing meaningful
+symlinks to device nodes in /dev when hardware is discovered or
+removed from the system
+
 %package -n %{libudev}
 Summary:	Library for udev
 Group:		System/Libraries
@@ -288,12 +375,22 @@ Obsoletes:	%{mklibname hal 1} <= 0.5.14-6
 %description -n	%{libudev}
 Library for udev.
 
+%package -n	uclibc-%{libudev}
+Summary:	Library for udev (uClibc linked)
+Group:		System/Libraries
+
+%description -n	uclibc-%{libudev}
+Library for udev.
+
 %package -n %{libudev_devel}
 Summary:	Devel library for udev
 Group:		Development/C
 License:	LGPLv2+
 Provides:	udev-devel = %{EVRD}
 Requires:	%{libudev} = %{EVRD}
+%if %{with uclibc}
+Requires:	uclibc-%{libudev} = %{EVRD}
+%endif
 Obsoletes:	%{_lib}udev0-devel
 Obsoletes:	%{name}-doc
 
@@ -350,6 +447,43 @@ find src/ -name "*.vala" -exec touch '{}' \;
 %serverbuild
 %endif
 
+export CONFIGURE_TOP=$PWD
+
+%if %{with uclibc}
+mkdir -p uclibc
+pushd uclibc
+%configure2_5x \
+	CC="%{uclibc_cc}" \
+	CFLAGS="%{uclibc_cflags}" \
+	--bindir=%{uclibc_root}%{_bindir} \
+	--sbindir=%{uclibc_root}%{_sbindir} \
+	--libdir=%{uclibc_root}%{_libdir} \
+	--with-rootprefix= \
+	--with-rootlibdir=%{uclibc_root}/%{_lib} \
+	--libexecdir=%{_prefix}/lib \
+	--with-distro=mandriva \
+	--with-firmware-path=/lib/firmware/updates:/lib/firmware \
+	--disable-static \
+	--with-sysvinit-path=%{_initrddir} \
+	--with-sysvrcd-path=%{_sysconfdir}/rc.d \
+	--disable-selinux \
+	--enable-split-usr \
+	--enable-introspection=no \
+	--with-usb-ids-path=/usr/share/usb.ids \
+	--with-pci-ids-path=/usr/share/pci.ids \
+	--enable-introspection=no \
+	--disable-gudev \
+	--disable-pam \
+	--disable-libcryptsetup	\
+	--disable-gcrypt \
+	--disable-audit \
+	--disable-manpages
+%make
+popd
+%endif
+
+mkdir -p shared
+pushd shared
 %configure2_5x \
 	--with-rootprefix= \
 	--with-rootlibdir=/%{_lib} \
@@ -368,13 +502,22 @@ find src/ -name "*.vala" -exec touch '{}' \;
 %endif
 	--with-usb-ids-path=/usr/share/usb.ids \
 	--with-pci-ids-path=/usr/share/pci.ids
-
 %make
+popd
 
 %install
-%makeinstall_std
+%if %{with uclibc}
+%makeinstall_std -C uclibc
+mv %{buildroot}/bin %{buildroot}%{uclibc_root}/bin
+mkdir -p %{buildroot}%{uclibc_root}/sbin
+mv %{buildroot}%{uclibc_root}%{_bindir}/udevadm %{buildroot}%{uclibc_root}/sbin
+rm -f %{buildroot}%{uclibc_root}%{_bindir}/systemd-analyze
+rm -rf %{buildroot}%{uclibc_root}%{_libdir}/pkgconfig
+%endif
 
-mkdir -p %{buildroot}/%{_sbindir}
+%makeinstall_std -C shared
+
+mkdir -p %{buildroot}%{_sbindir}
 
 # (bor) create late shutdown and sleep directory
 mkdir -p %{buildroot}%{systemd_libdir}/system-shutdown
@@ -392,6 +535,9 @@ ln -s ../bin/systemctl %{buildroot}/sbin/shutdown
 ln -s ../bin/systemctl %{buildroot}/sbin/telinit
 ln -s ../bin/systemctl %{buildroot}/sbin/runlevel
 ln -s /bin/loginctl %{buildroot}%{_bindir}/systemd-loginctl
+%if %{with uclibc}
+ln -srf %{buildroot}%{uclibc_root}/bin/loginctl %{buildroot}%{uclibc_root}%{_bindir}/systemd-loginctl
+%endif
 
 # (tpg) dracut needs this
 ln -s /bin/systemctl %{buildroot}%{_bindir}/systemctl
@@ -448,6 +594,10 @@ ln -s ../rpcbind.target %{buildroot}/%{systemd_libdir}/system/multi-user.target.
 
 # (bor) machine-id-setup is in /sbin in post-v20
 install -d %{buildroot}/sbin && mv %{buildroot}/bin/systemd-machine-id-setup %{buildroot}/sbin
+%if %{with uclibc}
+install -d %{buildroot}%{uclibc_root}/sbin && mv %{buildroot}%{uclibc_root}/bin/systemd-machine-id-setup %{buildroot}%{uclibc_root}/sbin
+%endif
+
 
 # (eugeni) install /run
 mkdir %{buildroot}/run
@@ -602,6 +752,9 @@ fi
 
 %post -n udev
 /bin/systemctl --quiet try-restart systemd-udevd.service >/dev/null 2>&1 || :
+
+#%post -n uclibc-udev
+#%{uclibc_root}/bin/systemctl --quiet try-restart systemd-udevd.service >/dev/null 2>&1 || :
 
 %pre
 systemctl stop systemd-udevd.service systemd-udev.service systemd-udev-control.socket systemd-udev-kernel.socket >/dev/null 2>&1 || :
@@ -793,6 +946,27 @@ fi
 %{_datadir}/systemd/kbd-model-map
 %{_docdir}/systemd
 
+%if %{with uclibc}
+%files -n uclibc-%{name}
+%{uclibc_root}/bin/systemctl
+%{uclibc_root}/bin/systemd-ask-password
+%{uclibc_root}/bin/systemd-notify
+%{uclibc_root}/bin/systemd-tmpfiles
+%{uclibc_root}/bin/systemd-tty-ask-password-agent
+%{uclibc_root}/bin/journalctl
+%{uclibc_root}/bin/loginctl
+%{uclibc_root}/bin/systemd-inhibit
+%{uclibc_root}/sbin/systemd-machine-id-setup
+%{uclibc_root}%{_bindir}/systemd-delta
+%{uclibc_root}%{_bindir}/systemd-detect-virt
+%{uclibc_root}%{_bindir}/systemd-loginctl
+%{uclibc_root}%{_bindir}/systemd-cgls
+%{uclibc_root}%{_bindir}/systemd-nspawn
+%{uclibc_root}%{_bindir}/systemd-stdio-bridge
+%{uclibc_root}%{_bindir}/systemd-cat
+%{uclibc_root}%{_bindir}/systemd-cgtop
+%endif
+
 %files tools
 %{_bindir}/systemd-analyze
 %{_mandir}/man1/systemd-analyze.1*
@@ -849,10 +1023,18 @@ fi
 %files -n %{libdaemon}
 /%{_lib}/libsystemd-daemon.so.%{libdaemon_major}*
 
+%if %{with uclibc}
+%files -n uclibc-%{libdaemon}
+%{uclibc_root}/%{_lib}/libsystemd-daemon.so.%{libdaemon_major}*
+%endif
+
 %files -n %{libdaemon_devel}
 %dir %{_includedir}/systemd
 %{_includedir}/systemd/sd-daemon.h
 %{_libdir}/libsystemd-daemon.so
+%if %{with uclibc}
+%{uclibc_root}%{_libdir}/libsystemd-daemon.so
+%endif
 %{_libdir}/pkgconfig/libsystemd-daemon.pc
 %{_datadir}/pkgconfig/systemd.pc
 %{_includedir}/systemd/sd-messages.h
@@ -861,28 +1043,52 @@ fi
 %files -n %{liblogin}
 /%{_lib}/libsystemd-login.so.%{liblogin_major}*
 
+%if %{with uclibc}
+%files -n uclibc-%{liblogin}
+%{uclibc_root}/%{_lib}/libsystemd-login.so.%{liblogin_major}*
+%endif
+
 %files -n %{liblogin_devel}
 %dir %{_includedir}/systemd
 %{_includedir}/systemd/sd-login.h
 %{_libdir}/libsystemd-login.so
+%if %{with uclibc}
+%{uclibc_root}%{_libdir}/libsystemd-login.so
+%endif
 %{_libdir}/pkgconfig/libsystemd-login.pc
 
 %files -n %{libjournal}
 /%{_lib}/libsystemd-journal.so.%{libjournal_major}*
 
+%if %{with uclibc}
+%files -n uclibc-%{libjournal}
+%{uclibc_root}/%{_lib}/libsystemd-journal.so.%{libjournal_major}*
+%endif
+
 %files -n %{libjournal_devel}
 %dir %{_includedir}/systemd
 %{_includedir}/systemd/sd-journal.h
 %{_libdir}/libsystemd-journal.so
+%if %{with uclibc}
+%{uclibc_root}%{_libdir}/libsystemd-journal.so
+%endif
 %{_libdir}/pkgconfig/libsystemd-journal.pc
 
 %files -n %{libid128}
 /%{_lib}/libsystemd-id128.so.%{libid128_major}*
 
+%if %{with uclibc}
+%files -n uclibc-%{libid128}
+%{uclibc_root}/%{_lib}/libsystemd-id128.so.%{libid128_major}*
+%endif
+
 %files -n %{libid128_devel}
 %dir %{_includedir}/systemd
 %{_includedir}/systemd/sd-id128.h
 %{_libdir}/libsystemd-id128.so
+%if %{with uclibc}
+%{uclibc_root}%{_libdir}/libsystemd-id128.so
+%endif
 %{_libdir}/pkgconfig/libsystemd-id128.pc
 
 %files -n udev
@@ -968,13 +1174,26 @@ fi
 #%{_mandir}/man8/systemd-udevd.8.*
 %{_mandir}/man8/udevadm.8.*
 
+%if %{with uclibc}
+%files -n uclibc-udev
+%attr(0755,root,root) %{uclibc_root}/sbin/udevadm
+%endif
+
 %files -n %{libudev}
 /%{_lib}/libudev.so.%{udev_major}*
+
+%if %{with uclibc}
+%files -n uclibc-%{libudev}
+%{uclibc_root}/%{_lib}/libudev.so.%{udev_major}*
+%endif
 
 %files -n %{libudev_devel}
 #%doc COPYING README TODO ChangeLog NEWS src/keymap/README.keymap.txt
 #%doc %{_datadir}/gtk-doc/html/libudev
-%{_libdir}/libudev.*
+%{_libdir}/libudev.so
+%if %{with uclibc}
+%{uclibc_root}%{_libdir}/libudev.so
+%endif
 %{_libdir}/pkgconfig/libudev.pc
 %{_datadir}/pkgconfig/udev.pc
 %{_includedir}/libudev.h
