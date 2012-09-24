@@ -463,7 +463,7 @@ pushd uclibc
 	--libexecdir=%{_prefix}/lib \
 	--with-distro=mandriva \
 	--with-firmware-path=/lib/firmware/updates:/lib/firmware \
-	--disable-static \
+	--enable-static \
 	--with-sysvinit-path=%{_initrddir} \
 	--with-sysvrcd-path=%{_sysconfdir}/rc.d \
 	--disable-selinux \
@@ -1195,6 +1195,7 @@ fi
 #%doc %{_datadir}/gtk-doc/html/libudev
 %{_libdir}/libudev.so
 %if %{with uclibc}
+%{uclibc_root}%{_libdir}/libudev.a
 %{uclibc_root}%{_libdir}/libudev.so
 %endif
 %{_libdir}/pkgconfig/libudev.pc
