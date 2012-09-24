@@ -970,6 +970,9 @@ fi
 %files tools
 %{_bindir}/systemd-analyze
 %{_mandir}/man1/systemd-analyze.1*
+%dir %{python_sitearch}/%{name}
+%{python_sitearch}/%{name}/*.py*
+%{python_sitearch}/%{name}/*.so
 
 %files units
 %dir %{_sysconfdir}/systemd
