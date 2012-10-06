@@ -1,4 +1,5 @@
 %bcond_with bootstrap
+%bcond_with uclibc
 
 # macros for sysvinit transition - should be equal to
 # sysvinit %version-%release-plus-1
@@ -40,8 +41,6 @@
 %define udev_libdir /lib/udev
 %define udev_rules_dir %{udev_libdir}/rules.d
 %define udev_user_rules_dir %{_sysconfdir}/udev/rules.d
-
-%bcond_without	uclibc
 
 Summary:	A System and Session Manager
 Name:		systemd
@@ -162,6 +161,7 @@ state, maintains mount and automount points and implements an
 elaborate transactional dependency-based service control logic. It can
 work as a drop-in replacement for sysvinit.
 
+%if %{with uclibc}
 %package -n uclibc-%{name}
 Summary:	A System and Session Manager (uClibc linked)
 Group:		System/Configuration/Boot and Init
@@ -181,6 +181,7 @@ Linux cgroups, supports snapshotting and restoring of the system
 state, maintains mount and automount points and implements an
 elaborate transactional dependency-based service control logic. It can
 work as a drop-in replacement for sysvinit.
+%endif
 
 %package tools
 Summary:	Non essential systemd tools
@@ -226,12 +227,14 @@ Provides:	libsystemd-daemon = %{version}-%{release}
 %description -n	%{libdaemon}
 This package provides the systemd-daemon shared library.
 
+%if %{with uclibc}
 %package -n	uclibc-%{libdaemon}
 Summary:	Systemd-daemon library package (uClibc linked)
 Group:		System/Libraries
 
 %description -n	uclibc-%{libdaemon}
 This package provides the systemd-daemon shared library.
+%endif
 
 %package -n %{libdaemon_devel}
 Summary:	Systemd-daemon library development files
@@ -253,12 +256,14 @@ Provides:	libsystemd-login = %{version}-%{release}
 %description -n	%{liblogin}
 This package provides the systemd-login shared library.
 
+%if %{with uclibc}
 %package -n uclibc-%{liblogin}
 Summary:	Systemd-login library package (uClibc linked)
 Group:		System/Libraries
 
 %description -n	uclibc-%{liblogin}
 This package provides the systemd-login shared library.
+%endif
 
 %package -n %{liblogin_devel}
 Summary:	Systemd-login library development files
@@ -280,12 +285,14 @@ Provides:	libsystemd-journal = %{version}-%{release}
 %description -n	%{libjournal}
 This package provides the systemd-journal shared library.
 
+%if %{with uclibc}
 %package -n uclibc-%{libjournal}
 Summary:	Systemd-journal library package (uClibc linked)
 Group:		System/Libraries
 
 %description -n	uclibc-%{libjournal}
 This package provides the systemd-journal shared library.
+%endif
 
 %package -n %{libjournal_devel}
 Summary:	Systemd-journal library development files
@@ -307,12 +314,14 @@ Provides:	libsystemd-id128 = %{version}-%{release}
 %description -n	%{libid128}
 This package provides the systemd-id128 shared library.
 
+%if %{with uclibc}
 %package -n uclibc-%{libid128}
 Summary:	Systemd-id128 library package (uClibc linked)
 Group:		System/Libraries
 
 %description -n	uclibc-%{libid128}
 This package provides the systemd-id128 shared library.
+%endif
 
 %package -n %{libid128_devel}
 Summary:	Systemd-id128 library development files
@@ -348,6 +357,7 @@ involves managing permissions, and creating and removing meaningful
 symlinks to device nodes in /dev when hardware is discovered or
 removed from the system
 
+%if %{with uclibc}
 %package -n uclibc-udev
 Summary:	Device manager for the Linux kernel (uClibc linked)
 Group:		System/Configuration/Hardware
@@ -368,6 +378,7 @@ from the kernel and deal with them in user-space. Primarily this
 involves managing permissions, and creating and removing meaningful
 symlinks to device nodes in /dev when hardware is discovered or
 removed from the system
+%endif
 
 %package -n %{libudev}
 Summary:	Library for udev
@@ -377,12 +388,14 @@ Obsoletes:	%{mklibname hal 1} <= 0.5.14-6
 %description -n	%{libudev}
 Library for udev.
 
+%if %{with uclibc}
 %package -n uclibc-%{libudev}
 Summary:	Library for udev (uClibc linked)
 Group:		System/Libraries
 
 %description -n	uclibc-%{libudev}
 Library for udev.
+%endif
 
 %package -n %{libudev_devel}
 Summary:	Devel library for udev
