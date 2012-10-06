@@ -162,7 +162,9 @@ state, maintains mount and automount points and implements an
 elaborate transactional dependency-based service control logic. It can
 work as a drop-in replacement for sysvinit.
 
-%package -n	uclibc-%{name}
+%package -n uclibc-%{name}
+Summary:	A System and Session Manager (uClibc linked)
+Group:		System/Configuration/Boot and Init
 Requires:	%{name} = %{EVRD}
 Requires:	uclibc-udev = %{EVRD}
 Requires:	uclibc-%{libdaemon} = %{EVRD}
@@ -251,7 +253,7 @@ Provides:	libsystemd-login = %{version}-%{release}
 %description -n	%{liblogin}
 This package provides the systemd-login shared library.
 
-%package -n	uclibc-%{liblogin}
+%package -n uclibc-%{liblogin}
 Summary:	Systemd-login library package (uClibc linked)
 Group:		System/Libraries
 
@@ -278,7 +280,7 @@ Provides:	libsystemd-journal = %{version}-%{release}
 %description -n	%{libjournal}
 This package provides the systemd-journal shared library.
 
-%package -n	uclibc-%{libjournal}
+%package -n uclibc-%{libjournal}
 Summary:	Systemd-journal library package (uClibc linked)
 Group:		System/Libraries
 
@@ -305,7 +307,7 @@ Provides:	libsystemd-id128 = %{version}-%{release}
 %description -n	%{libid128}
 This package provides the systemd-id128 shared library.
 
-%package -n	uclibc-%{libid128}
+%package -n uclibc-%{libid128}
 Summary:	Systemd-id128 library package (uClibc linked)
 Group:		System/Libraries
 
@@ -346,7 +348,7 @@ involves managing permissions, and creating and removing meaningful
 symlinks to device nodes in /dev when hardware is discovered or
 removed from the system
 
-%package -n	uclibc-udev
+%package -n uclibc-udev
 Summary:	Device manager for the Linux kernel (uClibc linked)
 Group:		System/Configuration/Hardware
 Requires:	udev = %{EVRD}
@@ -375,7 +377,7 @@ Obsoletes:	%{mklibname hal 1} <= 0.5.14-6
 %description -n	%{libudev}
 Library for udev.
 
-%package -n	uclibc-%{libudev}
+%package -n uclibc-%{libudev}
 Summary:	Library for udev (uClibc linked)
 Group:		System/Libraries
 
