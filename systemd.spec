@@ -119,6 +119,7 @@ BuildRequires:	pkgconfig(blkid)
 BuildRequires:	usbutils >= 005-3
 BuildRequires:	pciutils-devel
 BuildRequires:	ldetect-lst
+BuildRequires:	python-devel
 %if !%{with bootstrap}
 BuildRequires:	pkgconfig(gobject-introspection-1.0)
 %endif
@@ -878,6 +879,7 @@ fi
 %dir %{systemd_libdir}/ntp-units.d
 %dir %{systemd_libdir}/system-preset
 %dir %{systemd_libdir}/user-preset
+%dir %{_datadir}/systemd
 %dir %{_prefix}/lib/tmpfiles.d
 %dir %{_prefix}/lib/sysctl.d
 %dir %{_prefix}/lib/modules-load.d
