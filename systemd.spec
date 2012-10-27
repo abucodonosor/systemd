@@ -1,5 +1,5 @@
 %bcond_with bootstrap
-%bcond_without uclibc
+%bcond_with uclibc
 
 # macros for sysvinit transition - should be equal to
 # sysvinit %version-%release-plus-1
@@ -898,6 +898,10 @@ fi
 %{_bindir}/systemd-delta
 %{_bindir}/systemd-detect-virt
 %{_bindir}/systemd-loginctl
+%{_bindir}/hostnamectl
+%{_bindir}/localectl
+%{_bindir}/systemd-coredumpctl
+%{_bindir}/timedatectl
 %{systemd_libdir}/systemd
 %{systemd_libdir}/systemd-ac-power
 %{systemd_libdir}/systemd-binfmt
@@ -932,7 +936,9 @@ fi
 %{_mandir}/man1/systemd-cat.1*
 %{_mandir}/man1/systemd-cgls.*
 %{_mandir}/man1/systemd-cgtop.*
+%{_mandir}/man1/hostnamectl.*
 %{_mandir}/man1/journalctl.1*
+%{_mandir}/man1/localectl.*
 %{_mandir}/man1/loginctl.*
 %{_mandir}/man1/systemd-machine-id-setup.1*
 %{_mandir}/man1/systemd-notify.*
@@ -940,6 +946,7 @@ fi
 %{_mandir}/man1/systemd-delta.1.*
 %{_mandir}/man1/systemd-detect-virt.1.*
 %{_mandir}/man1/systemd-inhibit.1.*
+%{_mandir}/man1/timedatectl.*
 %{_mandir}/man3/*
 %{_mandir}/man5/*
 %{_mandir}/man7/*
@@ -1031,6 +1038,8 @@ fi
 /sbin/shutdown
 /sbin/telinit
 /sbin/runlevel
+%{_initrddir}/README
+%{_logdir}/README
 %{_mandir}/man1/init.*
 %{_mandir}/man8/halt.*
 %{_mandir}/man8/reboot.*
