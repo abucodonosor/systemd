@@ -936,6 +936,7 @@ fi
 %{_mandir}/man1/systemd-cat.1*
 %{_mandir}/man1/systemd-cgls.*
 %{_mandir}/man1/systemd-cgtop.*
+%{_mandir}/man1/systemd-coredumpctl.1.*
 %{_mandir}/man1/hostnamectl.*
 %{_mandir}/man1/journalctl.1*
 %{_mandir}/man1/localectl.*
