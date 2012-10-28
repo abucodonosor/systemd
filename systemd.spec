@@ -980,6 +980,10 @@ fi
 %{uclibc_root}/bin/systemd-tty-ask-password-agent
 %{uclibc_root}/bin/journalctl
 %{uclibc_root}/bin/loginctl
+%{uclibc_root}/bin/hostnamectl
+%{uclibc_root}/bin/localectl
+%{uclibc_root}/bin/systemd-coredumpctl
+%{uclibc_root}/bin/timedatectl
 %{uclibc_root}/bin/systemd-inhibit
 %{uclibc_root}/sbin/systemd-machine-id-setup
 %{uclibc_root}%{_bindir}/systemd-delta
