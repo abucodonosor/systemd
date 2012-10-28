@@ -980,12 +980,11 @@ fi
 %{uclibc_root}/bin/systemd-tty-ask-password-agent
 %{uclibc_root}/bin/journalctl
 %{uclibc_root}/bin/loginctl
-%{uclibc_root}/bin/hostnamectl
-%{uclibc_root}/bin/localectl
-%{uclibc_root}/bin/systemd-coredumpctl
-%{uclibc_root}/bin/timedatectl
 %{uclibc_root}/bin/systemd-inhibit
 %{uclibc_root}/sbin/systemd-machine-id-setup
+%{uclibc_root}%{_bindir}/hostnamectl
+%{uclibc_root}%{_bindir}/localectl
+%{uclibc_root}%{_bindir}/systemd-coredumpctl
 %{uclibc_root}%{_bindir}/systemd-delta
 %{uclibc_root}%{_bindir}/systemd-detect-virt
 %{uclibc_root}%{_bindir}/systemd-loginctl
@@ -994,6 +993,7 @@ fi
 %{uclibc_root}%{_bindir}/systemd-stdio-bridge
 %{uclibc_root}%{_bindir}/systemd-cat
 %{uclibc_root}%{_bindir}/systemd-cgtop
+%{uclibc_root}%{_bindir}/timedatectl
 %endif
 
 %files tools
