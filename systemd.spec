@@ -1,5 +1,5 @@
 %bcond_with bootstrap
-%bcond_with uclibc
+%bcond_without uclibc
 
 # macros for sysvinit transition - should be equal to
 # sysvinit %version-%release-plus-1
@@ -124,7 +124,7 @@ BuildRequires:	python-devel
 BuildRequires:	pkgconfig(gobject-introspection-1.0)
 %endif
 %if %{with uclibc}
-BuildRequires:	uClibc-devel >= 0.9.33.2-9
+BuildRequires:	uClibc-devel >= 0.9.33.2-15
 %endif
 Requires(pre,post):	coreutils
 Requires:	udev = %{version}-%{release}
