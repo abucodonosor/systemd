@@ -455,6 +455,7 @@ This package contains documentation of udev.
 %setup -q
 %apply_patches
 find src/ -name "*.vala" -exec touch '{}' \;
+find -type d |xargs chmod 755
 
 %build
 %if %mdvver >= 201200
