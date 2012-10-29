@@ -469,6 +469,7 @@ export CONFIGURE_TOP="$PWD"
 mkdir -p uclibc
 pushd uclibc
 %uclibc_configure \
+	--prefix=%{_prefix} \
 	--with-rootprefix= \
 	--with-rootlibdir=%{uclibc_root}/%{_lib} \
 	--libexecdir=%{_prefix}/lib \
