@@ -45,7 +45,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	195
-Release:	1.1
+Release:	2
 ExclusiveArch:	%{ix86}
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
@@ -464,17 +464,12 @@ find src/ -name "*.vala" -exec touch '{}' \;
 %serverbuild
 %endif
 
-export CONFIGURE_TOP=$PWD
+export CONFIGURE_TOP="$PWD"
 
 %if %{with uclibc}
 mkdir -p uclibc
 pushd uclibc
-%configure2_5x \
-	CC="%{uclibc_cc}" \
-	CFLAGS="%{uclibc_cflags}" \
-	--bindir=%{uclibc_root}%{_bindir} \
-	--sbindir=%{uclibc_root}%{_sbindir} \
-	--libdir=%{uclibc_root}%{_libdir} \
+%uclibc_configure \
 	--with-rootprefix= \
 	--with-rootlibdir=%{uclibc_root}/%{_lib} \
 	--libexecdir=%{_prefix}/lib \
@@ -491,8 +486,8 @@ pushd uclibc
 	--enable-introspection=no \
 	--disable-gudev \
 	--disable-pam \
-	--disable-libcryptsetup	\
-	--disable-gcrypt \
+	--enable-libcryptsetup	\
+	--enable-gcrypt \
 	--disable-audit \
 	--disable-manpages
 %make
