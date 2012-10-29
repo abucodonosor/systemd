@@ -488,7 +488,8 @@ pushd uclibc
 	--enable-libcryptsetup	\
 	--enable-gcrypt \
 	--disable-audit \
-	--disable-manpages
+	--disable-manpages \
+	--without-python
 %make
 popd
 %endif
