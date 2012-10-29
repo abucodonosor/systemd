@@ -100,7 +100,7 @@ BuildRequires:	audit-devel
 BuildRequires:	docbook-style-xsl
 BuildRequires:	gperf
 BuildRequires:	intltool
-BuildRequires:	libcap-devel
+BuildRequires:	cap-devel >= 2.22-3
 BuildRequires:	pam-devel
 BuildRequires:	perl(XML::Parser)
 BuildRequires:	tcp_wrappers-devel
