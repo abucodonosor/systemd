@@ -1224,6 +1224,7 @@ fi
 #%doc %{_datadir}/gtk-doc/html/libudev
 %{_libdir}/libudev.so
 %if %{with uclibc}
+# do not remove static library, required by lvm2
 %{uclibc_root}%{_libdir}/libudev.a
 %{uclibc_root}%{_libdir}/libudev.so
 %endif
