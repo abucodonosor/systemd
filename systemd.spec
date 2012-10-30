@@ -487,7 +487,7 @@ pushd uclibc
 	--enable-introspection=no \
 	--disable-gudev \
 	--disable-pam \
-	--enable-libcryptsetup	\
+	--disable-libcryptsetup	\
 	--enable-gcrypt \
 	--disable-audit \
 	--disable-manpages \
