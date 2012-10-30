@@ -45,7 +45,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	195
-Release:	2.1
+Release:	3
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -476,7 +476,7 @@ pushd uclibc
 	--libexecdir=%{_prefix}/lib \
 	--with-distro=mandriva \
 	--with-firmware-path=/lib/firmware/updates:/lib/firmware \
-	--disable-static \
+	--enable-static \
 	--with-sysvinit-path=%{_initrddir} \
 	--with-sysvrcd-path=%{_sysconfdir}/rc.d \
 	--disable-selinux \
@@ -1224,6 +1224,7 @@ fi
 #%doc %{_datadir}/gtk-doc/html/libudev
 %{_libdir}/libudev.so
 %if %{with uclibc}
+%{uclibc_root}%{_libdir}/libudev.a
 %{uclibc_root}%{_libdir}/libudev.so
 %endif
 %{_libdir}/pkgconfig/libudev.pc
