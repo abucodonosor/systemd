@@ -1,0 +1,13 @@
+sources:
+  "50-udev-mandriva.rules:"	3c43ce516e9d474d53f4fc4af37fedbb37bd18f4
+  "61-mobile-zte-drakx-net.rules:"	8eab164dfb3224c177f9d391ad79c94e53dcfe4b
+  "69-printeracl.rules:"	749af3d5c10404a0269e7184dd427145c8925027
+  "76-net.rules:"	30e30a8ba1cd83770770cfc51802e504c12dd1d4
+  "99-default.preset:"	65a3b8d16d7c0d1dbe498c76cb87b839e3fc58b9
+  "listen.conf:"	ab4d2ad0bd4c341026338a6133e5259ffa423144
+  "systemd-195.tar.xz:"	f13c4bba8ac00e464ff92e814168cce564474cf4
+  "systemd.macros:"	327b9385791d474b2e9e6c4942fd341863bc4feb
+  "udev_net_action:"	23be7cdc44885ef817878d870ffbe3bd7f8313d9
+  "udev_net_create_ifcfg:"	3920b908924b87b28b2a7a1f254b350f22952729
+  "udev_net.sysconfig:"	462f0e57c7ad00eabd049d3dead082f7a606a02b
+  "udev.sysconfig:"	1c4dbd6168f493847ae3cd11781a23ef8f2dec7e
