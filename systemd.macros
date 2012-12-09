@@ -1,0 +1,4 @@
+# tpg@mandriva.org
+# few macros for systemd
+
+%_unitdir	/lib/systemd/system

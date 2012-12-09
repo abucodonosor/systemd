@@ -1,15 +1,10 @@
 %bcond_with bootstrap
-%bcond_without uclibc
+%bcond_with uclibc
 
 # macros for sysvinit transition - should be equal to
 # sysvinit %version-%release-plus-1
 %define sysvinit_version 2.87
 %define sysvinit_release %mkrel 14
-
-# (eugeni) for backports and old distributions, rely on EVRD as well
-%if %mdkversion < 201100
-%define EVRD %{?epoch:%{epoch}:}%{?version:%{version}}%{?release:-%{release}}%{?distepoch::%{distepoch}}
-%endif
 
 %define libdaemon_major 0
 %define liblogin_major 0
@@ -44,8 +39,8 @@
 
 Summary:	A System and Session Manager
 Name:		systemd
-Version:	195
-Release:	5
+Version:	194
+Release:	10
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -69,7 +64,7 @@ Source12:	99-default.preset
 # (bor) clean up directories on boot as done by rc.sysinit
 Patch0:		systemd-18-clean-dirs-on-boot.patch
 Patch1:		systemd-tmpfilesd-utmp-temp-patch.patch
-Patch2:		systemd-33-rc-local.patch
+#Patch2:		systemd-33-rc-local.patch
 Patch3:		0502-main-Add-failsafe-to-the-sysvinit-compat-cmdline-key.patch
 
 # GIT
@@ -78,17 +73,20 @@ Patch3:		0502-main-Add-failsafe-to-the-sysvinit-compat-cmdline-key.patch
 # from Mandriva
 # disable coldplug for storage and device pci
 Patch100:	udev-182-coldplug.patch
-Patch101:	0509-udev-Allow-the-udevadm-settle-timeout-to-be-set-via-.patch
-Patch102:	0507-Allow-booting-from-live-cd-in-virtualbox.patch
-# (cg) timeout handling patch from Arch
-# https://bugs.archlinux.org/task/27938
-Patch103:	0508-reinstate-TIMEOUT-handling.patch
 # (proyvind):	FIXME: setting udev_log to 'info' royally screws everything up
 #		for some reason, revert to 'err' for now..
 Patch104:	systemd-186-set-udev_log-to-err.patch
 Patch105:	systemd-191-support-build-without-secure_getenv.patch
 Patch106:	systemd-191-uclibc-no-mkostemp.patch
 Patch107:	systemd-191-link-against-librt.patch
+
+#Fedora patchset
+Patch503: 0503-mandriva-Fallback-message-when-display-manager-fails.patch
+Patch504: 0504-mount-Add-a-new-remote-fs-target-to-specifically-del.patch
+Patch506: 0506-Allow-booting-from-live-cd-in-virtualbox.patch
+Patch507: 0507-reinstate-TIMEOUT-handling.patch
+Patch508: 0508-udev-Allow-the-udevadm-settle-timeout-to-be-set-via-.patch
+
 
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -99,7 +97,7 @@ BuildRequires:	audit-devel
 BuildRequires:	docbook-style-xsl
 BuildRequires:	gperf
 BuildRequires:	intltool
-BuildRequires:	cap-devel >= 2.22-4
+BuildRequires:	libcap-devel
 BuildRequires:	pam-devel
 BuildRequires:	perl(XML::Parser)
 BuildRequires:	tcp_wrappers-devel
@@ -120,11 +118,12 @@ BuildRequires:	usbutils >= 005-3
 BuildRequires:	pciutils-devel
 BuildRequires:	ldetect-lst
 BuildRequires:	python-devel
+
 %if !%{with bootstrap}
 BuildRequires:	pkgconfig(gobject-introspection-1.0)
 %endif
 %if %{with uclibc}
-BuildRequires:	uClibc-devel >= 0.9.33.2-15
+BuildRequires:	uClibc-devel >= 0.9.33.2-9
 %endif
 Requires(pre,post):	coreutils
 Requires:	udev = %{version}-%{release}
@@ -133,9 +132,7 @@ Requires(post):	grep
 Requires(post):	awk
 Requires:	dbus >= 1.3.2
 Requires(pre):	initscripts > 9.24
-%if %mdkver >= 201200
-Requires(pre):	basesystem-minimal >= 2011.0-2
-%endif
+Requires(pre):	basesystem-minimal
 Requires(pre):	util-linux >= 2.18-2
 Requires:	nss-myhostname
 Requires:	lockdev
@@ -216,6 +213,8 @@ Requires:	%{name} = %{version}-%{release}
 #like that SysVinit < 14-14 when it should be SysVinit 2.87-14
 Provides:	sysvinit = %sysvinit_version-%sysvinit_release, SysVinit = %sysvinit_version-%sysvinit_release
 Conflicts:	sysvinit < %sysvinit_version-%sysvinit_release, SysVinit < %sysvinit_version-%sysvinit_release
+# Due to halt/poweroff etc. in _bindir
+Conflicts: usermode-consoleonly < 1:1.110
 
 %description sysvinit
 Drop-in replacement for the System V init tools of systemd.
@@ -455,22 +454,22 @@ This package contains documentation of udev.
 %setup -q
 %apply_patches
 find src/ -name "*.vala" -exec touch '{}' \;
-find -type d |xargs chmod 755
 
 %build
-%if %mdvver >= 201200
+autoreconf
 %serverbuild_hardened
-%else
-%serverbuild
-%endif
 
-export CONFIGURE_TOP="$PWD"
+export CONFIGURE_TOP=$PWD
 
 %if %{with uclibc}
 mkdir -p uclibc
 pushd uclibc
-%uclibc_configure \
-	--prefix=%{_prefix} \
+%configure2_5x \
+	CC="%{uclibc_cc}" \
+	CFLAGS="%{uclibc_cflags}" \
+	--bindir=%{uclibc_root}%{_bindir} \
+	--sbindir=%{uclibc_root}%{_sbindir} \
+	--libdir=%{uclibc_root}%{_libdir} \
 	--with-rootprefix= \
 	--with-rootlibdir=%{uclibc_root}/%{_lib} \
 	--libexecdir=%{_prefix}/lib \
@@ -487,11 +486,10 @@ pushd uclibc
 	--enable-introspection=no \
 	--disable-gudev \
 	--disable-pam \
-	--enable-libcryptsetup	\
-	--enable-gcrypt \
+	--disable-libcryptsetup	\
+	--disable-gcrypt \
 	--disable-audit \
-	--disable-manpages \
-	--without-python
+	--disable-manpages
 %make
 popd
 %endif
@@ -531,7 +529,7 @@ rm -rf %{buildroot}%{uclibc_root}%{_libdir}/pkgconfig
 
 %makeinstall_std -C shared
 
-mkdir -p %{buildroot}%{_sbindir}
+mkdir -p %{buildroot}{/bin,%{_sbindir}}
 
 # (bor) create late shutdown and sleep directory
 mkdir -p %{buildroot}%{systemd_libdir}/system-shutdown
@@ -542,9 +540,9 @@ mkdir -p %{buildroot}%{systemd_libdir}/system-sleep
 mkdir -p %{buildroot}/sbin
 ln -s ..%{systemd_libdir}/systemd %{buildroot}/sbin/init
 ln -s ..%{systemd_libdir}/systemd %{buildroot}/bin/systemd
-ln -s ../bin/systemctl %{buildroot}/sbin/reboot
-ln -s ../bin/systemctl %{buildroot}/sbin/halt
-ln -s ../bin/systemctl %{buildroot}/sbin/poweroff
+ln -s ../bin/systemctl %{buildroot}/bin/reboot
+ln -s ../bin/systemctl %{buildroot}/bin/halt
+ln -s ../bin/systemctl %{buildroot}/bin/poweroff
 ln -s ../bin/systemctl %{buildroot}/sbin/shutdown
 ln -s ../bin/systemctl %{buildroot}/sbin/telinit
 ln -s ../bin/systemctl %{buildroot}/sbin/runlevel
@@ -636,13 +634,6 @@ touch %{buildroot}%{_sysconfdir}/machine-info
 touch %{buildroot}%{_sysconfdir}/timezone
 mkdir -p %{buildroot}%{_sysconfdir}/X11/xorg.conf.d
 touch %{buildroot}%{_sysconfdir}/X11/xorg.conf.d/00-keyboard.conf
-
-%if %mdvver < 201200
-# create modules.conf as a symlink to /etc/
-ln -s /etc/modules %{buildroot}%{_sysconfdir}/modules-load.d/modules.conf
-# (tpg) symlink also modprobe.preload because a lot of modules are inserted there from drak* stuff
-ln -s /etc/modprobe.preload %{buildroot}%{_sysconfdir}/modules-load.d/modprobe-preload.conf
-%endif
 
 # (cg) Set up the pager to make it generally more useful
 mkdir -p %{buildroot}%{_sysconfdir}/profile.d
@@ -746,15 +737,6 @@ if [ $1 -ge 2 -o $2 -ge 2 ] ; then
 	/bin/systemctl daemon-reexec 2>&1 || :
 fi
 
-%triggerin -- initscripts
-# (tpg) disable speedboot feature on install or on update
-# speedboot feature messes things really hard
-if [ $1 -ge 1 -o $2 -ge 2 ] ; then
-	if [ -e /etc/sysconfig/speedboot ] ; then
-	    sed -i -e 's/^SPEEDBOOT=.*$/SPEEDBOOT=no/g' /etc/sysconfig/speedboot
-	fi
-fi
-
 %pre -n udev
 if [ -d /lib/hotplug/firmware ]; then
 	echo "Moving /lib/hotplug/firmware to /lib/firmware"
@@ -782,9 +764,11 @@ systemctl stop systemd-udevd.service systemd-udev.service systemd-udev-control.s
 # (tpg) this is needed for rsyslog
 /bin/ln -s /usr/lib/systemd/system/rsyslog.service /etc/systemd/system/syslog.service >/dev/null 2>&1 || :
 
-%triggerin units -- %{name}-units < 19-4
+%triggerin units -- %{name}-units < 35-1
 # Enable the services we install by default.
 /bin/systemctl --quiet enable \
+	hwclock-load.service \
+        getty@.service \
 	quotaon.service \
 	quotacheck.service \
 	remote-fs.target
@@ -807,16 +791,15 @@ if [ $1 -eq 1 ] ; then
         # And symlink what we found to the new-style default.target
         /bin/ln -sf "$target" %{_sysconfdir}/systemd/system/default.target 2>&1 || :
 
-	# Enable the services we install by default.
-	/bin/systemctl --quiet enable \
-		getty@.service \
-		quotaon.service \
-		quotacheck.service \
-		remote-fs.target \
-		systemd-readahead-replay.service \
-		systemd-readahead-collect.service \
-		systemd-udev-settle.service \
-		2>&1 || :
+        # Enable the services we install by default.
+        /bin/systemctl --quiet enable \
+                getty@.service \
+                quotaon.service \
+                quotacheck.service \
+                remote-fs.target \
+                systemd-readahead-replay.service \
+                systemd-readahead-collect.service \
+                2>&1 || :
 fi
 
 hostname_new=`cat %{_sysconfdir}/hostname 2>/dev/null`
@@ -877,7 +860,6 @@ fi
 %dir %{systemd_libdir}/ntp-units.d
 %dir %{systemd_libdir}/system-preset
 %dir %{systemd_libdir}/user-preset
-%dir %{_datadir}/systemd
 %dir %{_prefix}/lib/tmpfiles.d
 %dir %{_prefix}/lib/sysctl.d
 %dir %{_prefix}/lib/modules-load.d
@@ -896,10 +878,6 @@ fi
 %{_bindir}/systemd-delta
 %{_bindir}/systemd-detect-virt
 %{_bindir}/systemd-loginctl
-%{_bindir}/hostnamectl
-%{_bindir}/localectl
-%{_bindir}/systemd-coredumpctl
-%{_bindir}/timedatectl
 %{systemd_libdir}/systemd
 %{systemd_libdir}/systemd-ac-power
 %{systemd_libdir}/systemd-binfmt
@@ -934,10 +912,7 @@ fi
 %{_mandir}/man1/systemd-cat.1*
 %{_mandir}/man1/systemd-cgls.*
 %{_mandir}/man1/systemd-cgtop.*
-%{_mandir}/man1/systemd-coredumpctl.1.*
-%{_mandir}/man1/hostnamectl.*
 %{_mandir}/man1/journalctl.1*
-%{_mandir}/man1/localectl.*
 %{_mandir}/man1/loginctl.*
 %{_mandir}/man1/systemd-machine-id-setup.1*
 %{_mandir}/man1/systemd-notify.*
@@ -945,7 +920,6 @@ fi
 %{_mandir}/man1/systemd-delta.1.*
 %{_mandir}/man1/systemd-detect-virt.1.*
 %{_mandir}/man1/systemd-inhibit.1.*
-%{_mandir}/man1/timedatectl.*
 %{_mandir}/man3/*
 %{_mandir}/man5/*
 %{_mandir}/man7/*
@@ -980,9 +954,6 @@ fi
 %{uclibc_root}/bin/loginctl
 %{uclibc_root}/bin/systemd-inhibit
 %{uclibc_root}/sbin/systemd-machine-id-setup
-%{uclibc_root}%{_bindir}/hostnamectl
-%{uclibc_root}%{_bindir}/localectl
-%{uclibc_root}%{_bindir}/systemd-coredumpctl
 %{uclibc_root}%{_bindir}/systemd-delta
 %{uclibc_root}%{_bindir}/systemd-detect-virt
 %{uclibc_root}%{_bindir}/systemd-loginctl
@@ -991,7 +962,6 @@ fi
 %{uclibc_root}%{_bindir}/systemd-stdio-bridge
 %{uclibc_root}%{_bindir}/systemd-cat
 %{uclibc_root}%{_bindir}/systemd-cgtop
-%{uclibc_root}%{_bindir}/timedatectl
 %endif
 
 %files tools
@@ -1015,10 +985,6 @@ fi
 %{_sysconfdir}/systemd/system/getty.target.wants/getty@*.service
 %{_sysconfdir}/bash_completion.d/systemd
 
-%if %mdvver < 201200
-%{_sysconfdir}/modules-load.d/*.conf
-%endif
-
 /bin/systemctl
 %{_bindir}/systemctl
 %{systemd_libdir}/system
@@ -1035,14 +1001,12 @@ fi
 
 %files sysvinit
 /sbin/init
-/sbin/reboot
-/sbin/halt
-/sbin/poweroff
+/bin/reboot
+/bin/halt
+/bin/poweroff
 /sbin/shutdown
 /sbin/telinit
 /sbin/runlevel
-%{_initrddir}/README
-%{_logdir}/README
 %{_mandir}/man1/init.*
 %{_mandir}/man8/halt.*
 %{_mandir}/man8/reboot.*
@@ -1224,7 +1188,6 @@ fi
 #%doc %{_datadir}/gtk-doc/html/libudev
 %{_libdir}/libudev.so
 %if %{with uclibc}
-# do not remove static library, required by lvm2
 %{uclibc_root}%{_libdir}/libudev.a
 %{uclibc_root}%{_libdir}/libudev.so
 %endif

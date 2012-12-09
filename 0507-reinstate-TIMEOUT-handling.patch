@@ -1,4 +1,4 @@
-From a95d6bc550146dc489cb5d5a4795690a858d1ac5 Mon Sep 17 00:00:00 2001
+From 58aaaf2171984b3a90a67998e1e0d991dc4d6642 Mon Sep 17 00:00:00 2001
 From: Tom Gundersen <teg@jklm.no>
 Date: Thu, 15 Mar 2012 02:12:43 +0100
 Subject: [PATCH 508/509] reinstate TIMEOUT= handling
@@ -14,7 +14,7 @@ Signed-off-by: Tom Gundersen <teg@jklm.no>
  3 files changed, 30 insertions(+), 3 deletions(-)
 
 diff --git a/src/libudev/libudev-device.c b/src/libudev/libudev-device.c
-index a8277d1..4c1a92e 100644
+index 98077e7..ba6c12c 100644
 --- a/src/libudev/libudev-device.c
 +++ b/src/libudev/libudev-device.c
 @@ -68,6 +68,7 @@ struct udev_device {
@@ -65,10 +65,10 @@ index a8277d1..4c1a92e 100644
          /* copy global properties */
          udev_list_entry_foreach(list_entry, udev_get_properties_list_entry(udev))
 diff --git a/src/libudev/libudev-private.h b/src/libudev/libudev-private.h
-index 4eb4a59..99aefeb 100644
+index 5990605..52b6d64 100644
 --- a/src/libudev/libudev-private.h
 +++ b/src/libudev/libudev-private.h
-@@ -70,6 +70,7 @@ const char *udev_device_get_id_filename(struct udev_device *udev_device);
+@@ -66,6 +66,7 @@ const char *udev_device_get_id_filename(struct udev_device *udev_device);
  void udev_device_set_is_initialized(struct udev_device *udev_device);
  int udev_device_add_tag(struct udev_device *udev_device, const char *tag);
  void udev_device_cleanup_tags_list(struct udev_device *udev_device);
@@ -77,7 +77,7 @@ index 4eb4a59..99aefeb 100644
  void udev_device_set_usec_initialized(struct udev_device *udev_device, unsigned long long usec_initialized);
  int udev_device_get_devlink_priority(struct udev_device *udev_device);
 diff --git a/src/udev/udevd.c b/src/udev/udevd.c
-index 393e2a9..9aa95c6 100644
+index 23351ae..0a6ba6e 100644
 --- a/src/udev/udevd.c
 +++ b/src/udev/udevd.c
 @@ -387,7 +387,7 @@ out:
@@ -122,5 +122,5 @@ index 393e2a9..9aa95c6 100644
  }
  
 -- 
-1.7.11
+1.7.11.4
 
