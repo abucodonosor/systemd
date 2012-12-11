@@ -776,6 +776,12 @@ systemctl stop systemd-udevd.service systemd-udev.service systemd-udev-control.s
 # rc-local is now enabled by default in base package
 rm -f /etc/systemd/system/multi-user.target.wants/rc-local.service || :
 
+#systemd 195 changed the prototype of logind's OpenSession()
+# see http://lists.freedesktop.org/archives/systemd-devel/2012-October/006969.html
+# and http://cgit.freedesktop.org/systemd/systemd/commit/?id=770858811930c0658b189d980159ea1ac5663467
+%triggerun -- %{name} < 196
+%{_bindir}/systemctl restart systemd-logind.service
+
 %post units
 if [ $1 -eq 1 ] ; then
         # Try to read default runlevel from the old inittab if it exists
