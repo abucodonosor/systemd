@@ -4,7 +4,7 @@
 # macros for sysvinit transition - should be equal to
 # sysvinit %version-%release-plus-1
 %define sysvinit_version 2.87
-%define sysvinit_release %mkrel 14
+%define sysvinit_release %mkrel 17
 
 %define libdaemon_major 0
 %define liblogin_major 0
@@ -83,7 +83,7 @@ Patch107:	systemd-191-link-against-librt.patch
 Patch503: 0503-mandriva-Fallback-message-when-display-manager-fails.patch
 Patch504: 0504-mount-Add-a-new-remote-fs-target-to-specifically-del.patch
 Patch506: 0506-Allow-booting-from-live-cd-in-virtualbox.patch
-Patch507: 0507-reinstate-TIMEOUT-handling.patch
+#Patch507: 0507-reinstate-TIMEOUT-handling.patch
 Patch508: 0508-udev-Allow-the-udevadm-settle-timeout-to-be-set-via-.patch
 
 
