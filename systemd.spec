@@ -477,8 +477,6 @@ pushd uclibc
 	--disable-selinux \
 	--enable-split-usr \
 	--enable-introspection=no \
-	--with-usb-ids-path=/usr/share/usb.ids \
-	--with-pci-ids-path=/usr/share/pci.ids \
 	--enable-introspection=no \
 	--disable-gudev \
 	--disable-pam \
@@ -502,14 +500,13 @@ pushd shared
 	--with-sysvinit-path=%{_initrddir} \
 	--with-sysvrcd-path=%{_sysconfdir}/rc.d \
 	--disable-selinux \
-	--enable-split-usr \
 %if %{with bootstrap}
 	--enable-introspection=no \
 %else
 	--enable-introspection=yes \
 %endif
-	--with-usb-ids-path=/usr/share/usb.ids \
-	--with-pci-ids-path=/usr/share/pci.ids
+	--enable-split-usr
+
 %make
 popd
 
@@ -1102,6 +1099,7 @@ fi
 %dir /lib/firmware
 %dir /lib/firmware/updates
 %dir %{udev_libdir}
+%dir %{udev_libdir}/hwdb.d
 %dir %{_sysconfdir}/udev
 %dir %{udev_rules_dir}
 
@@ -1120,6 +1118,7 @@ fi
 %attr(0755,root,root) /sbin/udevd
 %attr(0755,root,root) %{udev_libdir}/udevd
 %{udev_libdir}/keymaps/*
+%{udev_libdir}/hwdb.d/*.hwdb
 %{udev_rules_dir}/*.rules
 
 %attr(0755,root,root) %{udev_libdir}/keymap
