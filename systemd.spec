@@ -147,6 +147,8 @@ Requires:	libsystemd-daemon = %{version}-%{release}
 Requires:	libsystemd-login = %{version}-%{release}
 Requires:	libsystemd-journal = %{version}-%{release}
 Requires:	libsystemd-id128 = %{version}-%{release}
+#(tpg)for future releases... systemd provides also a full functional syslog tool
+#Provides:	syslog-daemon
 
 %description
 systemd is a system and session manager for Linux, compatible with
@@ -484,6 +486,7 @@ pushd uclibc
 	--enable-gcrypt \
 	--disable-audit \
 	--disable-manpages
+    
 %make
 popd
 %endif
@@ -640,6 +643,8 @@ install -m 0644 -D %{SOURCE1} %{buildroot}%{_sysconfdir}/rpm/macros.d/%{name}.ma
 
 # Make sure the NTP units dir exists
 mkdir -p %{buildroot}%{systemd_libdir}/ntp-units.d/
+#(tpg)for future releases... systemd provides also a full functional syslog tool
+#install -m 0755 -d %{buildroot}%{_logdir}/journal
 
 # (tpg) Install default Mandriva preset policy for services
 mkdir -p %{buildroot}%{systemd_libdir}/system-preset/
@@ -858,6 +863,8 @@ fi
 %dir %{_prefix}/lib/sysctl.d
 %dir %{_prefix}/lib/modules-load.d
 %dir %{_prefix}/lib/binfmt.d
+#(tpg)for future releases... systemd provides also a full functional syslog tool
+#%dir %{_logdir}/journal
 
 %{_sysconfdir}/xdg/systemd
 /bin/systemd-ask-password
