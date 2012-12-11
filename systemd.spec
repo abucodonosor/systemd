@@ -76,7 +76,6 @@ Patch100:	udev-182-coldplug.patch
 # (proyvind):	FIXME: setting udev_log to 'info' royally screws everything up
 #		for some reason, revert to 'err' for now..
 Patch104:	systemd-186-set-udev_log-to-err.patch
-Patch105:	systemd-191-support-build-without-secure_getenv.patch
 Patch106:	systemd-191-uclibc-no-mkostemp.patch
 Patch107:	systemd-191-link-against-librt.patch
 
