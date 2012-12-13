@@ -1,5 +1,5 @@
 %bcond_with bootstrap
-%bcond_with uclibc
+%bcond_without uclibc
 
 # macros for sysvinit transition - should be equal to
 # sysvinit %version-%release-plus-1
@@ -40,7 +40,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	196
-Release:	1
+Release:	2
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -1235,6 +1235,9 @@ fi
 %endif
 
 %changelog
+* Tue Dec 13 2012 Per Øyvind Karlsen <peroyvind@mandriva.org> 196-2
+- reenable uClibc build
+
 * Tue Dec 11 2012 Per Øyvind Karlsen <peroyvind@mandriva.org> 195-5
 - fixup merge with ROSA package and rebuild on ABF
 - leave uClibc build disabled for now untill uClibc toolchain is complete
