@@ -1,6 +1,6 @@
---- systemd-191/src/shared/missing.h.getenv~	2012-09-24 12:17:04.080883133 +0200
-+++ systemd-191/src/shared/missing.h	2012-09-24 12:17:07.207907787 +0200
-@@ -234,6 +234,7 @@ static inline int name_to_handle_at(int
+--- systemd-196/src/shared/missing.h.0105~	2012-10-26 19:28:29.124141650 +0200
++++ systemd-196/src/shared/missing.h	2012-12-13 17:53:26.388457701 +0100
+@@ -246,7 +246,8 @@ static inline int name_to_handle_at(int
  #  ifdef HAVE___SECURE_GETENV
  #    define secure_getenv __secure_getenv
  #  else
@@ -9,3 +9,4 @@
 +#    define secure_getenv getenv
  #  endif
  #endif
+ 
