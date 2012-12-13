@@ -484,7 +484,7 @@ pushd uclibc
 	--enable-introspection=no \
 	--disable-gudev \
 	--disable-pam \
-	--enable-libcryptsetup	\
+	--disable-libcryptsetup	\
 	--enable-gcrypt \
 	--disable-audit \
 	--disable-manpages
@@ -1238,7 +1238,7 @@ fi
 
 %changelog
 * Tue Dec 13 2012 Per Øyvind Karlsen <peroyvind@mandriva.org> 196-2
-- reenable uClibc build
+- reenable uClibc build (with libgcrypt support disabled for bootstrapping)
 
 * Tue Dec 11 2012 Per Øyvind Karlsen <peroyvind@mandriva.org> 195-5
 - fixup merge with ROSA package and rebuild on ABF
