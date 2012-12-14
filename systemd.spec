@@ -40,7 +40,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	196
-Release:	2
+Release:	3
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -484,7 +484,7 @@ pushd uclibc
 	--enable-introspection=no \
 	--disable-gudev \
 	--disable-pam \
-	--disable-libcryptsetup	\
+	--enable-libcryptsetup	\
 	--enable-gcrypt \
 	--disable-audit \
 	--disable-manpages \
