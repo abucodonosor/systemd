@@ -120,6 +120,7 @@ BuildRequires:	usbutils >= 005-3
 BuildRequires:	pciutils-devel
 BuildRequires:	ldetect-lst
 BuildRequires:	python-devel
+BuildRequires:	chkconfig 
 
 %if !%{with bootstrap}
 BuildRequires:	pkgconfig(gobject-introspection-1.0)
