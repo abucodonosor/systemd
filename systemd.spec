@@ -82,7 +82,8 @@ Patch106:	systemd-191-uclibc-no-mkostemp.patch
 Patch107:	systemd-191-link-against-librt.patch
 
 #Fedora patchset
-Patch503: 0503-mandriva-Fallback-message-when-display-manager-fails.patch
+# (tpg) disable for now
+#Patch503: 0503-mandriva-Fallback-message-when-display-manager-fails.patch
 Patch504: 0504-mount-Add-a-new-remote-fs-target-to-specifically-del.patch
 Patch506: 0506-Allow-booting-from-live-cd-in-virtualbox.patch
 #Patch507: 0507-reinstate-TIMEOUT-handling.patch
