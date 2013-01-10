@@ -10,6 +10,7 @@
 %define liblogin_major 0
 %define libjournal_major 0
 %define libid128_major 0
+%define libnss_myhostname_major 0
 
 %define libdaemon %mklibname systemd-daemon %{libdaemon_major}
 %define libdaemon_devel %mklibname -d systemd-daemon %{libdaemon_major}
@@ -22,6 +23,8 @@
 
 %define libid128 %mklibname systemd-id128 %{libid128_major}
 %define libid128_devel %mklibname -d systemd-id128 %{libid128_major}
+
+%define libnss_myhostname %mklibname nss_myhostname %{libnss_myhostname_major}
 
 %define udev_major 1
 %define gudev_api 1.0
@@ -139,12 +142,6 @@ Requires(pre):	basesystem-minimal
 Requires(pre):	util-linux >= 2.18-2
 Requires(pre):	rpm-helper
 Requires(pre):	%{name}-units
-%if %mdvver >= 201300
-Obsoletes:	nss-myhostname <= 0.3-1
-Provides:	nss-myhostname
-%else
-Requires:	nss-myhostname
-%endif
 Requires:	lockdev
 Conflicts:	initscripts < 9.24
 Conflicts:	udev < 186-5
@@ -269,6 +266,31 @@ Provides:	libsystemd-login = %{version}-%{release}
 
 %description -n	%{liblogin}
 This package provides the systemd-login shared library.
+
+%package -n %{libnss_myhostname}
+Summary:	Library for local system host name resolution
+Group:		System/Libraries
+Provides:	libnss_myhostname = %{version}-%{release}
+Provides:	nss_myhostname = %{version}-%{release}
+Obsoletes:	nss_myhostname <= 0.3-1
+Requires(post,preun):	rpm-helper
+Requires(post,preun):	sed
+
+%description -n %{libnss_myhostname}
+nss-myhostname is a plugin for the GNU Name Service Switch (NSS)
+functionality of the GNU C Library (glibc) providing host name
+resolution for the locally configured system hostname as returned by
+gethostname(2).
+
+
+%if %{with_uclibc}
+%package -n uclibc-%{libnss_myhostname}
+Summary:	Library for local system host name resolution (uClibc linked)
+Group:		System/Libraries
+
+%description -n uclibc-%{libnss_myhostname}
+uClibc version of nss-myhostname.
+%endif
 
 %if %{with uclibc}
 %package -n uclibc-%{liblogin}
@@ -852,6 +874,28 @@ if [ $1 -ge 1 ] ; then
         /bin/systemctl daemon-reload 2>&1 || :
 fi
 
+
+%post -n %{libnss_myhostname}
+# sed-fu to add myhostname to the hosts line of /etc/nsswitch.conf
+if [ -f /etc/nsswitch.conf ] ; then
+	sed -i.bak -e '
+			/^hosts:/ !b
+			/\<myhostname\>/ b
+			s/[[:blank:]]*$/ myhostname/
+			' /etc/nsswitch.conf
+fi
+
+
+%preun -n %{libnss_myhostname}
+# sed-fu to remove myhostname from the hosts line of /etc/nsswitch.conf
+if [ "$1" -eq 0 -a -f /etc/nsswitch.conf ] ; then
+	sed -i.bak -e '
+			/^hosts:/ !b
+			s/[[:blank:]]\+myhostname\>//
+			' /etc/nsswitch.conf
+fi
+
+
 %files
 %config(noreplace) %{_sysconfdir}/dbus-1/system.d/org.freedesktop.systemd1.conf
 %config(noreplace) %{_sysconfdir}/dbus-1/system.d/org.freedesktop.hostname1.conf
@@ -1054,6 +1098,15 @@ fi
 %{_mandir}/man8/telinit.*
 %{_mandir}/man8/runlevel.*
 %dir /run
+
+%files -n %{libnss_myhostname}
+%{_libdir}/libnss_myhostname.so.%{libnss_myhostname_major}*
+%{_mandir}/man8/nss-myhostname.8*
+
+%if %{with uclibc}
+%files -n uclibc-%{libnss_myhostname}
+%{uclibc_root}%{_libdir}/libnss_myhostname.so.%{libnss_myhostname_major}*
+%endif
 
 %files -n %{libdaemon}
 /%{_lib}/libsystemd-daemon.so.%{libdaemon_major}*
