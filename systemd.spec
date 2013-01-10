@@ -936,6 +936,7 @@ fi
 %{_bindir}/systemd-cgtop
 %{_mandir}/man1/systemd.*
 %{_mandir}/man1/systemd-ask-password.*
+%{_mandir}/man1/systemd-bootchart.1.*
 %{_mandir}/man1/systemd-tty-ask-password-agent.*
 %{_mandir}/man1/systemd-cat.1*
 %{_mandir}/man1/systemd-cgls.*
