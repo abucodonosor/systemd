@@ -10,7 +10,7 @@
 %define liblogin_major 0
 %define libjournal_major 0
 %define libid128_major 0
-%define libnss_myhostname_major 0
+%define libnss_myhostname_major 2
 
 %define libdaemon %mklibname systemd-daemon %{libdaemon_major}
 %define libdaemon_devel %mklibname -d systemd-daemon %{libdaemon_major}
