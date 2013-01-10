@@ -907,6 +907,7 @@ fi
 %{_bindir}/timedatectl
 %{systemd_libdir}/systemd
 %{systemd_libdir}/systemd-ac-power
+%{systemd_libdir}/systemd-bootchart
 %{systemd_libdir}/systemd-binfmt
 %{systemd_libdir}/systemd-c*
 %{systemd_libdir}/systemd-fsck
