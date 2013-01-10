@@ -137,7 +137,14 @@ Requires:	dbus >= 1.3.2
 Requires(pre):	initscripts > 9.24
 Requires(pre):	basesystem-minimal
 Requires(pre):	util-linux >= 2.18-2
+Requires(pre):	rpm-helper
+Requires(pre):	%{name}-units
+%if %mdvver >= 201300
+Obsoletes:	nss-myhostname <= 0.3-1
+Provides:	nss-myhostname
+%else
 Requires:	nss-myhostname
+%endif
 Requires:	lockdev
 Conflicts:	initscripts < 9.24
 Conflicts:	udev < 186-5
@@ -204,6 +211,8 @@ Requires(post):	coreutils
 Requires(post):	gawk
 Requires(post):	grep
 Requires(post):	awk
+Requires(pre):	setup
+Requires(pre):	rpm-helper
 
 %description units
 Basic configuration files, directories and installation tool for the systemd
@@ -351,6 +360,8 @@ Requires:	acl
 # for disk/lp groups
 Requires(pre):	setup
 Requires(pre):	coreutils
+Requires(pre):	filesystem
+Requires(pre):	rpm-helper
 Requires(post,preun):	rpm-helper
 Provides:	should-restart = system
 Obsoletes:	hal <= 0.5.14-6
