@@ -130,6 +130,9 @@ BuildRequires:	pkgconfig(gobject-introspection-1.0)
 %endif
 %if %{with uclibc}
 BuildRequires:	uClibc-devel >= 0.9.33.2-15
+%ifarch %ix86
+BuildConflicts:	uclibc-libdevmapper1.02
+%endif
 %endif
 Requires(pre,post):	coreutils
 Requires:	udev = %{version}-%{release}
