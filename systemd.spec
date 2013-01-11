@@ -1,4 +1,4 @@
-%bcond_without bootstrap
+%bcond_with bootstrap
 %bcond_without uclibc
 
 # macros for sysvinit transition - should be equal to
@@ -43,7 +43,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	197
-Release:	2
+Release:	3
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -231,7 +231,7 @@ Requires:	%{name} = %{version}-%{release}
 Provides:	sysvinit = %sysvinit_version-%sysvinit_release, SysVinit = %sysvinit_version-%sysvinit_release
 Conflicts:	sysvinit < %sysvinit_version-%sysvinit_release, SysVinit < %sysvinit_version-%sysvinit_release
 # Due to halt/poweroff etc. in _bindir
-Conflicts: usermode-consoleonly < 1:1.110
+Conflicts:	usermode-consoleonly < 1:1.110
 
 %description sysvinit
 Drop-in replacement for the System V init tools of systemd.
