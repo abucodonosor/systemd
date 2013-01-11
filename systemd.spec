@@ -522,7 +522,7 @@ pushd uclibc
 	--enable-introspection=no \
 	--disable-gudev \
 	--disable-pam \
-%if %{with_bootstrap}
+%if %{with bootstrap}
 	--disable-libcryptsetup \
 %else
 	--enable-libcryptsetup	\
