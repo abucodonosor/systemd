@@ -510,11 +510,13 @@ pushd uclibc
 	--with-rootprefix= \
 	--with-rootlibdir=%{uclibc_root}/%{_lib} \
 	--libexecdir=%{_prefix}/lib \
-	--with-distro=mandriva \
 	--with-firmware-path=/lib/firmware/updates:/lib/firmware \
 	--enable-static \
 	--with-sysvinit-path=%{_initrddir} \
+%if %mdvver < 201300
+	--with-distro=mandriva \
 	--with-sysvrcd-path=%{_sysconfdir}/rc.d \
+%endif
 	--disable-selinux \
 	--enable-split-usr \
 	--enable-introspection=no \
@@ -540,11 +542,13 @@ pushd shared
 	--with-rootprefix= \
 	--with-rootlibdir=/%{_lib} \
 	--libexecdir=%{_prefix}/lib \
-	--with-distro=mandriva \
 	--with-firmware-path=/lib/firmware/updates:/lib/firmware \
 	--disable-static \
 	--with-sysvinit-path=%{_initrddir} \
+%if %mdvver < 201300
+	--with-distro=mandriva \
 	--with-sysvrcd-path=%{_sysconfdir}/rc.d \
+%endif
 	--disable-selinux \
 %if %{with bootstrap}
 	--enable-introspection=no \
