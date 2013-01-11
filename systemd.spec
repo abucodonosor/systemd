@@ -456,7 +456,6 @@ Obsoletes:	%{name}-doc
 %description -n	%{libudev_devel}
 Devel library for udev.
 
-%if !%{with bootstrap}
 %package -n %{libgudev}
 Summary:	Libraries for adding libudev support to applications that use glib
 Group:		System/Libraries
@@ -468,6 +467,7 @@ Provides:	libgudev = %{EVRD}
 This package contains the libraries that make it easier to use libudev
 functionality from applications that use glib.
 
+%if !%{with bootstrap}
 %package -n %{girgudev}
 Group:		System/Libraries
 Summary:	GObject Introspection interface library for gudev
@@ -1300,12 +1300,8 @@ fi
 %{_datadir}/pkgconfig/udev.pc
 %{_includedir}/libudev.h
 
-%if !%{with bootstrap}
 %files -n %{libgudev}
 /%{_lib}/libgudev-%{gudev_api}.so.%{gudev_major}*
-
-%files -n %{girgudev}
-%{_libdir}/girepository-1.0/GUdev-%{gudev_api}.typelib
 
 %files -n %{libgudev_devel}
 #%doc %{_datadir}/gtk-doc/html/gudev
@@ -1313,6 +1309,10 @@ fi
 %{_includedir}/gudev-%{gudev_api}
 %{_datadir}/gir-1.0/GUdev-%{gudev_api}.gir
 %{_libdir}/pkgconfig/gudev-%{gudev_api}.pc
+
+%if !%{with bootstrap}
+%files -n %{girgudev}
+%{_libdir}/girepository-1.0/GUdev-%{gudev_api}.typelib
 %endif
 
 %changelog
