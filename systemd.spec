@@ -476,6 +476,7 @@ Obsoletes:	%{_lib}udev-gir1.0
 
 %description -n %{girgudev}
 GObject Introspection interface library for gudev.
+%endif
 
 %package -n %{libgudev_devel}
 Summary:	Header files for adding libudev support to applications that use glib
@@ -485,7 +486,6 @@ Requires:	%{libgudev} = %{EVRD}
 %description -n	%{libgudev_devel}
 This package contains the header and pkg-config files for developing
 glib-based applications using libudev functionality.
-%endif
 
 %package -n udev-doc
 Summary:	Udev documentation
