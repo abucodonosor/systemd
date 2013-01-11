@@ -43,7 +43,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	197
-Release:	3
+Release:	4
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -132,10 +132,6 @@ BuildRequires:	pkgconfig(gobject-introspection-1.0)
 %endif
 %if %{with uclibc}
 BuildRequires:	uClibc-devel >= 0.9.33.2-15
-%ifarch %ix86
-BuildConflicts:	uclibc-libdevmapper1.02
-BuildConflicts:	uclibc-libcryptsetup4
-%endif
 %endif
 Requires(pre,post):	coreutils
 Requires:	udev = %{version}-%{release}
