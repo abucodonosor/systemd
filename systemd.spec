@@ -1,4 +1,4 @@
-%bcond_with bootstrap
+%bcond_witho bootstrap
 %bcond_without uclibc
 
 # macros for sysvinit transition - should be equal to
@@ -112,7 +112,9 @@ BuildRequires:	pkgconfig(dbus-glib-1)
 BuildRequires:	pkgconfig(gee-0.8)
 BuildRequires:	pkgconfig(glib-2.0)
 BuildRequires:	pkgconfig(gtk+-2.0)
+%if !%{with bootstrap}
 BuildRequires:	pkgconfig(libcryptsetup)
+%endif
 BuildRequires:	pkgconfig(libkmod) >= 5
 BuildRequires:	pkgconfig(liblzma)
 BuildRequires:	pkgconfig(libnotify)
@@ -520,10 +522,13 @@ pushd uclibc
 	--disable-selinux \
 	--enable-split-usr \
 	--enable-introspection=no \
-	--enable-introspection=no \
 	--disable-gudev \
 	--disable-pam \
+%if %{with_bootstrap}
+	--disable-libcryptsetup \
+%else
 	--enable-libcryptsetup	\
+%endif
 	--enable-gcrypt \
 	--disable-audit \
 	--disable-manpages \
@@ -547,6 +552,7 @@ pushd shared
 	--disable-selinux \
 %if %{with bootstrap}
 	--enable-introspection=no \
+    --disable-libcryptsetup \
 %else
 	--enable-introspection=yes \
 %endif
