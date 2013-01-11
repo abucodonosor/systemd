@@ -132,6 +132,7 @@ BuildRequires:	pkgconfig(gobject-introspection-1.0)
 BuildRequires:	uClibc-devel >= 0.9.33.2-15
 %ifarch %ix86
 BuildConflicts:	uclibc-libdevmapper1.02
+BuildConflicts:	uclibc-libcryptsetup4
 %endif
 %endif
 Requires(pre,post):	coreutils
