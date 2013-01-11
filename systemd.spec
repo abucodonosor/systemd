@@ -1307,7 +1307,9 @@ fi
 #%doc %{_datadir}/gtk-doc/html/gudev
 %{_libdir}/libgudev-%{gudev_api}.so
 %{_includedir}/gudev-%{gudev_api}
+%if !%{with bootstrap}
 %{_datadir}/gir-1.0/GUdev-%{gudev_api}.gir
+%endif
 %{_libdir}/pkgconfig/gudev-%{gudev_api}.pc
 
 %if !%{with bootstrap}
