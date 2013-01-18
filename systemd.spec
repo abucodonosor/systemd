@@ -43,7 +43,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	197
-Release:	5
+Release:	6
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -225,7 +225,8 @@ Requires:	%{name} = %{version}-%{release}
 #SysVinit < %sysvinit_release-%sysvinit_release It's provides something
 #like that SysVinit < 14-14 when it should be SysVinit 2.87-14
 Provides:	sysvinit = %sysvinit_version-%sysvinit_release, SysVinit = %sysvinit_version-%sysvinit_release
-Conflicts:	sysvinit < %sysvinit_version-%sysvinit_release, SysVinit < %sysvinit_version-%sysvinit_release
+# (tpg) time to die
+Obsoletes:	sysvinit < %sysvinit_version-%sysvinit_release, SysVinit < %sysvinit_version-%sysvinit_release
 # Due to halt/poweroff etc. in _bindir
 Conflicts:	usermode-consoleonly < 1:1.110
 
