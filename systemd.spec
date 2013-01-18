@@ -1,4 +1,4 @@
-%bcond_without bootstrap
+%bcond_with bootstrap
 %bcond_without uclibc
 
 # macros for sysvinit transition - should be equal to
@@ -43,7 +43,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	197
-Release:	6
+Release:	7
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
