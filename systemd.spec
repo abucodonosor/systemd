@@ -814,6 +814,85 @@ systemctl stop stop systemd-udevd-control.socket systemd-udevd-kernel.socket sys
 # (tpg) this is needed for rsyslog
 /bin/ln -s /usr/lib/systemd/system/rsyslog.service /etc/systemd/system/syslog.service >/dev/null 2>&1 || :
 
+#(tpg) BIG migration
+
+# Migrate /etc/sysconfig/clock
+if [ ! -L /etc/localtime -a -e /etc/sysconfig/clock ] ; then
+	. /etc/sysconfig/clock 2>&1 || :
+	if [ -n "$ZONE" -a -e "/usr/share/zoneinfo/$ZONE" ] ; then
+	    /usr/bin/ln -sf "../usr/share/zoneinfo/$ZONE" /etc/localtime >/dev/null 2>&1 || :
+	fi
+fi
+
+# Migrate /etc/sysconfig/i18n
+if [ -e /etc/sysconfig/i18n -a ! -e /etc/locale.conf ]; then
+        unset LANG
+        unset LC_CTYPE
+        unset LC_NUMERIC
+        unset LC_TIME
+        unset LC_COLLATE
+        unset LC_MONETARY
+        unset LC_MESSAGES
+        unset LC_PAPER
+        unset LC_NAME
+        unset LC_ADDRESS
+        unset LC_TELEPHONE
+        unset LC_MEASUREMENT
+        unset LC_IDENTIFICATION
+        . /etc/sysconfig/i18n >/dev/null 2>&1 || :
+        [ -n "$LANG" ] && echo LANG=$LANG > /etc/locale.conf 2>&1 || :
+        [ -n "$LC_CTYPE" ] && echo LC_CTYPE=$LC_CTYPE >> /etc/locale.conf 2>&1 || :
+        [ -n "$LC_NUMERIC" ] && echo LC_NUMERIC=$LC_NUMERIC >> /etc/locale.conf 2>&1 || :
+        [ -n "$LC_TIME" ] && echo LC_TIME=$LC_TIME >> /etc/locale.conf 2>&1 || :
+        [ -n "$LC_COLLATE" ] && echo LC_COLLATE=$LC_COLLATE >> /etc/locale.conf 2>&1 || :
+        [ -n "$LC_MONETARY" ] && echo LC_MONETARY=$LC_MONETARY >> /etc/locale.conf 2>&1 || :
+        [ -n "$LC_MESSAGES" ] && echo LC_MESSAGES=$LC_MESSAGES >> /etc/locale.conf 2>&1 || :
+        [ -n "$LC_PAPER" ] && echo LC_PAPER=$LC_PAPER >> /etc/locale.conf 2>&1 || :
+        [ -n "$LC_NAME" ] && echo LC_NAME=$LC_NAME >> /etc/locale.conf 2>&1 || :
+        [ -n "$LC_ADDRESS" ] && echo LC_ADDRESS=$LC_ADDRESS >> /etc/locale.conf 2>&1 || :
+        [ -n "$LC_TELEPHONE" ] && echo LC_TELEPHONE=$LC_TELEPHONE >> /etc/locale.conf 2>&1 || :
+        [ -n "$LC_MEASUREMENT" ] && echo LC_MEASUREMENT=$LC_MEASUREMENT >> /etc/locale.conf 2>&1 || :
+        [ -n "$LC_IDENTIFICATION" ] && echo LC_IDENTIFICATION=$LC_IDENTIFICATION >> /etc/locale.conf 2>&1 || :
+fi
+
+# Migrate /etc/sysconfig/keyboard
+if [ -e /etc/sysconfig/keyboard -a ! -e /etc/vconsole.conf ]; then
+        unset SYSFONT
+        unset SYSFONTACM
+        unset UNIMAP
+        unset KEYMAP
+        [ -e /etc/sysconfig/i18n ] && . /etc/sysconfig/i18n >/dev/null 2>&1 || :
+        . /etc/sysconfig/keyboard >/dev/null 2>&1 || :
+        [ -n "$SYSFONT" ] && echo FONT=$SYSFONT > /etc/vconsole.conf 2>&1 || :
+        [ -n "$SYSFONTACM" ] && echo FONT_MAP=$SYSFONTACM >> /etc/vconsole.conf 2>&1 || :
+        [ -n "$UNIMAP" ] && echo FONT_UNIMAP=$UNIMAP >> /etc/vconsole.conf 2>&1 || :
+        [ -n "$KEYTABLE" ] && echo KEYMAP=$KEYTABLE >> /etc/vconsole.conf 2>&1 || :
+fi
+
+# Migrate HOSTNAME= from /etc/sysconfig/network
+if [ -e /etc/sysconfig/network -a ! -e /etc/hostname ]; then
+        unset HOSTNAME
+        . /etc/sysconfig/network >/dev/null 2>&1 || :
+        [ -n "$HOSTNAME" ] && echo $HOSTNAME > /etc/hostname 2>&1 || :
+fi
+/usr/bin/sed -i '/^HOSTNAME=/d' /etc/sysconfig/network >/dev/null 2>&1 || :
+
+# Migrate the old systemd-setup-keyboard X11 configuration fragment
+if [ ! -e /etc/X11/xorg.conf.d/00-keyboard.conf ] ; then
+        /usr/bin/mv /etc/X11/xorg.conf.d/00-system-setup-keyboard.conf /etc/X11/xorg.conf.d/00-keyboard.conf >/dev/null 2>&1 || :
+else
+        /usr/bin/rm -f /etc/X11/xorg.conf.d/00-system-setup-keyboard.conf >/dev/null 2>&1 || :
+fi
+
+# sed-fu to add myhostname to the hosts line of /etc/nsswitch.conf
+if [ -f /etc/nsswitch.conf ] ; then
+        sed -i.bak -e '
+                /^hosts:/ !b
+                /\<myhostname\>/ b
+                s/[[:blank:]]*$/ myhostname/
+                ' /etc/nsswitch.conf
+fi
+
 %triggerin units -- %{name}-units < 35-1
 # Enable the services we install by default.
 /bin/systemctl --quiet enable \
@@ -929,6 +1008,7 @@ fi
 %ghost %config(noreplace) %{_sysconfdir}/machine-info
 %ghost %config(noreplace) %{_sysconfdir}/timezone
 %ghost %config(noreplace) %{_sysconfdir}/X11/xorg.conf.d/00-keyboard.conf
+%ghost %config(noreplace) %{_sysconfdir}/X11/xorg.conf.d/00-system-setup-keyboard.conf
 
 %dir /run
 %dir %{systemd_libdir}
