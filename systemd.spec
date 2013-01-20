@@ -43,7 +43,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	197
-Release:	7
+Release:	8
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -517,6 +517,7 @@ pushd uclibc
 %if %mdvver < 201300
 	--with-distro=mandriva \
 	--with-sysvrcd-path=%{_sysconfdir}/rc.d \
+	--with-rc-local-script-path-start=/etc/rc.d/rc.local
 %endif
 	--disable-selinux \
 	--enable-split-usr \
@@ -532,7 +533,7 @@ pushd uclibc
 	--disable-audit \
 	--disable-manpages \
 	--without-python
-    
+
 %make
 popd
 %endif
@@ -549,6 +550,7 @@ pushd shared
 %if %mdvver < 201300
 	--with-distro=mandriva \
 	--with-sysvrcd-path=%{_sysconfdir}/rc.d \
+	--with-rc-local-script-path-start=/etc/rc.d/rc.local
 %endif
 	--disable-selinux \
 %if %{with bootstrap}
