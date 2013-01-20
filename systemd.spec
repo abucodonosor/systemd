@@ -157,6 +157,7 @@ Requires:	libsystemd-daemon = %{version}-%{release}
 Requires:	libsystemd-login = %{version}-%{release}
 Requires:	libsystemd-journal = %{version}-%{release}
 Requires:	libsystemd-id128 = %{version}-%{release}
+Requires:	nss_myhostname = %{version}-%{release}
 #(tpg)for future releases... systemd provides also a full functional syslog tool
 #Provides:	syslog-daemon
 
