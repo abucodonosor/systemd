@@ -125,7 +125,7 @@ BuildRequires:	usbutils >= 005-3
 BuildRequires:	pciutils-devel
 BuildRequires:	ldetect-lst
 BuildRequires:	python-devel
-BuildRequires:	chkconfig 
+BuildRequires:	chkconfig
 
 %if !%{with bootstrap}
 BuildRequires:	pkgconfig(gobject-introspection-1.0)
@@ -197,7 +197,6 @@ Summary:	Non essential systemd tools
 Group:		System/Configuration/Boot and Init
 Requires:	%{name} = %{version}-%{release}
 Conflicts:	%{name} < 35-6
-Requires:	python-dbus
 Requires:	python-cairo
 
 %description tools
