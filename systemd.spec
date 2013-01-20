@@ -285,7 +285,6 @@ functionality of the GNU C Library (glibc) providing host name
 resolution for the locally configured system hostname as returned by
 gethostname(2).
 
-
 %if %{with_uclibc}
 %package -n uclibc-%{libnss_myhostname}
 Summary:	Library for local system host name resolution (uClibc linked)
@@ -802,7 +801,7 @@ fi
 #%{uclibc_root}/bin/systemctl --quiet try-restart systemd-udevd.service >/dev/null 2>&1 || :
 
 %pre
-systemctl stop systemd-udevd.service systemd-udev.service systemd-udev-control.socket systemd-udev-kernel.socket >/dev/null 2>&1 || :
+systemctl stop stop systemd-udevd-control.socket systemd-udevd-kernel.socket systemd-udevd.service >/dev/null 2>&1 || :
 
 %post
 /usr/bin/systemd-machine-id-setup > /dev/null 2>&1 || :
