@@ -40,6 +40,8 @@ enable cups.*
 enable rsyslog.*
 enable syslog-ng.*
 enable sysklogd.*
+enable accounts-daemon.service
+enable rtkit-daemon.service
 
 # Network services
 enable iptables.service
