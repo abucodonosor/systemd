@@ -62,6 +62,7 @@ Source10:	61-mobile-zte-drakx-net.rules
 Source11:	listen.conf
 # (tpg) default preset for services
 Source12:	99-default.preset
+Source13:	systemd.rpmlintrc
 ### SYSTEMD ###
 
 # (bor) clean up directories on boot as done by rc.sysinit
