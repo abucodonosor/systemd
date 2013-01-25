@@ -606,12 +606,6 @@ ln -s /bin/systemctl %{buildroot}%{_bindir}/systemctl
 rm -r %{buildroot}%{_sysconfdir}/systemd/system/*.target.wants
 rm -f %{buildroot}%{_sysconfdir}/systemd/system/display-manager.service
 
-# Make sure the ghost-ing below works
-touch %{buildroot}%{_sysconfdir}/systemd/system/runlevel2.target
-touch %{buildroot}%{_sysconfdir}/systemd/system/runlevel3.target
-touch %{buildroot}%{_sysconfdir}/systemd/system/runlevel4.target
-touch %{buildroot}%{_sysconfdir}/systemd/system/runlevel5.target
-
 # Make sure these directories are properly owned
 mkdir -p %{buildroot}/%{systemd_libdir}/system/basic.target.wants
 mkdir -p %{buildroot}/%{systemd_libdir}/system/default.target.wants
@@ -1168,11 +1162,6 @@ fi
 %{_sysconfdir}/rpm/macros.d/%{name}.macros
 %{_sysconfdir}/rpm/macros.systemd
 %{_mandir}/man1/systemctl.*
-
-%ghost %config(noreplace) %{_sysconfdir}/systemd/system/runlevel2.target
-%ghost %config(noreplace) %{_sysconfdir}/systemd/system/runlevel3.target
-%ghost %config(noreplace) %{_sysconfdir}/systemd/system/runlevel4.target
-%ghost %config(noreplace) %{_sysconfdir}/systemd/system/runlevel5.target
 
 %files sysvinit
 /sbin/init
