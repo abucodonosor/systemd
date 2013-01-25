@@ -120,7 +120,7 @@ BuildRequires:	pkgconfig(libkmod) >= 5
 BuildRequires:	pkgconfig(liblzma)
 BuildRequires:	pkgconfig(libnotify)
 BuildRequires:	pkgconfig(libxslt)
-BuildRequires:	pkgconfig(libmicrohttpd)
+#BuildRequires:	pkgconfig(libmicrohttpd)
 BuildRequires:	xsltproc
 BuildRequires:	pkgconfig(blkid)
 BuildRequires:	usbutils >= 005-3
@@ -632,8 +632,8 @@ mkdir -p %{buildroot}%{_prefix}/lib/systemd/user-generators
 
 # We are not prepared to deal with tmpfs /var/run or /var/lock
 pushd %{buildroot}/%{systemd_libdir}/system/local-fs.target.wants && {
-        rm -f var-lock.mount
-        rm -f var-run.mount
+ rm -f var-lock.mount
+ rm -f var-run.mount
 popd
 }
 
