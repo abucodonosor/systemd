@@ -932,8 +932,6 @@ if [ $1 -eq 1 ] ; then
         # Enable the services we install by default.
         /bin/systemctl --quiet enable \
                 getty@.service \
-                quotaon.service \
-                quotacheck.service \
                 remote-fs.target \
                 systemd-readahead-replay.service \
                 systemd-readahead-collect.service \
@@ -954,8 +952,6 @@ fi
 if [ $1 -eq 0 ] ; then
         /bin/systemctl --quiet disable \
 		getty@.service \
-		quotaon.service \
-		quotacheck.service \
 		remote-fs.target \
 		systemd-readahead-replay.service \
 		systemd-readahead-collect.service \
