@@ -124,6 +124,7 @@ BuildRequires:	pkgconfig(liblzma)
 BuildRequires:	pkgconfig(libnotify)
 BuildRequires:	pkgconfig(libxslt)
 BuildRequires:	pkgconfig(libmicrohttpd)
+BuildRequires:	pkgconfig(libqrencode)
 BuildRequires:	xsltproc
 BuildRequires:	pkgconfig(blkid)
 BuildRequires:	usbutils >= 005-3
