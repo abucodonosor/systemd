@@ -43,7 +43,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	197
-Release:	10
+Release:	11
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -123,7 +123,7 @@ BuildRequires:	pkgconfig(libkmod) >= 5
 BuildRequires:	pkgconfig(liblzma)
 BuildRequires:	pkgconfig(libnotify)
 BuildRequires:	pkgconfig(libxslt)
-#BuildRequires:	pkgconfig(libmicrohttpd)
+BuildRequires:	pkgconfig(libmicrohttpd)
 BuildRequires:	xsltproc
 BuildRequires:	pkgconfig(blkid)
 BuildRequires:	usbutils >= 005-3
