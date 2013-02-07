@@ -533,6 +533,8 @@ pushd uclibc
 	--enable-split-usr \
 	--enable-introspection=no \
 	--disable-gudev \
+    --disable-qrencode \
+    --disable-microhttpd \
 	--disable-pam \
 %if %{with bootstrap}
 	--disable-libcryptsetup \
