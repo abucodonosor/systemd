@@ -1023,6 +1023,7 @@ fi
 %dir %{_prefix}/lib/modules-load.d
 %dir %{_prefix}/lib/binfmt.d
 %dir %{_logdir}/journal
+%dir %{_datadir}/systemd/gatewayd
 
 %{_sysconfdir}/xdg/systemd
 /bin/systemd-ask-password
@@ -1049,7 +1050,7 @@ fi
 %{systemd_libdir}/systemd-fsck
 %{systemd_libdir}/systemd-hostnamed
 %{systemd_libdir}/systemd-initctl
-%{systemd_libdir}/systemd-journald
+%{systemd_libdir}/systemd-journal*
 %{systemd_libdir}/systemd-lo*
 %{systemd_libdir}/systemd-m*
 %{systemd_libdir}/systemd-quotacheck
@@ -1111,6 +1112,7 @@ fi
 %{_datadir}/polkit-1/actions/org.freedesktop.timedate1.policy
 %{_datadir}/systemd/kbd-model-map
 %{_docdir}/systemd
+%{_datadir}/systemd/gatewayd/browse.html
 
 %if %{with uclibc}
 %files -n uclibc-%{name}
