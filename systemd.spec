@@ -43,7 +43,7 @@
 Summary:	A System and Session Manager
 Name:		systemd
 Version:	197
-Release:	13
+Release:	14
 License:	GPLv2+
 Group:		System/Configuration/Boot and Init
 Url:		http://www.freedesktop.org/wiki/Software/systemd
@@ -537,8 +537,8 @@ pushd uclibc
 	--enable-split-usr \
 	--enable-introspection=no \
 	--disable-gudev \
-    --disable-qrencode \
-    --disable-microhttpd \
+	--disable-qrencode \
+	--disable-microhttpd \
 	--disable-pam \
 %if %{with bootstrap}
 	--disable-libcryptsetup \
@@ -548,7 +548,9 @@ pushd uclibc
 	--enable-gcrypt \
 	--disable-audit \
 	--disable-manpages \
-	--without-python
+	--without-python \
+	--with-kbd-loadkeys=/bin/loadkeys \
+	--with-kbd-setfont=/bin/setfont
 
 %make
 popd
@@ -571,11 +573,13 @@ pushd shared
 	--disable-selinux \
 %if %{with bootstrap}
 	--enable-introspection=no \
-    --disable-libcryptsetup \
+	--disable-libcryptsetup \
 %else
 	--enable-introspection=yes \
 %endif
-	--enable-split-usr
+	--enable-split-usr \
+	--with-kbd-loadkeys=/bin/loadkeys \
+	--with-kbd-setfont=/bin/setfont
 
 %make
 popd
