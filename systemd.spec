@@ -578,7 +578,7 @@ pushd shared
 %endif
 	--enable-split-usr
 
-%make
+make
 popd
 
 %install
