@@ -1160,9 +1160,10 @@ fi
 %dir %{_sysconfdir}/modules-load.d
 %dir %{_sysconfdir}/binfmt.d
 %dir %{_datadir}/bash-completion
+%dir %{_datadir}/bash-completion/completions
 
 %{_sysconfdir}/systemd/system/getty.target.wants/getty@*.service
-%{_sysconfdir}/bash_completion.d/systemd
+%{_datadir}/bash-completion/completions/*
 
 /bin/systemctl
 %{_bindir}/systemctl
