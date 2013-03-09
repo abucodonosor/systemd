@@ -551,7 +551,7 @@ pushd uclibc
 	--disable-manpages \
 	--without-python
 
-%make
+make
 popd
 %endif
 
