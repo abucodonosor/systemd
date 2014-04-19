@@ -1,7 +1,7 @@
-From dafaa84b0ad83a320ae22b2be63bb9059a376187 Mon Sep 17 00:00:00 2001
+From 98cd991470905d861e9034a3f61e0091a2c1d168 Mon Sep 17 00:00:00 2001
 From: Kay Sievers <kay@vrfy.org>
 Date: Sun, 20 Oct 2013 01:12:29 +0200
-Subject: [PATCH 147/240] hwdb: update
+Subject: [PATCH 147/443] hwdb: update
 
 ---
  hwdb/20-OUI.hwdb              | 391 +++++++++++++++++++++++++++++++++++++++++-
@@ -1628,5 +1628,5 @@ index fdb534d..289f81c 100644
  pci:v00009005d00000285sv0000108Esd00000287*
   ID_MODEL_FROM_DATABASE=STK RAID EXT
 -- 
-1.8.4.5
+1.8.3.2
 
